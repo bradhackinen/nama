@@ -1,0 +1,501 @@
+﻿query_string,candidate_string,match
+Cambridge Technology Partners,Cambridge Technology Partner,1
+National Grape Cooperative,National Grape Co-operative,1
+Cable & Wireless Communications,Cable & Wireless Communication,1
+American Equity Investmt Life Holding Co,American Equity Investment Life Holding Co,1
+Anheuser-Busch InBev,Anheuser-Busch Companies Inc,1
+Enterprise Financial Group,Enterprise Financial Services Corp,
+Evergreen Health Cooperative,Evergreen Healthcare Inc,
+Maui Land & Pineapple Co,Maui Land & Pineapple Co Inc.,1
+Logitech International,"Logitech International SA, Apples",1
+International Biometric Industry Assn,International Biofuel & Biochemical,0
+Banco Bilbao Vizcaya Argentaria,Banco Bilbao Vizcaya Argentaria Chile,1
+United States Medical Supply,United States Metals Index Fund,0
+Internet Commerce Coalition,Internet Commerce & Communication,
+NorthPoint Communications Group,Northpoint Communications Gp,1
+Horizons BetaPro Exchange Traded Funds,Horizons BetaPro COMEX Gold Inverse ETF,1
+Physicians for Human Rights,Physicians Formula Holdings Inc,0
+Advanced Power Technologies,Advanced Power Technology Inc,1
+Electronic Datasystems Corp,Electronic Data Systems Corp,1
+Equitable Financial Services,Equitable Financial Corp,1
+Mead Johnson Nutritional,Mead Johnson Nutrition Co,1
+International Petroleum Investment Co,International Petroleum Corporation,0
+Aralez Pharmaceuticals US,Aralez Pharmaceuticals Inc,1
+Infineon Technologies,Infineon Technologies AG,1
+Penn Virginia Resource Partners,Penn Virginia Resource Partners LP -Old,1
+Specialty Products,Specialty Equipment Cos Inc,0
+Arch Capital Group (US),Arch Capital Group Ltd,1
+First National Bank of Olathe,First National Bankshares of Florida Inc,0
+Global Strategies Group,Global Strategy Master LP,0
+Liberty Mutual Group,Liberty Mutual Agency Corp,1
+Pacific Rim Environmental Resources,Pacific Rim Mining Corp.,0
+South Carolina Research Authority,South Carolina Elec & Gas Co,0
+Tennessee Valley Floating Homes Alliance,Tennessee Valley Authority,0
+United Pan-Europe Communications,United Pan-Europe Communications NV,1
+Washington National Cathedral,Washington National Corp,0
+Adams Respiratory Therapeutics,Adams Respiratoryrapeutics Inc,1
+Commonwealth Energy Services,Commonwealth Energy System,0
+Consolidated Communications,Consolidated Container Co LLC,0
+American Government Services,American Government Term Trust,0
+Republic Airway's Holdings,Republic Airways Holdings Inc,0
+Santander Consumer USA,Santander Consumer USA Holdings Inc,1
+Community Health Partners of Ohio,Community Health Systems Inc,0
+Meridian Medical Technologies,Meridian Medical Technology Inc,1
+First American Real Estate Solutions,First American Scientific Corp,0
+Artesian Resource Corp,Artesian Resources Corp,1
+Comcast Cable Communications Management,Comcast Cable Communications Inc.,1
+Clean Diesel Technologies Inc,Clean Diesel Technologies-OLD,
+Chicago Bridge & Iron,Chicago Bridge & Iron Co. NV,1
+Jones Financial Companies,Jones Financial Cos LLLP,1
+North American Alcohols,North American Insurance Leaders Inc,1
+California Stem Cell,California Style Palms Inc,0
+Independence Technology Inc,Independence Community Bank Corp.,0
+North American Development Bank,North American REIT Income Fund,0
+North American Ship Recycling Inc,North American Nickel Inc,0
+Westmoreland County,Westmoreland Coal Co,0
+Imperial Petroleum Recovery Corp,Imperial Pete Recovery Corp,1
+Ericsson Inc,Erickson Inc,0
+Southern California Regional Rail Auth,Southern California Gas Co,0
+Infineon Technologies Americas,Infineon Technologies AG,1
+New York Center for Liver Transplantion,New York Community Bancorp Inc.,0
+Public Service Co of Colorado,Public Service Co Of Colo,1
+Great Atlantic & Pacific Tea Co,Great Atlantic & Pacific Tea Co Inc.,1
+New England Fuel Institute,New England Community Bancorp,0
+Strategic Hotel Capital,Strategic Hotels & Resorts Inc,0
+North American Technician Excellence,North American Technologies Group Inc,0
+United Water Resources/SUEZ SA,United Water Resources,1
+North American Network/Cities of Asylum,North American Scientific Inc,0
+Enterprise Information Management,Enterprise Informatics Inc,0
+Fresenius Medical Care North America,Fresenius Medical Care AG &Co KGAA,1
+Professional Transportation Inc,Professional Transportation Group Inc,1
+Telefonos de Mexico SA de CV,Telefonos De Mexico SA Telmex,1
+Alliance for Strong Families & Communities,Alliance Forest Products Inc,0
+Acceptance Insurance Companies,Acceptance Insurance Cos Inc,1
+Washington National Opera,Washington National Corp,0
+Jones Lang LaSalle Americas,Jones Lang LaSalle Inc,1
+General Nutrition Corp,General Nutrition Centers Inc,1
+First Financial Network,First Financial Service Corp,0
+Heartland Technologies,Heartland Technology Inc,1
+Independent Physical Therapists of Amer,Independent Nickel Corp,0
+Hawaiian Telcom Communications,Hawaiian Telcom Holdco Inc,1
+First National Bank In Durant,First National Bankshares of Florida Inc,0
+Spanish Broadcasting Systems,Spanish Broadcasting System Inc,1
+University General Hospital Systems,University General Health Systems Inc,1
+New England Province/Society of Jesus,New England Community Bancorp,0
+California Lutheran University,California Coastal Communities Inc,0
+Southern California Economic Partnership,Southern California Gas Co,0
+Brookfield Properties,Brookfield Property Partners LP,1
+Tender Loving Care Health Care Services,Tender Loving Care Health Services,1
+Bion Environmental Technologies,Bion Environmental Tech Inc,1
+Crescent Point Energy US,Crescent Point Energy Corp,1
+Central & South West Services,Central & South West Corp,1
+New England Development,New England Electric System,0
+Electronic Design Inc,Electronic Designs Inc,1
+Community Oncology Alliance,Community Investors Bancorp Inc,0
+Consolidated-Tomoka Land Co,Consolidated Tomoka-Land Co.,1
+Genesis Health Care,Genesis Healthcare Inc,1
+Prestige Financial Center,Prestige Financial Corp,1
+Sea Containers America,Sea Containers Ltd.,1
+Western New England University,Western New England Bancorp Inc,0
+Mitsubishi Electric America,Mitsubishi Electric Corp,1
+Northern Indiana Commuter Transp Dist,Northern Indiana Public Service Co,0
+Northern Indiana Commuter Transit Dist,Northern Indiana Public Service Co,0
+British American Tobacco,British American Tobacco PLC,0
+Alliance for Lupus Research,Alliance Forest Products Inc,0
+Sun Life Financial US,Sun Life Financial Inc,1
+North American Coal Corp,North American Palladium Ltd.,0
+Alliance for the Arts,Alliance Forest Products Inc,0
+Fiat Chrysler Automobiles,Fiat Chrysler Automobiles NV,1
+Health Care Tax Working Group,Health Care Select Sector SPDR Fund,0
+Pacific Rim Environmental Resources  ,Pacific Rim Mining Corp.,0
+Digital Promise Project,Digital Products Corp,0
+International Research & Exchange Board,International Research & Development Corp,0
+Wheeling Pittsburgh Steel,Wheeling Pittsburgh Corp,1
+Alliance for I-69 Texas,Alliance Forest Products Inc,0
+New England Organ Bank,New England Community Bancorp,0
+Alliance for Secure America,Alliance Forest Products Inc,0
+Haws Corp,Hawk Corp,0
+Environmental Research & Ed Found,Environmental Energy Service,0
+North American Communications Corp,North American Technologies Group Inc,0
+Endurance Specialty Insurance,Endurance Specialty Holdings Inc,1
+Intelligent Decisions Inc,Intelligent Communication Enterprise Corp-Old,0
+Pacific Capital Bank,Pacific Capital Bancorp,0
+Makhteshim Agan of North America,Makhteshim Agan Industries Ltd,1
+IAC/Interactive Corp,IAC/InterActiveCorp,1
+Southern Energies Inc,Southern Energy Co Inc,0
+Environmental Law & Policy Center,Environmental Services of America Inc,0
+Advanced Photonics Integrated Circuits,Advanced Photonix Inc.,
+North American Die Casting Assn,North American Insurance Leaders Inc,0
+Sterling Construction Services,Sterling Construction Co Inc,1
+Current Technologies,Current Technology Corp,1
+Pennsylvania Power & Light,Pennsylvania Power Co,1
+Nippon Telegraph & Telephone,Nippon Telegraph & Telephone Corp Ntt,1
+Independent Living Aids,Independent Financial Network Inc,0
+North Central Associated Milk Producers,North Central Bancshares Inc,0
+Communications Infrastructure Group,Communications Central Inc,0
+Integrated Environmental Technologies,Integrated Enviro Technologies Ltd,1
+Crown Central Petroleum,Crown Central Petrol,0
+Diamond Management & Tech Solutions,Diamond Management & Technology Consultants Inc,1
+Puerto Rico Dept of Trans & Pub Works,Puerto Rico Telephone Co,0
+Oxford Glycosciences UK,Oxford Glycosciences,1
+North American Meat Assn,North American Palladium Ltd.,0
+Southern California Water Co,Southern California Gas Co,0
+Global Technology Systems,Global Technologies Ltd,0
+Southern Star Central Gas Pipeline,Southern Star Central Corp,1
+Independent Insurance Agents of America,Independent Insurance Group Inc,0
+Century Financial Group,Century Financial Corp,1
+Schein Pharmaceuticals,Schein Pharmaceutical Inc,1
+Environmental Pasteurization LLC,Environmental Waste International Inc,0
+Northern Indiana Commuter Trans District,Northern Indiana Public Service Co,0
+Philadelphia Holocaust Remembrance Fdtn,Philadelphia Consolidated Holding Corp,0
+Metro International Trade Services,"Metro International SA, Luxembourg",0
+Alliance of Catholic Health Care Systems,Alliance Holdings GP LP,0
+Royal Bank of Scotland,Royal Bank of Scotland Group PLC,1
+Applied Systems Inc,Applied Science Products Inc,0
+General Nutrition Center,General Nutrition Centers Inc,1
+Great Lakes Carbon Fiber,Great Lakes Carbon Corp,0
+Varian Semiconductor Equipment Assoc,Varian Semiconductor Equipment Associates Inc,1
+Memex Inc,Medex Inc,0
+Metropolitan Communications,Metropolitan Life Insurance Co,0
+High Performance Wheels,High Performance Beverages Co,0
+Entertainment Industry Development Corp,Entertainment One Income Fund,0
+Environmental Communications,Environmental Technologies USA Inc,0
+Information Management Resources Inc,Information Management Technology,0
+Wave Technologies,Wave Technologies International Inc,1
+American Rivers Inc,American Rivers Oil Co,0
+AXA Equitable Life Insurance,AXA Equitable Holdings Inc,1
+Metropolitan Washington Airports Auth,Metropolitan Bank Holding Corp,0
+Macquarie Infrastructure & Real Assets,Macquarie Infrastructure Corp,1
+Johnson Controls International,Johnson Controls International Plc,1
+Metropolitan Community College,Metropolitan Mortgage & Securities Co Inc,0
+First Trust Portfolios,First Trust Morningstar Dividend Leaders,
+General Electric Healthcare,General Electric Capital Svc,1
+Environmental Technology Council,Environmental Technologies USA Inc,0
+San Francisco Unified School District,San Francisco Co,0
+Virginia Commonwealth University,Virginia Commonwealth Financial,0
+Professional Beauty Federation,Professional Sports Care Management,0
+Cantel Medical Group,Cantel Medical Corp.,1
+Environmental Technology Unlimited,Environmental Technologies USA Inc,0
+Pershing Government Account,Pershing Gold Corp,0
+California Federal Bank,California Federal Bancorp Inc,1
+LVMH Moet Hennessy Louis Vuitton,LVMH Moet Hennessy Louis Vuitton SE,1
+Alliance for Better Campaigns,Alliance Forest Products Inc,0
+American Electric Power Service Co,American Electric Power Co Inc,1
+Alliance for Safe Online Pharmacies,Alliance MMA Inc,0
+Communications Technology LLC,Communications Systems Inc.,0
+Metropolitan Ambulance Services Trust,Metropolitan Bank Holding Corp,0
+Veolia Environmental Services,"Veolia Environnement, Paris",1
+Sierra Pacific Resources,Sierra Pacific Power Co,1
+Eagle Industries Unlimited,Eagle Industries Inc,1
+General Dynamics Robotic Systems,General Dynamics Corp,1
+Schweitzer-Mauduit International,Schweitzer-Mauduit Intl Inc,1
+First Western Advisors,First Western Bank,1
+Professional Sports Planning,Professional Sports Care Management,0
+North American Millers' Assn,North American Financial 15 Split Corp,0
+Electrochemical Oxygen Concepts,Electrochemical Industries (1952) Ltd,0
+North American Industrial Hemp Council,North American Scientific Inc,0
+Clean Energy Bridge LLC,Clean Energy Fuels Corp,0
+Royal Dutch Shell,Royal Dutch Shell PLC,1
+Franklin Electric,Franklin Electric Co Inc,1
+First National Bank of Omaha,First National Bankshares of Florida Inc,0
+Northwest Hospital,NorthWest International Healthcare Properties Real Estate Investment Trust,0
+Hartford Financial Services,Hartford Financial Services Group Inc.,1
+Paradigm Technologies Inc,Paradigm Technology Inc,1
+Forest City Ratner Companies,Forest City Realty Trust Inc,0
+Energy & Environment Twenty-One,Energy & Environmental Services Inc,0
+European American Armory,European American Resources,0
+Sociedad Quimica y Minera de Chile SA,Sociedad Quimica y Minera de Chile SA Soqimich,1
+General American Life Insurance,General American Investors Company Inc.,0
+International Fibre Drum Institute,International FiberCom Inc.,0
+Ballistic Recover Systems,Ballistic Recovery Systems Inc,0
+Vought Aircraft Industries,Vought Aircraft Holdings Inc,1
+Pacific Northwest Waterways Assn,Pacific Northwest Bancorp,0
+First American Title Insurance,First American Minnesota Municipal Income Fund II Inc.,0
+Veolia Environnement,"Veolia Environnement, Paris",1
+American Lands Access Assn,American Vantage Companies,0
+Intercontinental Distributing,Intercontinental Hotels Group PLC,0
+Strategic Value Partners,Strategic Value Corp,0
+First American Natl Default Title Servic,First American Health Concepts,0
+Heartland Partnership,Heartland Partners LP,0
+Heritage Forest Campaign,Heritage Commerce Corp,0
+Fairchild Semiconductor,Fairchild Semiconductor International Inc.,1
+Columbia Employees,COLUMBIA EM STR OPPS ETF,0
+Alliance for Shared Values,Alliance MMA Inc,0
+Florida East Coast Railway,Florida East Coast Industries Inc.,0
+Technology Management Consulting Service,Technology Flavors & Fragrances Inc.,0
+North American Sports Management,North American Tungsten Corp Ltd,0
+Community Care of North Carolina,Community Care Services Inc,1
+North American Meat Institute,North American Datacom Inc,0
+Authentidate Holding Corp,Authentidate Holding Corp -Old,
+Vanguard Integrity Professionals,Vanguard Short-Term Bond ETF,
+New York Cross Harbor Railroad,New York Intl Commerce Group,0
+ASM International,ASM International NV,1
+Allied World Assurance Co Holdings,Allied World Assurance Company Holdings AG,1
+American Seafoods Group,American Seafoods Corp,1
+Great Lakes Maritime Task Force,Great Lakes Carbon Income Fund,0
+Cellular Commission Expense Coalition,Cellular Communications International,0
+Transatlantic Lines-Iceland EHF,Transatlantic Mining Corp,0
+North American Blueberry Council,North American Tungsten Corp Ltd,0
+Apollo Investment Management,Apollo Investment Corp,1
+Health Care Service Corp,Health Care Select Sector SPDR Fund,0
+Universal Systems,Universal Security Instruments Inc.,0
+North Carolina Arboretum Society,North Carolina Natural Gas,0
+Global Technologies Group,Global Technologies Ltd,1
+Mississippi Valley State University,Mississippi Valley Bancshares Inc,0
+Legacy Holding Co,Legacy Holdings Inc,
+Clean Power Finance,Clean Power Income Fund,0
+Nighthawk Radiology Services,NightHawk Radiology Holdings Inc,1
+Columbus College of Art & Design,Columbus McKinnon Corp,0
+North America Freight Car Assn,North American Mortgage Co,0
+First American Bulk Carriers Corp,First American Scientific Corp,0
+Mississippi Levee Board,Mississippi Chemical Corp,0
+First Southwest Co,First Southern Bancshares Inc,0
+National Watershed Coalition,National Waterworks Inc,0
+Implant Sciences Corp,Implant Sciences Corp -OId,
+National Health Sciences Consortium,National Health Investors Inc.,0
+Global Strategic Partners,Global Strategy Master LP,0
+River Valley Transit,River Valley Bancorp.,0
+International Assest Systems,International Absorbents Inc,0
+Westmoreland Health Systems,Westmoreland Coal Co,0
+Global Resources,Global Resource Corp,1
+Asia Pacific Econ Cooperation Secretaria,Asia Pacific Resources Ltd,0
+Kerzner International Resorts,Kerzner International Ltd,1
+Telecommunications Systems Inc,TeleCommunication Systems Inc,1
+Direct Pharmacy Service,Direct Pharmaceutical Corp,0
+LyondellBasell Industries,LyondellBasell Industries NV,1
+Enbridge Energy Co,Enbridge Energy Management LLC,1
+Microvision Inc,Microvision Inc WA,1
+Clear Channel Communications,Clear Channel Outdoor Holdings Inc,1
+Patient Safety Movement Coalition,Patient Safety Technologies Inc,0
+Cable & Wireless USA,Cable & Wireless Hkt Ltd,0
+North American Trade Schools,North American Tungsten Corp Ltd,0
+First National Bank,First National Bancshares Inc,0
+Environmental Vehicle Rental,Environmental Technologies Corp,0
+International Monetary Fund,International Monetary Systems,0
+Main Street Markets Alliance,Main Street Capital Corp,0
+North American Steel Framing Alliance,North American Nickel Inc,0
+Alternate Energy Holdings,Alternate Energy Corp Inc.,1
+Alliance for Israel Advocacy,Alliance MMA Inc,0
+Grupo Industrial Maseca,Grupo Industrial Maseca SA De CV,1
+North American Home Furnishings Assn,North American Scientific Inc,0
+North Carolina Agribusiness Council,North Carolina Natural Gas,0
+Global Water Resources Management,Global Water Resources Inc,1
+Diversified Port Holdings,Diversified Corp Resources Inc.,0
+First National Bank of New England,First National of Nebraska Inc,0
+Allegheny General Hospital,Allegheny Generating Co,0
+Alliance for Security & Trade,Alliance Forest Products Inc,0
+Rockefeller Group FTZ Services,Rockefeller Center Properties Inc,0
+Rocky Mountain Elk Foundation,Rocky Mountain Chocolate Factory Inc,0
+Rocky Mountain Elk Fountain,Rocky Mountain Chocolate Factory Inc,0
+Veolia Environmental Services North America,"Veolia Environnement, Paris",1
+Community Care of Oklahoma,Community Care Services Inc,0
+Great Lakes Trade Corridor Assn,Great Lakes Carbon Income Fund,0
+Republic of Zimbabwe,Republic Companies Group Inc,0
+Cardiovascular Outpatient Ctr Alliance,CardioVascular BioTherapeutics Inc,0
+Metropolitan Taxicab Board of Trade,Metropolitan Life Insurance Co,0
+New England Shirt Co,New England Community Bancorp,0
+Worldwide Flight Service,Worldwide Flight Services Inc.,1
+InterContinental Hotels Group,Intercontinental Telecommunications Corp,0
+Entertainment Software Assn,Entertainment Is Us Inc,0
+Renaissance Steel,Renaissance IPO ETF,0
+Clean Energy Group,Clean Energy Fuels Corp,0
+Advanced Scientific Concepts,Advanced Tobacco Products,0
+California Strawberry Commission,California Software Corp,0
+Community Health Leadership Network,Community Healthcare Trust Inc,0
+Community Bankers Assn of New York State,Community Bank System Inc.,0
+Liberty Mutual Insurance,Liberty Mutual Insurance Group,1
+Baltimore Technologies Americas,Baltimore Technologies PLC,1
+ArcelorMittal USA,Arcelormittal SA,1
+Advanced Electron Beams,Advanced Engine Technologies,0
+Renaissance Community Loan Fund,Renaissance Hotel Group NV,0
+Global Employment Services,Global Employment Holdings Inc,0
+Metropolitan Family Services,Metropolitan Realty Co LLC,0
+Professional Airways Systems Specialists,Professional Staff PLC,0
+Eastern Mennonite University,Eastern Edison Co,0
+International Biometrics & Identification Assn,International Biofuel & Biochemical,0
+Hanwha Q Cells USA,Hanwha Q CELLS Co Ltd,1
+Par Pharmaceutical Companies,Par Pharmaceutical Holdings Inc,1
+Republic Properties,Republic Property Trust,1
+First American Transp Title Insurance,First American Minnesota Municipal Income Fund II Inc.,0
+Nomura Holding America,Nomura Holdings Inc,1
+North American Midway Entertainment,North American Mortgage Co,0
+Independent Insurance Agents & Brokers of America,Independent Insurance Group Inc,0
+First National Bank of Georgia,First National of Nebraska Inc,0
+Environmental Energy Capital,Environmental Energy Service,0
+Integrated Medical Systems,Integrated Medical Resources,0
+Morningstar Credit Ratings,Morningstar Group Inc,1
+Professional Services Council,Professional Transportation Group Inc,0
+Pennsylvania Engineering,Pennsylvania Enterprises Inc,0
+North American Bison Cooperative,North American Construction Group Ltd,0
+Norwegian Cruise Line,Norwegian Cruise Line Holdings Ltd,1
+Carolina Filters,Carolina Fincorp,0
+Environmental Action Cmte of West Marin,Environmental Technologies Corp,0
+Riverside National Bank,Riverside National Bank/CA,1
+Entertainment Industry Cltn/Free Trade,Entertainment One Income Fund,0
+World Healthcare Solutions,World Health Alternatives,0
+Southeastern Freight Lines,Southeastern Grocers Inc,0
+Sentry Technology Group,Sentry Technology Corp,1
+California Independent Petroleum Assn,California Independent Bancorp,0
+National Water Resources Assn,National Waterworks Holdings Inc,0
+Chadmoore Wierless Group,Chadmoore Wireless Group Inc,1
+Global Trade & Technology Center,Global Traffic Network Inc,0
+Renewable Energy Systems America,Renewable Energy Group Inc,0
+North American Soc/Pediatric Gastroent,North American Scientific Inc,0
+Environmental Defense Fund,Environmental Energy Service,0
+Advanced Electronics Co,Advanced Engine Technologies,0
+Massachusetts Bay Trans Authority,Massachusetts Mutual Life Insurance Co,0
+Information Network Systems,Information Storage Devices,0
+Medical Transcription Industry Assn,Medical Transcription Billing Corp,0
+Electronic Check Clearing House Org,Electronic Retailing Systems International,0
+Deutsche Telekom,Deutsche Telekom AG,1
+ASML Holding,ASML Holding NV,1
+New York Community Bank,New York Community Bancorp Inc.,1
+First State Bancshares of Blakely,First State Bancorporation Inc,
+Liberty Medical Supply,Liberty Media Corp Starz Group,0
+Deutsche Lufthansa,Deutsche Lufthansa AG,1
+Pennsylvania Pyrotechnics Assn,Pennsylvania Power Co,0
+Nabi Biopharmaceuticals,Nabi Biopharmaceuticals-Old,
+Alliance for Power Privatization,Alliance Forest Products Inc,0
+Dominion Resources,Dominion Bridge Corp,0
+Spacelabs Medical/Intesys,Spacelabs Medical Inc,1
+Vanguard Research,Vanguard REIT ETF,
+American Medical Depot,American Medical Response,0
+Editas Medicines,Editas Medicine Inc,1
+Metropolitan Hospital,Metropolitan Bank Holding Corp,0
+California Strategies,California Software Corp,0
+Southern California Public Power Auth,Southern California Gas Co,0
+Sheridan Group & Command Trust Network,Sheridan Group Inc,0
+Cable & Wireless Global,Cable & Wireless Hkt Ltd,0
+Yellow Pages Integrated Media Assn,Yellow Pages Ltd,1
+Alliance for a Stronger FDA,Alliance MMA Inc,0
+Cablevision Systems,Cablevision Industries Corp,0
+North American Electric Reliability Corp,North American Datacom Inc,0
+Ben Franklin Technology Partners,Ben Franklin Retail Stores,0
+Professional Rodeo Cowboys Assn,Professional Sports Care Management,0
+Cellular Bioengineering Inc,Cellular Biomedicine Group Inc,0
+Providence Equity Partners,Provident Energy Ltd,0
+Arysta Life Sciences,Arysta LifeScience Plc,1
+Borden Chemical & Plastic,Borden Chemicals & Plastics LP,1
+Golden Eagle International,Golden Eagle International Inc -Old,
+Intelligent Engineering Holdings,Intelligent Electronics Inc,0
+Community Health Center of Asbury Park,Community Health Systems Inc,0
+Bridgewater Capital,Bridgewater Bancshares Inc,0
+Massachusetts Software Council,Massachusetts Mutual Life Insurance Co,0
+Florists Transworld Delivery Assn,Florists Transworld Delivery Inc,1
+Twenty-First Century Systems,Twenty-First Century Fox Inc,0
+Wells Fargo Advisors,Wells Fargo Utilities and High Income Fund,
+Electronic Concepts & Engineering,Electronic Tele-Communications Inc.,0
+Smartcool Systems Usa,Smartcool Systems Inc,1
+Hispanic Broadcasting Inc,Hispanic Broadcasting Corporation,1
+Huron Consulting Services,Huron Consulting Group Inc,1
+North American Metal Packaging Alliance,North American Vaccine Inc,0
+Talen Energy Supply,Talen Energy Corp,1
+Grupo Financiero Banorte,Grupo Financiero Serfin SA,0
+Professional Numismatists Guild,Professional Transportation Group Inc,0
+Energy & Environment Inc,Energy & Environmental Services Inc,0
+First State Bank of Blakely,First State Bancorporation Inc,0
+First BanCorp,First Bancorp/NC,1
+Metropolitan Property/Casualty Insurance,Metropolitan Mortgage & Securities Co Inc,0
+Transamerica Corridor,Transamerica Corp,0
+Great Lakes Higher Education Corp,Great Lakes Carbon Income Fund,0
+North American GSM Alliance,North American Datacom Inc,0
+Pacific Lumber & Shipping,Pacific Lumber Co,0
+Occupational HealthLink Inc,Occupational Health & Rehabilitation Inc,0
+Alternative Investment Management Assn,Alternative Investment Corp,0
+Pacific Scientific Instruments,Pacific Scientific Co,0
+DRS Technology Services,DRS Technologies Inc.,1
+Advanced Life Sciences,Advanced Life Sciences Holdings Inc,1
+Perpetual Energy Systems,Perpetual Energy Inc,0
+International Microwave Corp,International Diversified,0
+North American Conveyor Corp,North American Datacom Inc,0
+Consolidated Oil Services,Consolidated Tomoka-Land Co.,0
+International Telecommunications,International Telecommunications Data Systems Inc,0
+Independent Bankers Assn,Independent Bankshares Inc,0
+North American Hoganas,North American Vaccine Inc,0
+IntercontinentalExchange Inc,Intercontinental Life Corp,0
+General Chemical Soda Ash Partners,General Chemical Industrial Products Inc.,1
+Vought Aircraft Division,Vought Aircraft Holdings Inc,1
+Commonwealth Research Institute,Commonwealth Electric Co,0
+Philadelphia Convention & Visitors Burea,Philadelphia Consolidated Holding Corp,0
+Acuity Brands Lighting,Acuity Brands Inc.,1
+Cambium Learning,Cambium Learning Group Inc,1
+Electronic Systems Products,Electronic System Tech Inc,0
+North American Equipment Dealers Assn,North American Tungsten Corp Ltd,0
+Aidex Corp,Andrx Corp,0
+Washington National Insurance,Washington National Corp,0
+Summit Technologies,Summit Technology Inc,0
+North Carolina Global Trans Park,North Carolina Natural Gas,0
+Northern States Power,Northern States Power/WI,0
+Alliance for Safe Injection Practices,Alliance MMA Inc,0
+Global Medical Direct,Global Medical REIT Inc,0
+Environmental Redevelopers Assn,Environmental Elements Corp,0
+First Wave Intelligent Optical Network,First Palm Beach Bancorp Inc,0
+Alliance for Outpatient Rehab Quality & Access,Alliance Forest Products Inc,0
+Metropolitan Transit Authority,Metropolitan Bank Holding Corp,0
+CB Richard Ellis,CB Richard Ellis Services,1
+Metropolitan Bank Group,Metropolitan Bancorp,0
+Healthcare Financing Study Group,Healthcare Financial Partners Inc,0
+California State Univ/San Bernardino,California State Bank/CA,0
+Kinder Morgan Co2,Kinder Morgan Inc.,1
+Internet Infrastructure Coalition,Internet Infrastructure HOLDRS Trust,0
+California State Lands Commission,California State Bank/CA,0
+California State University,California State Bank/CA,0
+Northwest Nazarene University,Northwest Natural Gas Co,0
+North American Retail Dealers Assn,North American Datacom Inc,0
+Providence Plan,Providence Gas Co,0
+Strategic Energy,Strategic Energy Fund,1
+Clean Energy Systems Inc,Clean Energy Technologies Inc,0
+New England Center for Children,New England Electric System,0
+Metropolitan Mortgage & Securities,Metropolitan Mortgage & Securities Co Inc,1
+Independent Bankers Assn of Texas,Independent Bankshares Inc,0
+Silicon Valley Clean Water,Silicon Valley Research Inc,0
+Sheridan Group Enough Campaign,Sheridan Group Inc,0
+Transatlantic Lines,Transatlantic Holdings Inc.,0
+First Alliance Lending,First Alliance Corp/DE,0
+Garden State Seafood Assn,Garden State Bancshares Inc,0
+Summit Environmental,Summit Environmental Corp Inc,0
+21st Century School Fund,21St Century Technologies,0
+Metropolitan Dade County Seaport Dept,Metropolitan Realty Co LLC,0
+North American Meat Processors Assn,North American Tungsten Corp Ltd,0
+Puerto Rico Dept of Housing,Puerto Rico Telephone Co,0
+Professional Benefit Trust,Professionals Group Inc,0
+Brookfield Property Group,Brookfield Property Partners LP,1
+Commonwealth Technologies,Commonwealth Edison Co,0
+Capstar Broadcasting Partners,Capstar Broadcasting Corp,1
+Penske Truck Leasing,Penske Truck Leasing Co LP,1
+Graphic Packaging Corp,Graphic Packaging Holding Co,1
+Washington Forest Protection Assn,Washington Group International Inc,0
+Exxon Mobil Chemical,Exxon Mobil Corp,1
+Community & Southern Bank,Community Bancorp Inc,0
+Phoenix Medical & Wellness Center,Phoenix Medical Technology,0
+Camber Corp,Cambex Corp,0
+Community Healthcare System,Community Healthcare Trust Inc,0
+Environment One Corp,Environment-One Corp,1
+Asia Pacific Resort & Entertainment,Asia Pacific Resources International Holding Ltd,0
+Central Trading Systems,Central Tractor Farm & Country,0
+Foundation Coal,Foundation Healthcare Inc,0
+Central Park Historical Field Trips,Central Parking Corp.,0
+Virtual Radiologic,Virtual Radiologic Corporation,0
+North Americans Trading Together,North American Trust,0
+Associated Credit Bureaus,Associated Group Inc,0
+Adirondack Optics,Adirondack Trust Co,0
+New England Eye Institute,New England Power Co,0
+Latin American Youth Center,Latin American Discovery Inc,0
+Avant Immunotherapeutics,Avant Immunotherapeutics Inc-Old,
+Progressive Expert Consulting,Progressive Green Solutions Inc,0
+Professional Services Industries Inc,Professional Sports Care Management,0
+American Technologies Inc,American Technologies Group Inc,0
+Orthofix International,Orthofix International NV,1
+New England Transrail,New England Community Bancorp,0
+Commonwealth of Australia,Commonwealth Bancorp Inc,0
+North American Interpipe,North American Metals Corp,0
+Applied Radar,Applied Materials Inc.,0
+Stewart & Stewart,Stewart & Stevenson LLC,0
+Global Blood Therapeutics,Global Bloodrapeutics Inc,
+Advanced Practical Solutions,Advanced Battery Technologies Inc,0
+Orleans Home Builders,Orleans Homebuilders Inc,1
+North American Senior Care,North American Trust,0
+Massachusetts Port Authority,Massachusetts Mutual Life Insurance Co,0
+Telecommunications Technology,TeleCommunication Systems Inc,0
+Environmental Services Group,Environmental Services of America Inc,0
+Professional Engineers in California Government,Professional Diversity Network LLC,0
