@@ -1,0 +1,148 @@
+﻿query_string,candidate_string,match
+Legal Services Corp,Legal Services Corporation,1
+Federal Deposit Insurance Commission,Federal Deposit Insurance Corporation,1
+Federal Mediation & Conciliation Servi,Federal Mediation and Conciliation Service,1
+Health Resources & Svcs Administration,Health Resources and Services Administration,1
+Advisory Council/Historic Preservation,Advisory Council on Historic Preservation,1
+Federal Mine Safety & Health Review Cmsn,Federal Mine Safety and Health Review Commission,1
+Occupational Safety & Health Review Co,Occupational Safety and Health Review Commission,1
+Agency for Toxic Substances & Disease,Agency for Toxic Substances and Disease Registry,1
+Office of Government Ethics,Office of Government Information Services,0
+Federal Motor Carrier Safety Admin,Federal Motor Carrier Safety Administration,1
+National Highway Traffic Safety Admin,National Highway Traffic Safety Administration,1
+Occupational Safety & Health Admin,Occupational Safety and Health Administration,1
+Office of National AIDS Policy,Office of National Drug Control Policy,0
+Office of National Aids Policy,Office of National Drug Control Policy,0
+Substance Abuse & Mental Hlth Svcs Adm,Substance Abuse and Mental Health Services Administration,1
+National Oceanic & Atmospheric Admin,National Oceanic and Atmospheric Administration,1
+National Archives & Records Admin,National Archives and Records Administration,1
+Defense Business Transformation Agency,Defense Acquisition Regulations System,0
+Export-Import Bank of the US,Export-Import Bank,1
+Agency for Health Care Policy & Research,Agency for Healthcare Research and Quality,1
+Defense Security Assistance Agency,Defense Acquisition Regulations System,0
+Government Printing Office,Government Accountability Office,0
+Defense Threat Reduction Agency,Defense Base Closure and Realignment Commission,0
+Pipeline & Hazardous Materials Safety,Pipeline and Hazardous Materials Safety Administration,1
+Defense Commissary Agency,Defense Criminal Investigative Service,0
+Bureau of Economic Analysis,Bureau of the Fiscal Service,0
+Bureau of Justice Assistance,Bureau of the Fiscal Service,0
+Office of Management & Budget,Office of Motor Carrier Safety,0
+Office of Science & Technology Policy,Office of Policy Development,0
+Financial Management Service,Financial Research Office,0
+Defense Field Activities,Defense Intelligence Agency,0
+Defense Legal Services Agency,Defense Department,0
+Defense Finance & Accounting Service,Defense Nuclear Facilities Safety Board,0
+Pension & Welfare Benefits Admin,Pension Benefit Guaranty Corporation,0
+Research & Special Programs Administra,Research and Special Programs Administration,1
+Federal Management Service,Federal Maritime Commission,0
+Bureau of Justice Statistics,Bureau of the Fiscal Service,0
+National Security Agency,National Security Agency/Central Security Service,1
+Office of US Trade Representative,"Office of the Chief Financial Officer, Agriculture Department",0
+Administration on Aging,"Administration Office, Executive Office of the President",0
+Office of Special Counsel,"Office of the Chief Financial Officer, Agriculture Department",0
+Administration for Children & Families,"Administration Office, Executive Office of the President",0
+Office of Director of Natl Intelligence,"Office of the Chief Financial Officer, Agriculture Department",0
+US Immigration & Customs Enforcement,U.S. Immigration and Customs Enforcement,1
+Bureau of Land Management,Bureau of the Fiscal Service,0
+National Aeronautics & Space Admin,National Aeronautics and Space Administration,1
+Office of Personnel Management,Office of Government Information Services,0
+US House of Representatives,U.S. House of Representatives,1
+Office of the Secretary of Defense,Office of Government Information Services,0
+Bureau of Export Administration,Bureau of the Fiscal Service,0
+Office of Thrift Supervision,"Office of the Chief Financial Officer, Agriculture Department",0
+Natl Telecom & Information Admin,National Telecommunications and Information Administration,1
+Office of Juvenile Justice & Delinq Prev,Office of Government Information Services,0
+Bureau of the Public Debt,Bureau of the Fiscal Service,0
+US Copyright Office,"U.S. Copyright Office, Library of Congress",1
+Bureau of Indian Affairs,Bureau of the Fiscal Service,0
+Office of Administration,Office of Motor Carrier Safety,0
+Natl Inst on Alcohol Abuse & Alcoholism,National Institute of Corrections,0
+Office for Victims of Crime,Office of Government Information Services,0
+Bureau of Alcohol Tobacco & Firearms,Bureau of the Fiscal Service,0
+Bureau of Engraving & Printing,Bureau of the Fiscal Service,0
+Bureau of Industry & Security,Bureau of the Fiscal Service,0
+Bureau of Reclamation,Bureau of the Fiscal Service,0
+US Customs Service,U.S. Customs and Border Protection,1
+Bureau of the Census,Bureau of the Fiscal Service,0
+Office of Justice Program,Office of Government Information Services,0
+US Citizenship & Immigration Services,U.S. Citizenship and Immigration Services,1
+General Accounting Office,General Services Administration,0
+Bureau of Prisons,Bureau of the Fiscal Service,0
+Bureau of Labor Statistics,Bureau of the Fiscal Service,0
+US Cmsn on Intl Religious Freedom,U.S. Customs and Border Protection,0
+AMTRAK,Amtrak Reform Council,0
+US International Trade Commission,U.S. House of Representatives,0
+National Inst of Standards & Technology,National Institute of Standards and Technology,1
+US International Development Cooperation,U.S. Citizenship and Immigration Services,0
+US Chem Safety & Haz Invest Board,U.S. Immigration and Customs Enforcement,0
+US Institute of Peace,U.S. House of Representatives,0
+Drug Courts Program Office,Drug Enforcement Administration,0
+US Natl Central Bureau-INTERPOL,U.S. Customs and Border Protection,0
+Council of Economic Advisers,Council on Environmental Quality,0
+US Information Agency,U.S. House of Representatives,0
+US Marine Corps,U.S. Trade Deficit Review Commission,0
+Bureau of Transportation Statistics,Bureau of the Fiscal Service,0
+Fed Retirement Thrift Investment Board,Federal Contract Compliance Programs Office,0
+Natl Bioethics Advisory Commission,National Oceanic and Atmospheric Administration,0
+Joint Service Schools,Joint Board for Enrollment of Actuaries,0
+US Secret Service,U.S. Immigration and Customs Enforcement,0
+US Mint,U.S. Customs and Border Protection,0
+Corp for National & Community Service,Corporation for National and Community Service,1
+Natl Inst of Mental Health,National Institute of Standards and Technology,0
+US Commission of Fine Arts,U.S. Immigration and Customs Enforcement,0
+Corp for Public Broadcasting,Corporation for National and Community Service,0
+White House,The White House Office,
+Joint Chiefs of Staff,Joint Board for Enrollment of Actuaries,0
+Alt Ag Research & Commercialization Ctr,Alaska Power Administration,0
+US Senate,U.S. Immigration and Customs Enforcement,0
+US Arms Control & Disarmament Agency,U.S. Trade Deficit Review Commission,0
+US Commission on Civil Rights,U.S. Customs and Border Protection,0
+USA Freedom Corps,Women's Business Enterprise Interagency Committee,0
+US Postal Service,U.S. Customs and Border Protection,0
+Def Advanced Research Projects Agency,Defense Contract Audit Agency,0
+US Marshals Service,U.S. Trade Deficit Review Commission,0
+US Coast Guard,U.S. Customs and Border Protection,0
+US Agency for International Development,U.S. Customs and Border Protection,0
+US Botanic Garden,United States Marshals Service,0
+National Guard,National Geospatial-Intelligence Agency,0
+Corrections Program Office,Coast Guard,0
+Fed Accounting Standards Advidosry Board,Equal Employment Opportunity Commission,0
+US Fish & Wildlife Service,United States Sentencing Commission,0
+Natl Fdtn on the Arts & the Humanities,National Women's Business Council,0
+Dept of Housing & Urban Development,U.S. Immigration and Customs Enforcement,0
+On-Site Inspection Agency,Public Health Service,0
+Dept of Labor,U.S. Trade Deficit Review Commission,0
+Dept of Navy,U.S. Immigration and Customs Enforcement,0
+Voice of America,Food and Nutrition Service,0
+Dept of Homeland Security,U.S. Immigration and Customs Enforcement,0
+US Geological Survey,United States Sentencing Commission,0
+0,Army Department,
+St Lawrence Seaway Development Corp,Saint Lawrence Seaway Development Corporation,1
+Dept of the Interior,U.S. Immigration and Customs Enforcement,0
+Violence Against Women Office,Food and Drug Administration,0
+Dept of Health & Human Services,U.S. Immigration and Customs Enforcement,0
+Dept of the Treasury,U.S. Trade Deficit Review Commission,0
+Dept of Transportation,U.S. Trade Deficit Review Commission,0
+Dept of State,U.S. Trade Deficit Review Commission,0
+Dept of Education,Delaware River Basin Commission,0
+Dept of Army,U.S. Trade Deficit Review Commission,0
+Pentagon Force Protection Agency,Centers for Disease Control and Prevention,0
+Dept of Commerce,U.S. Trade Deficit Review Commission,0
+Undetermined,Uniformed Services University of the Health Sciences,0
+Dept of Agriculture,U.S. Trade Deficit Review Commission,0
+Dept of Defense,U.S. Immigration and Customs Enforcement,0
+UNDETERMINED,Uniformed Services University of the Health Sciences,0
+Dept of Justice,U.S. Immigration and Customs Enforcement,0
+Dept of Air Force,U.S. Immigration and Customs Enforcement,0
+Dept of Energy,U.S. Immigration and Customs Enforcement,0
+Vice President's Office,Fish and Wildlife Service,0
+Dept of Veterans Affairs,U.S. Trade Deficit Review Commission,0
+Ofc of the Comptroller of the Currency,"Ocean Energy Management, Regulation, and Enforcement Bureau",0
+Ofc/Surface Mining Reclamation & Enforce,Centers for Disease Control and Prevention,0
+Faith-Based & Community Initiatives,Smithsonian Institution,0
+NONE,Counsel to the President,0
+Job Corps,Japan-United States Friendship Commission,0
+ACCESS Board,Risk Management Agency,0
+Ginnie Mae,Judicial Conference of the United States,0
+Access Board,Risk Management Agency,0
+Ballistic Missile Defense Organization,Railroad Retirement Board,0

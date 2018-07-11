@@ -78,6 +78,17 @@ trainingDF.to_csv(os.path.join(trainingDir,'lobbyingClients_training.csv'),index
 
 
 
+#Build training data from compustat company name and legal name fields
+compustatDF = pd.read_csv(r'E:\Data\WRDS\compustat_annualSummary_2000-2018.csv')
+trainingDF = compustatDF[compustatDF['conm']!=compustatDF['conml']][['conm','conml']].drop_duplicates()
+trainingDF.columns = ['query_string','candidate_string']
+trainingDF['match'] = 1
+
+
+trainingDF.to_csv(os.path.join(trainingDir,'compustatLegalName_training.csv'),index=False,encoding='utf8')
+
+
+
 
 #Build training data from simple modifications
 trainingFiles = [os.path.join(trainingDir,f) for f in os.listdir(trainingDir) if f.endswith('.csv')]
