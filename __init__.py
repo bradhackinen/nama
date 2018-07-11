@@ -425,8 +425,6 @@ def merge(queryDF,candidateDF,modelPackage,how='inner',on=None,left_on=None,righ
 
 
 
-
-
 def basicHash(s):
     '''
     A simple case and puctuation-insentive hash
