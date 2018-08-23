@@ -155,21 +155,25 @@ def loadModelPackage(filename):
     return modelPackage
 
 
-def connectedStrings(strings,correctPairs=None,hash_function=None):
-    if (correctPairs is None) and (hash_function is None):
+def connectedStrings(strings,correct_pairs=None,incorrect_pairs=None,hash_function=None):
+    if (correct_pairs is None) and (hash_function is None):
         raise Exception('Must provide correct pairs or hash function')
 
     G = nx.Graph()
     G.add_nodes_from(strings)
 
-    #Connect correct pairs
-    if correctPairs:
-        G.add_edges_from(correctPairs)
+    # Connect correct pairs
+    if correct_pairs:
+        G.add_edges_from(correct_pairs)
 
-    #Connect strings with the same hash value (if hash function provided)
+    # Connect strings with the same hash value (if hash function provided)
     if hash_function is not None:
         for s in strings:
             G.add_edge(s,hash_function(s))
+
+    # Disconnect any pairs that are forced to be 'incorrect'
+    if incorrect_pairs:
+        G.remove_edges_from(incorrect_pairs)
 
     components = nx.connected_components(G)
     componentMap = {s:i for i,component in enumerate(components) for s in component}
@@ -262,23 +266,27 @@ def scorePairs(stringPairs,modelPackage,batch_size=100):
 
 
 
-def findDirectMatches(queryStrings,candidateStrings,trainingDF=None,hash_function=None):
+def findDirectMatches(query_strings,candidate_strings,trainingDF=None,hash_function=None,min_score=0.5):
     '''
     Finds strings that are matched because they are in the same conected component,
     where edges are defined by trainingDF pairs or a shared hash value.
     Optional hash function takes a string and produces a hash value.
     '''
-    queryDF = pd.DataFrame(list(queryStrings),columns=['string'])
-    candidateDF = pd.DataFrame(list(candidateStrings),columns=['string'])
+    query_strings = list(set(query_strings))
+    candidate_strings = list(set(candidate_strings))
+
+    queryDF = pd.DataFrame(query_strings,columns=['string'])
+    candidateDF = pd.DataFrame(candidate_strings,columns=['string'])
 
     if trainingDF is not None:
-        correctPairs = {(s0,s1) for i,s0,s1,m in trainingDF[['query_string','candidate_string','match']].itertuples() if m >= 0.5}
-        correctPairs.update({(s1,s0) for s0,s1 in correctPairs})
+        correctPairs = {(s0,s1) for i,s0,s1,m in trainingDF[['query_string','candidate_string','match']].itertuples() if m >= min_score}
+        incorrectPairs = {(s0,s1) for i,s0,s1,m in trainingDF[['query_string','candidate_string','match']].itertuples() if m < min_score}
     else:
-        correctPairs = {}
+        correctPairs = set()
+        incorrectPairs = set()
 
-    allStrings = set(queryStrings) | set(candidateStrings)
-    componentMap = connectedStrings(allStrings,correctPairs,hash_function)
+    allStrings = set(query_strings) | set(candidate_strings)
+    componentMap = connectedStrings(allStrings,correct_pairs=correctPairs,incorrect_pairs=incorrectPairs,hash_function=hash_function)
 
     for df in queryDF,candidateDF:
         df['component'] = df['string'].apply(lambda s: componentMap[s])
@@ -291,57 +299,74 @@ def findDirectMatches(queryStrings,candidateStrings,trainingDF=None,hash_functio
     return matchesDF
 
 
-# queryStrings,candidateStrings = sampleDF['query_string'],sampleDF['candidate_string']
-def findFuzzyMatches(queryStrings,candidateStrings,modelPackage,incorrectPairs={},max_attempts=10,batch_size=100):
-    queryStrings = sorted(set(queryStrings))
-    candidateStrings = sorted(set(candidateStrings))
+
+def findFuzzyMatches(query_strings,candidate_strings,modelPackage,incorrect_pairs={},best_only=True,min_score=0.95,max_attempts=10,batch_size=100):
+    query_strings = set(query_strings)
+    candidate_strings = set(candidate_strings)
+
+    strings = list(query_strings | candidate_strings)
+    string_ids = {s:i for i,s in enumerate(strings)}
+
+    query_strings = list(query_strings)
+    candidate_strings = list(candidate_strings)
+
+    query_selector = np.array([string_ids[s] for s in query_strings])
+    candidate_selector = np.array([string_ids[s] for s in candidate_strings])
 
     # Compute vector representations of strings
-    vecs = [vectorizeStrings(strings,modelPackage,batch_size=batch_size) for strings in (queryStrings,candidateStrings)]
-
-    # Use sklearn to efficiently find nearest neighbours
-    nearestNeighbors = NearestNeighbors(n_neighbors=1,metric='euclidean')
-    nearestNeighbors.fit(vecs[1])
+    vecs = vectorizeStrings(strings,modelPackage,batch_size=batch_size)
 
     # Search for best match while discarding incorrect pairs
     # Re-try search with more neighbors for incorrect pairs
     matchesDF = pd.DataFrame()
     for attempt in range(max_attempts):
+        # Use sklearn to efficiently find nearest neighbours
+        nearestNeighbors = NearestNeighbors(n_neighbors=1,radius=-np.log(max(min_score,1e-8)),metric='euclidean')
+        nearestNeighbors.fit(vecs[candidate_selector])
 
-        distances,matches = nearestNeighbors.kneighbors(vecs[0],n_neighbors=1 + attempt)
+        if best_only:
+            distances,matches = nearestNeighbors.kneighbors(vecs[query_selector],n_neighbors=1 + attempt)
+        else:
+            distances,matches = nearestNeighbors.radius_neighbors(vecs[query_selector])
 
         matchPairs = [(i,j) for i,query_matches in enumerate(matches) for j in query_matches]
         pairDistances = np.array([d for query_distances in distances for d in query_distances])
 
         #Build results table
-        stringPairs = [(queryStrings[i],candidateStrings[j]) for i,j in matchPairs]
+        stringPairs = [(query_strings[i],candidate_strings[j]) for i,j in matchPairs]
 
         df = pd.DataFrame(stringPairs,columns=['query_string','candidate_string'])
         df['score'] = np.exp(-pairDistances)
         df['attempt'] = attempt
 
-        df = df[[(pair not in incorrectPairs) for pair in stringPairs]]
+        df = df[[(pair not in incorrect_pairs) for pair in stringPairs]]
 
         matchesDF = matchesDF.append(df)
 
-        # Reduce query vectors and strings to only the unmatched strings
-        matched = set(matchesDF['query_string'])
-        vecs[0] = vecs[0][[s not in matched for s in queryStrings],:]
-        queryStrings = [s for s in queryStrings if s not in matched]
+        if not best_only:
+            break
 
-        if not queryStrings:
+        # Reduce query vectors and strings to only the unmatched strings
+        query_strings = sorted(set(query_strings) - set(matchesDF['query_string']))
+        query_selector = np.array([string_ids[s] for s in query_strings])
+
+        if not len(query_selector):
             break
 
     else:
         print('Warning: Reached max attempts ({}) while looking for a non-incorrect match'.format(max_attempts))
 
-    return matchesDF#.drop('in_incorrect',axis=1)
+    if min_score:
+        matchesDF = matchesDF[matchesDF['score'] >= min_score].copy()
+
+    return matchesDF
 
 
-def findMatches(queryStrings,candidateStrings,modelPackage,trainingDF=None,hash_function=None,n_matches=1,batch_size=100):
+
+def findMatches(queryStrings,candidateStrings,modelPackage,trainingDF=None,hash_function=None,n_matches=1,batch_size=100,min_score=0.5):
     #Look for direct matches
     if (trainingDF is not None) or (hash_function is not None):
-        matchesDF = findDirectMatches(queryStrings,candidateStrings,trainingDF,hash_function)
+        matchesDF = findDirectMatches(queryStrings,candidateStrings,trainingDF,hash_function,min_score=min_score)
         matchesDF = matchesDF.drop('component',axis=1)
         matchesDF['score'] = 1
 
@@ -352,14 +377,14 @@ def findMatches(queryStrings,candidateStrings,modelPackage,trainingDF=None,hash_
         queryStrings = list(queryStrings)
 
     #Look for fuzzy matches for remaining strings
-    if len(queryStrings):
+    if len(queryStrings) and min_score < 1:
         if trainingDF is not None:
             incorrectPairs = {(c0,c1) for i,c0,c1,m in trainingDF[['query_string','candidate_string','match']].itertuples() if m < 0.5}
             incorrectPairs.update({(c1,c0) for c0,c1 in incorrectPairs})
         else:
             incorrectPairs = {}
 
-        fuzzyMatchesDF = findFuzzyMatches(queryStrings,candidateStrings,modelPackage,incorrectPairs=incorrectPairs,batch_size=batch_size)
+        fuzzyMatchesDF = findFuzzyMatches(queryStrings,candidateStrings,modelPackage,incorrect_pairs=incorrectPairs,batch_size=batch_size,min_score=min_score)
 
         matchesDF = matchesDF.append(fuzzyMatchesDF.drop('attempt',axis=1))
 
@@ -372,7 +397,7 @@ def findMatches(queryStrings,candidateStrings,modelPackage,trainingDF=None,hash_
 
 def scoreTestDF(modelPackage,testDF,hash_function=None):
     # Compute match scores (note that false negatives will not be included - need to correct for this later)
-    matchesDF = findFuzzyMatches(testDF['query_string'],testDF['candidate_string'],modelPackage)#,hash_function=hash_function)
+    matchesDF = findFuzzyMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,min_score=0)
 
     # Compute correct match values (using hash function if provided)
     correctPairs = {(s0,s1) for i,s0,s1,m in testDF[['query_string','candidate_string','match']].itertuples() if m >= 0.5}
@@ -400,6 +425,31 @@ def scoreTestDF(modelPackage,testDF,hash_function=None):
     optimalAccuracy = accuracyDF['accuracy'].max()
 
     return {'matches':matchesDF,'accuracies':accuracyDF,'optimal_accuracy':optimalAccuracy,'optimal_threshold':optimalThreshold}
+
+
+
+def findClusters(strings,modelPackage,min_score=0.99,trainingDF=None,hash_function=None,as_df=True):
+    strings = sorted(set(strings))
+
+    correctPairs = set()
+    incorrectPairs = set()
+
+    if trainingDF is not None:
+        correctPairs.update({(s0,s1) for i,s0,s1,m in trainingDF[['query_string','candidate_string','match']].itertuples() if m >= min_score})
+        incorrectPairs.update({(s0,s1) for i,s0,s1,m in trainingDF[['query_string','candidate_string','match']].itertuples() if m < min_score})
+
+    if min_score < 1:
+        matchesDF = findFuzzyMatches(strings,strings,modelPackage,best_only=False,min_score=min_score)
+        correctPairs.update({(s0,s1) for i,s0,s1 in matchesDF[['query_string','candidate_string']].itertuples()})
+
+    clusterMap = connectedStrings(strings,correct_pairs=correctPairs,incorrect_pairs=incorrectPairs,hash_function=hash_function)
+
+    if as_df:
+        df = pd.DataFrame(strings,columns=['string'])
+        df['cluster'] = df['string'].apply(lambda s: clusterMap[s])
+        return df
+    else:
+        return clusterMap
 
 
 
@@ -454,6 +504,19 @@ def corpHash(s):
 
 
 
+def loadTrainingData(filename,encoding='utf8',force_binary_match=True):
+    df = pd.read_csv(filename,encoding=encoding)
+    df = df[['query_string','candidate_string','match']]
+    df = df[df['match'].notnull()]
+    if force_binary_match:
+        df['match'] = (df['match'] > 0.5).astype(float)
+
+    return df
+
+
+
+
+
 if __name__ == '__main__':
 
     #Train a base model
@@ -463,26 +526,25 @@ if __name__ == '__main__':
     modelDir = os.path.join(namaDir,'trainedModels')
 
     trainingFiles = [os.path.join(trainingDir,f) for f in os.listdir(trainingDir) if f.endswith('.csv')]
-    trainingDF = pd.concat([pd.read_csv(f,encoding='utf8') for f in trainingFiles]).drop_duplicates()
-    trainingDF = trainingDF[trainingDF['match'].notnull()]
-    trainingDF['match'] = (trainingDF['match'] > 0.5).astype(float)
+    trainingDF = pd.concat([loadTrainingData(f) for f in trainingFiles]).drop_duplicates()
 
     # trainingDF = trainingDF.sample(frac=1).reset_index(drop=True)
 
-    testDF = trainingDF.sample(frac=0.05)
+    testDF = trainingDF.sample(n=1000)
     trainDF = trainingDF[~trainingDF.index.get_level_values(0).isin(testDF.index.get_level_values(0))]
 
     # trainingDF = trainingDF.sample(1000)
 
     # modelPackage = newModel(cuda=True,d=300,d_recurrent=200,weight_decay=1e-6,recurrent_layers=3,bidirectional=True)
 
-    modelPackage = loadModelPackage(os.path.join(modelDir,'allTrainingData_3bi200_to_300.001.bin'))
+    modelPackage = loadModelPackage(os.path.join(modelDir,'allTrainingData_3bi200_to_300.003.bin'))
 
     #Repeat as desired:
     historyDF = trainModel(modelPackage,trainDF,testDF=testDF,hash_function=corpHash,epochs=5,minibatch_size=(11,50),resample_ratio=10,
-                            save_as=os.path.join(modelDir,'allTrainingData_3bi200_to_300.002.bin'))
+                            save_as=os.path.join(modelDir,'allTrainingData_3bi200_to_300.003.bin'))
     plotLossHistory(historyDF)
 
+    df = findFuzzyMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,best_only=False,min_score=0.95)
 
     testResults = scoreTestDF(modelPackage,testDF,corpHash)
 
@@ -495,3 +557,14 @@ if __name__ == '__main__':
     review = scoreTestDF(modelPackage,trainingDF,corpHash)
     df = review['matches'].sort_values('loss',ascending=False).head(1000)
     df[['query_string','candidate_string','match']].to_csv(os.path.join(namaDir,'trainingData','corrections','corrections.001.csv'),index=False,encoding='mbcs')
+
+
+    # # Test individual functions
+    # df = findFuzzyMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,best_only=False,min_score=0.5)
+    # df = findDirectMatches(testDF['query_string'],testDF['candidate_string'],trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
+    # df = findMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
+    # df = findMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=1)
+    # df = findClusters(testDF['query_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
+    #
+    # import cProfile
+    # cProfile.run("findClusters(trainingDF['query_string'].sample(10000),modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=1)",sort='cumtime')
