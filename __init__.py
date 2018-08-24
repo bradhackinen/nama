@@ -363,7 +363,7 @@ def findFuzzyMatches(query_strings,candidate_strings,modelPackage,incorrect_pair
 
 
 
-def findMatches(queryStrings,candidateStrings,modelPackage,trainingDF=None,hash_function=None,n_matches=1,batch_size=100,min_score=0.5):
+def findMatches(queryStrings,candidateStrings,modelPackage,trainingDF=None,hash_function=None,best_only=True,batch_size=100,min_score=0.5):
     #Look for direct matches
     if (trainingDF is not None) or (hash_function is not None):
         matchesDF = findDirectMatches(queryStrings,candidateStrings,trainingDF,hash_function,min_score=min_score)
@@ -384,14 +384,15 @@ def findMatches(queryStrings,candidateStrings,modelPackage,trainingDF=None,hash_
         else:
             incorrectPairs = {}
 
-        fuzzyMatchesDF = findFuzzyMatches(queryStrings,candidateStrings,modelPackage,incorrect_pairs=incorrectPairs,batch_size=batch_size,min_score=min_score)
+        fuzzyMatchesDF = findFuzzyMatches(queryStrings,candidateStrings,modelPackage,incorrect_pairs=incorrectPairs,batch_size=batch_size,best_only=best_only,min_score=min_score)
 
         matchesDF = matchesDF.append(fuzzyMatchesDF.drop('attempt',axis=1))
 
-    matchesDF = matchesDF.groupby('query_string').first().reset_index()
-    matchesDF = matchesDF.sort_values('score',ascending=False)
+    matchesDF = matchesDF.drop_duplicates()
+    if best_only:
+        matchesDF = matchesDF[matchesDF['score'] == matchesDF.groupby('query_string')['score'].transform('max')]
 
-    return matchesDF.reset_index(drop=True).drop_duplicates()
+    return matchesDF.reset_index(drop=True)
 
 
 
@@ -459,15 +460,17 @@ def merge(queryDF,candidateDF,modelPackage,how='inner',on=None,left_on=None,righ
         right_on = on
 
     if left_on is None or right_on is None:
-        raise('Must provide column to merge on')
+        raise Exception('Must provide column to merge on')
 
-    matchesDF = findMatches(queryDF[left_on],candidateDF[right_on],modelPackage,**search_args)
-    matchesDF = matchesDF[matchesDF['score']>min_score]
+    matchesDF = findMatches(queryDF[left_on],candidateDF[right_on],modelPackage,min_score=min_score,**search_args)
 
     matchesDF = pd.merge(queryDF,matchesDF,left_on=left_on,right_on='query_string',how=how)
     matchesDF = pd.merge(matchesDF,candidateDF,left_on='candidate_string',right_on=right_on,how=how)
 
-    matchesDF = matchesDF.drop(['query_string','candidate_string'],axis=1)
+    if 'query_string' not in [left_on,right_on]:
+        matchesDF = matchesDF.drop('query_string',axis=1)
+    if 'candidate_string' not in [left_on,right_on]:
+        matchesDF = matchesDF.drop('candidate_string',axis=1)
 
     matchesDF = matchesDF.sort_values('score',ascending=False)
 
@@ -560,11 +563,12 @@ if __name__ == '__main__':
 
 
     # # Test individual functions
-    # df = findFuzzyMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,best_only=False,min_score=0.5)
-    # df = findDirectMatches(testDF['query_string'],testDF['candidate_string'],trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
-    # df = findMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
-    # df = findMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=1)
-    # df = findClusters(testDF['query_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
+    df = findFuzzyMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,best_only=False,min_score=0.5)
+    df = findDirectMatches(testDF['query_string'],testDF['candidate_string'],trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
+    df = findMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
+    df = findMatches(testDF['query_string'],testDF['candidate_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=1)
+    df = findClusters(testDF['query_string'],modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
+    df = merge(testDF[['query_string']],testDF[['candidate_string']],modelPackage,left_on='query_string',right_on='candidate_string',trainingDF=trainingDF,hash_function=corpHash,min_score=0.5)
     #
     # import cProfile
     # cProfile.run("findClusters(trainingDF['query_string'].sample(10000),modelPackage,trainingDF=trainingDF,hash_function=corpHash,min_score=1)",sort='cumtime')
