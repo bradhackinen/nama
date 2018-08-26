@@ -1,0 +1,589 @@
+﻿query_string,candidate_string,match
+Western Growers,Western Refining,0
+Louisiana Mid-Continent Oil and Gas Association,Louisiana-Pacific,0
+Center for Law and Social Policy,CenterPoint Energy,0
+New England Fishery Management Council,New England Mutual Life Ins.,0
+Transport Workers Union of America,Trans World Airlines,0
+New England Fuel Institute,New England Electric Systems,0
+Kansas City Board of Public Utilities,Kansas City Southern,0
+Federal Aviation Administration,Federal Realty Investment Trust,0
+"Alliant Energy Corporate Services, Inc.",Alliant Energy Corp,1
+Louisiana Environmental Action Network,Louisiana Land & Exploration,0
+Packaging Corporation of America,Packaging Corp. of America,1
+Sierra Pacific Industries,Sierra Pacific Resources,0
+Electronic Transactions Association,Electronic Data Systems,0
+Washington Toxics Coalition,Washington Group Intl.,0
+Western Resource Advocates,Western Gas Resources,0
+Pacific Fishery Management Council,Pacific Telesis Group,0
+Boston College,Boston Scientific,0
+AFS,AES,0
+Mallinckrodt Pharmaceuticals,Mallinckrodt plc,1
+"Commerce Bancshares, Inc.",Commerce Bancorp,1
+Alliance to Protect Nantucket Sound,Alliant Techsystems,0
+Alaska Trollers Association,Alaska Air Group,0
+Reinsurance Association of America,Reinsurance Group of America,0
+Massachusetts Department of Public Health,Massachusetts Mutual Life Insurance,0
+Western Riverside County Regional Conservation Authority,Western & Southern Financial Group,0
+Alaska Power Association,Alaska Air Group,0
+Electronic Health Record Association,Electronic Data Systems,0
+Center for Foodborne Illness Research & Prevention,Centerior Energy,0
+Central Missouri State University,Central & South West,0
+Western Farmers Electric Cooperative,Western Gas Resources,0
+Centers for Disease Control and Prevention,Centerior Energy,0
+Illinois Coal Association,Illinois Tool Works,0
+NEA,NVR,0
+Massachusetts Highway Department,Massachusetts Mutual Life Insurance,0
+Massachusetts Department of Transportation,Massachusetts Mutual Life Insurance,0
+Alliance for Orthopedic Solutions,Alliance Data Systems,0
+"Columbia Helicopters, Inc.",Columbia Pipeline Group Inc.,0
+"Safety-Kleen Systems, Inc.",Safety-Kleen Corp.,1
+Union Pacific Railroad,Union Pacific Resources,0
+New York State,New York Times,0
+General Aviation,General Re,0
+Center for Public Environmental Oversight,Centerior Energy,0
+Center for Neighborhood Technology,Centerior Energy,0
+Louisiana Bankers Association,Louisiana-Pacific,0
+Texas Credit Union League,Texas Utilities,0
+UNION IBT,Union Camp,0
+Western Governors' Association,Western Gas Resources,0
+Sierra Clu,Sierra Pacific Resources,0
+Laboratory Corporation of America Holdings,Laboratory Corp. of America,1
+Delta Airlines,Delta Air Lines,1
+Western Pacific Fishery Management Council,Western & Southern Financial Group,0
+Alaska Railroad Corporation,Alaska Air Group,0
+Alliance for Climate Protection,Alliance Data Systems,0
+Washington Utilities and Transportation Commission,Washington Group Intl.,0
+New York City,New York Times,0
+Fisheries and Oceans Canada,Fisher Scientific Intl.,0
+United South and Eastern Tribes,UnitedHealth Group,0
+People With Disabilities Foundation,People's United Bank,0
+"United South and Eastern Tribes, Inc.",UnitedHealth Group,0
+Alliance for Home Health Quality and Innovation,Alliance Data Systems,0
+Jefferson County,Jefferson-Pilot,0
+Center for International Environmental Law,Centerior Energy,0
+Alliance for Natural Health,Alliance Data Systems,0
+Alaska Trucking Association,Alaska Air Group,0
+Frontier Airlines,Frontier Communications,0
+Century,CenturyTel,0
+PHI,PPL,0
+Southern California Regional Rail Authority,Southern Pacific Rail,0
+Southern California Alliance of Publicly Owned Treatment Works,Southern Pacific Rail,0
+Great Lakes United,Great Lakes Chemical,0
+Alaska Inter-Tribal Council,Alaska Air Group,0
+Edison Chouest Offshore,Edison International,0
+"Chesapeake Bay Foundation, Inc.",Chesapeake Energy,0
+General Services Administration,General Signal Corp,0
+Transport Workers Union,Transocean Ltd,0
+Massachusetts Office of Medicaid,Massachusetts Mutual Life Insurance,0
+Illinois CPA Society,Illinois Tool Works,0
+"Frontier Airlines, Inc.",Frontier Communications,0
+Community Health Care Association of New York State,Community Health Systems,0
+Louisiana Mid-Continent Oil & Gas Association,Louisiana Land & Exploration,0
+Sierra club,Sierra Pacific Resources,0
+Provident Bank,Provident Cos Inc.,0
+Central Arizona Water Conservation District,Central & South West,0
+Electronic Payments Association,Electronic Data Systems,0
+SCE,SPX,0
+Center for Disability Rights,Centerior Energy,0
+First Community Bank,First Interstate Bancorp,0
+New York City Bar,New York Times,0
+Global Automakers,Global Partners,0
+Alliance for a Just Society,Alliance Data Systems,0
+Southwestern Water Conservation District,Southwestern Energy,0
+Hospital,Hospira Inc.,0
+Walgreen Co.,Walgreens Boots Alliance,0
+Central Valley Clean Water Association,Central & South West,0
+Southern Company Services,Southern Pacific Rail,0
+ExxonMobil Chemical Company,Exxon Mobil,1
+Florida Hospital,Florida Progress,0
+Louisiana Bucket Brigade,Louisiana-Pacific,0
+Pharmacy e,Pharmacia,0
+Federal StormWater Association,Federal Realty Investment Trust,0
+General,General Cable,0
+Honeywell Specialty Materials,Honeywell International,1
+Western Kentucky University,Western Digital,0
+Center for Diagnostic Imaging,Centerior Energy,0
+"Continental Resources, Inc.",Continental,0
+Vanguard,Vanguard Health Systems,0
+MonsantoStop,Monsanto,0
+Massachusetts Office of the Attorney General,Massachusetts Mutual Life Insurance,0
+Public Service Company of New Hampshire,Public Service Enterprise Group,0
+Louisiana Association of Business and Industry,Louisiana-Pacific,0
+Massachusetts Office on Disability,Massachusetts Mutual Life Insurance,0
+"Charles Schwab & Co., Inc.",Charles Schwab,1
+TransCanada,Transco Energy,0
+Advance,AdvancePCS,
+Southern Crop Production Association,Southern Pacific Rail,0
+Center for Plain Language,Centerior Energy,0
+Western Pennsylvania Conservancy,Western Digital,0
+Transportation Corridor Agencies,Transocean Ltd,0
+Allegheny County Health Department,Allegheny Technologies,0
+Western Association of Fish and Wildlife Agencies,Western & Southern Financial Group,0
+Georgia Association of Manufacturers,Georgia-Pacific,0
+Washington Health Benefit Exchange,Washington Group Intl.,0
+Pacific Gas and Electric,Pacific Enterprises,0
+Public Service Commission,Public Service Enterprise Group,0
+New England Farmers Union,New England Electric Systems,0
+Center for Coalfield Justice,Centerior Energy,0
+Center for Inquiry,Centerior Energy,0
+"Travelers United, Inc.",TravelCenters of America,0
+Travelers United,TravelCenters of America,0
+New England Aquarium,New England Mutual Life Ins.,0
+Alliance for Natural Health-USA,Alliance Data Systems,0
+Lockheed Martin Aeronautics,Lockheed Martin,1
+Public Service Company of Colorado,Public Service Enterprise Group,0
+Texas RioGrande Legal Aid,Texas Instruments,0
+Knights of Columbus,Knight-Ridder,0
+ALLIANCE OF AUTOMOBILE MANUFACTURERS,Alliant Energy Corp,0
+Capital Power Corporation,Capital Cities/ABC,0
+Western Fishboat Owners Association,Western Digital,0
+Louisiana Audubon Council,Louisiana Land & Exploration,0
+"Millennium Pharmaceuticals, Inc.",Millennium Chemicals,0
+Morrison & Foerster LLP,Morrison Knudsen,0
+"Autoliv ASP, Inc.",Autoliv,1
+Huntington National Bank,Huntington Bancshares,1
+Air Pacific Limited,Air Products & Chemicals,0
+Georgia Aquarium,Georgia-Pacific,0
+"Mutual Pharmaceutical Company, Inc.",Mutual of Omaha Insurance,0
+First Horizon National Corporation,First Chicago NBD Corp.,0
+Florida Association of Rehabilitation Facilities,Florida Progress,0
+Transportation Communications Union,Transocean Ltd,0
+Electronic Health Record,Electronic Data Systems,0
+Pacific Business Group on Health,Pacific Telesis Group,0
+Federal Home Loan Banks,Federal Paper Board Co.,0
+Kansas City International Airport,Kansas City Southern,0
+Services,Service Merchandise,0
+Public Service Company of Oklahoma,Public Service Enterprise Group,0
+Advanced Biofuels USA,Advanced Micro Devices,0
+Advanced Energy,Advanced Micro Devices,0
+ExpressJet Inc.,Express Scripts,0
+General Dynam,General Instrument,0
+SOUTHWESTERN BELL TELEPHONE,Southwestern Energy,0
+Center for Digital Democracy,Centerior Energy,0
+Louisiana Workforce Commission,Louisiana Land & Exploration,0
+Safety Regulation Group,Safety-Kleen Corp.,0
+ica,NCR,0
+Sierra Club Iowa,Sierra Pacific Resources,0
+Georgia Power,Georgia-Pacific,0
+Louisiana Public Service Commission,Louisiana Land & Exploration,0
+Alliance for Human Research Protection,Alliance Data Systems,0
+Cooper University Hospital,Cooper Industries,0
+Great Lakes Pilots,Great Lakes Chemical,0
+Northeast Utilities System,Northeast Utilities,1
+Columbia College Chicago,Columbia Pipeline Group Inc.,0
+Energy Future Coalition,Energy Future Holdings,0
+"Alaska Trucking Association, Inc.",Alaska Air Group,0
+Texas Utilities Electric Company,Texas Utilities,0
+American Electronics Association,American Electric Power,0
+New York Law School,New York Life Insurance,0
+Southern Arizona Home Builders Association,Southern Pacific Rail,0
+ExpressJet Airlines,Express Scripts,0
+Center for Democracy and Technology,Centerior Energy,0
+Washington Suburban Sanitary Commission,Washington Group Intl.,0
+Illinois Action for Children,Illinois Tool Works,0
+Expressjet Airlines,Express Scripts,0
+Western Municipal Water District,Western & Southern Financial Group,0
+"ExxonMobil Biomedical Sciences, Inc.",Exxon Mobil,1
+Center for Science in Public Participation,Centerior Energy,0
+Computer & Communications Industry Ass'n,Computer Sciences,0
+Capital Group Companies,Capital Cities/ABC,0
+Sierra Club and Earthjustice,Sierra Pacific Resources,0
+Transportation Equity Network,Transocean Ltd,0
+"Federal Marine Terminals, Inc.",Federal Realty Investment Trust,0
+Union Pacific Railroad Company Law Department,Union Pacific Resources,0
+Standard Insurance Company,Standard Pacific,0
+Great Lakes Aviation,Great Lakes Chemical,0
+New England Fishery Mgmt Council,New England Mutual Life Ins.,0
+Burlington Trailways,Burlington Stores,0
+CPS,CHS,0
+Mercy,Merck,0
+Sierra Club and,Sierra Pacific Resources,0
+use,USG,0
+Guardian Life Insurance Company of America,Guardian Life Ins. Cos. of America,1
+Sempra Energy Utilities,Sempra Energy,1
+Massachusetts Office of Coastal Zone Management,Massachusetts Mutual Life Insurance,0
+Federal Employee,Federal-Mogul,0
+Targe,Target,0
+Freddie Mac and Fannie Mae,Freddie Mac,
+Willamette University,Willamette Industries,0
+Energy Efficient Codes Coalition,Energy Future Holdings,0
+Massachusetts Department of Energy Resources,Massachusetts Mutual Life Insurance,0
+Mutual of Omaha,Mutual of Omaha Insurance,1
+Massachusetts House of Representatives,Massachusetts Mutual Life Insurance,0
+Kansas City Southern Railway Company,Kansas City Southern,1
+Northeast Iowa Community College,Northeast Utilities,0
+Alaska Coal Association,Alaska Air Group,0
+Massachusetts League of Community Health Centers,Massachusetts Mutual Life Insurance,0
+Alaska Tanker Company,Alaska Air Group,0
+Cincinnati USA Regional Chamber,Cincinnati Financial,0
+Massachusetts Housing and Shelter Alliance,Massachusetts Mutual Life Insurance,0
+Pharmacy Society of Wisconsin,Pharmacia & Upjohn Inc.,0
+Washington DC,Washington Mutual,0
+NorthWestern Energy,Northwestern Mutual,0
+"Central and South West Services, Inc.",Central & South West,1
+"Vane Line Bunkering, Inc.",Erie Insurance Group,0
+Central Michigan University,Central & South West,0
+American Free Trade Association,American Greetings Corp,0
+Sciencecorps,Science Applications Intl.,0
+Becton Dickinson and Company,Becton Dickinson,1
+Alliance of American Insurers,Alliance Data Systems,0
+Federal Storm Water Association,Federal Realty Investment Trust,0
+Center for Elder Care and Advanced Illness,Centerior Energy,0
+Texas Food Bank Network,Texas Utilities,0
+"Western Plains Energy, LLC",Western & Southern Financial Group,0
+"Texas RioGrande Legal Aid, Inc.",Texas Instruments,0
+Southwestern Public Service Company,Southwestern Energy,0
+Health First,Health Net,0
+Health Law Advocates,HealthSouth,0
+Progress Center for Independent Living,Progress Energy,0
+Martin Thomas,Martin Marietta,0
+New York Medical College,New York Life Insurance,0
+Enterprise Products Partners L.P.,Enterprise Products,1
+Western Carolina University,Western & Southern Financial Group,0
+Georgia Organics,Georgia-Pacific,0
+Compass Bank,Compass Bancshares,0
+Travelers First,TravelCenters of America,0
+"Southwest Power Pool, Inc.",Southwest Airlines,0
+"Applied Research Associates, Inc.",Applied Materials,0
+Washington County Water Conservancy District,Washington Group Intl.,0
+Vanguard Airlines,Vanguard Health Systems,0
+First County Bank,First Horizon,0
+General Foods Corporation,General Dynamics,0
+New England Journal of Medicine,New England Mutual Life Ins.,0
+"Alexander & Baldwin, Inc",Alexander & Alexander,0
+New England Gas Association,New England Electric Systems,0
+Center for Economic Justice,Centerior Energy,0
+"Jefferson Parish, Louisiana",Jefferson-Pilot,0
+Univers,Universal,0
+First Choice Airways Limited,First Chicago NBD Corp.,0
+Riverside County,Alexander & Alexander,0
+TransCanada Corporation,Transocean Ltd,0
+Pacific Gas & Electric Company,Pacific Enterprises,0
+Center for Injury Research,Centerior Energy,0
+Trans-Bridge Lines,Transocean Ltd,0
+Western Governors Association,Western Gas Resources,0
+New York Cruise Lines,New York Life Insurance,0
+General Electric Company Aviation,General Electric,1
+Campbell Group,Campbell Soup,0
+Center for Disease Control and Prevention,Centerior Energy,0
+"Great Northwest, Inc.",Great Lakes Chemical,0
+NORTHWEST HORTICULTURAL COUNCIL,Northwest Airlines,0
+Center for Global Policy Solutions,Centerior Energy,0
+American Red Cross Biomedical Services,American Axle & Mfg.,0
+Advanced Technology Corporation,Advanced Micro Devices,0
+Western Lake Superior Sanitary District,Western & Southern Financial Group,0
+"Texas Utilities Services, Inc.",Texas Utilities,1
+"General Shale Brick, Inc.",General Growth Properties,0
+Spectrum Medical Group,Spectrum Group International,0
+Anderson,Andersons,
+Hewlett Packard Company NonStop Enterprise Division,Hewlett Packard Enterprise Co,1
+New England Council,New England Mutual Life Ins.,0
+New York Credit Union Association,New York Life Insurance,0
+Hudson City School District,Hudson City Bancorp,0
+General Electric Appliances,General Electric,1
+American Airlines Flight Operations,American Airlines Group,1
+Allegheny Power System,Allegheny Technologies,0
+People's Energy Cooperative,Peoples Energy,1
+Southwest Clean Air Agency,Southwest Airlines,0
+Federal Home Loan Bank of Atlanta,Federal Paper Board Co.,0
+Western Industries,Western Digital,0
+Center for Environmental Education,Centerior Energy,0
+Borden Chemicals and Plastics,Borden Chemical,1
+Texas Woman's University,Texas Utilities,0
+John Hancock Life Insurance Company,John Hancock Financial Svcs.,1
+Western Landowners Alliance,Western Union,0
+OHA,KKR,0
+Alaska Conservation Trust,Alaska Air Group,0
+Center for Social Inclusion,Centerior Energy,0
+Southern California,Southern Pacific Rail,0
+Pacific Egg and Poultry Association,Pacific Telesis Group,0
+Southwest Airlines Co. General Counsel Department,Southwest Airlines,1
+Whole Grains Council,Whole Foods Market,0
+Franklin County Farm Bureau,Franklin Resources,0
+Alliance for Biosecurity,Alliance Data Systems,0
+American Airlines Pilot,American Airlines Group,
+Illinois Road Builders Association,Illinois Tool Works,0
+Peoples Neighborhood Bank,People's United Bank,0
+Williams & Associates,Williams,0
+Guardian Industries Corp.,Guardian Life Ins. Cos. of America,0
+"Fisher Wallace Laboratories, LLC",Fisher Scientific Intl.,0
+Pacific Seabird Group,Pacific Enterprises,0
+Honeywell Safety Products,Honeywell International,1
+New England Organ Bank,New England Mutual Life Ins.,0
+"Northeast Recycling Council, Inc.",Northeast Utilities,0
+Federal Home Loan Bank of Boston,Federal Paper Board Co.,0
+Transport Canada Civil Aviation,Transocean Ltd,0
+Center for Injury Research and Prevention,Centerior Energy,0
+Massachusetts Water Works Association,Massachusetts Mutual Life Insurance,0
+"Center for Disability Rights, Inc.",Centerior Energy,0
+First American Bulk Carrier Corporation,First American Corp.,0
+Central Valley Health Network,Central & South West,0
+New York Housing Conference,New York Life Insurance,0
+Express Employment Professionals,Express Scripts,0
+Master-Bilt Products,MasterCard,0
+Massachusetts Medical Device Industry Council,Massachusetts Mutual Life Insurance,0
+Southern California Public Power Authority,Southern Pacific Rail,0
+Alaska Airmen's Association,Alaska Air Group,0
+Prudential Fixed Income,Prudential Financial,0
+Federal Government,Federal-Mogul,0
+Center for Lawful Access and Abuse Deterrence,Centerior Energy,0
+Washington Sustainable Food & Farming Network,Washington Group Intl.,0
+OCCIDENTAL CHEM CORP,Occidental Petroleum,1
+Sierra Club Lone Star Chapter,Sierra Pacific Resources,0
+"Commerce Bancshares, Inc",Commerce Bancorp,
+Alliance for Physical Therapy Quality and Innovation,Alliance Data Systems,0
+American Medical Women's Association,American Medical Holdings,0
+Commercial Anglers Association,Commercial Metals,0
+New York University Medical Center,New York Life Insurance,0
+Pacific Rivers Council,Pacific Enterprises,0
+First State Bank of Uvalde,First American Corp.,0
+Alliance For A Clean Environment,Alliance Data Systems,0
+American Medical Society for Sports Medicine,American Medical Holdings,0
+Eastern Federal Bank,Eastern Enterprises,0
+General Aviation Pilot,General Re,0
+Southwest Bank,Southwest Airlines,0
+Franklin County,Franklin Resources,0
+Cooper Power Systems,Cooper Companies,0
+Barnes & Thornburg LLP,Barnes & Noble,0
+Capital CDC,Capital Cities/ABC,0
+North Atlantic Clam Association,North Fork Bancorp. Inc.,0
+Affinity Financial,Affiliated Computer Services,0
+Federal Airways & Airspace,Federal Paper Board Co.,0
+Gro,Gap,0
+Great Neck Breast Cancer Coalition,Great Lakes Chemical,0
+Long Island University,Long Island Lighting,0
+Standard Process,Standard Pacific,0
+Trinity University,Trinity Industries,0
+Louisiana Rice Growers Association,Louisiana-Pacific,0
+Burlington International Airport,Burlington Resources,0
+Colgate Palmolive Company,Colgate-Palmolive,1
+Advanced Ethanol Council,Advanced Micro Devices,0
+ANHEUSER BUSCH INC,Anheuser-Busch,1
+"Targeted Growth, Inc.",TravelCenters of America,0
+Martin Marietta Aggregates,Martin Marietta,0
+LCA,NCR,0
+Massachusetts Fishermen's Partnership,Massachusetts Mutual Life Insurance,0
+Charles Spence,Charles Schwab,0
+ITE,LTV,0
+Pioneer Bank of Wisconsin,Pioneer Hi-Bred Int'l,0
+Georgia Pacific,Georgia-Pacific,1
+Allegheny College,Allegheny Technologies,0
+International Pape,International Paper,1
+Patterson Pump Company,Patterson Companies,0
+Exxon Mobil Chemical Company,Exxon Mobil,1
+Global Organics,Global Payments,0
+Southwest National Bank,Southwest Airlines,0
+Southern Rolling Plains Cotton Growers Association,Southern Pacific Rail,0
+Schulte Roth & Zabel LLP,Schlumberger Ltd.,0
+"Chesapeake Financial Shares, Inc.",Chesapeake Energy,0
+Massachusetts Service Alliance,Massachusetts Mutual Life Insurance,0
+Community Health Centers of Arkansas,Community Health Systems,0
+Western Bank,Western Atlas,0
+Massachusetts General Physicians Organization,Massachusetts Mutual Life Insurance,0
+Boston College Law School,Boston Scientific,0
+Illinois Soybean Growers,Illinois Tool Works,0
+First American Title Insurance Company,First American Financial,0
+Celanese Chemicals,Celanese,1
+Electronics TakeBack Coalition,Electronic Data Systems,0
+Florida Park Service,Florida Progress,0
+American Water Works Association  Government Affairs,American Water Works Company Inc,0
+Massachusetts Municipal Wholesale Electric Company,Massachusetts Mutual Life Insurance,0
+"Universal Leaf Tobacco Company, Inc.",Universal Health Services,0
+"Morgan Stanley Private Bank, N.A.",Morgan Stanley,
+FAQ,GTE,0
+Massachusetts Society of Anesthesiologists,Massachusetts Mutual Life Insurance,0
+Manitowoc Ice,Manitowoc,
+Western Regional Council,Western Refining,0
+Commercial Bank of Texas,Commerce Bancorp,0
+"CenterPoint Energy Houston Electric, LLC",CenterPoint Energy,1
+Massachusetts Department of Public Utilities,Massachusetts Mutual Life Insurance,0
+ECU,GPU,0
+Louisiana Municipal Association,Louisiana Land & Exploration,0
+Center for Environmental Innovation in Roofing,Centerior Energy,0
+Peoples Community Bank,PeopleSoft Inc.,0
+General Shale Brick,General Growth Properties,0
+MORTON INTL INC,Morton International,1
+Northwest Georgia Bank,Northwestern Mutual,0
+New England Coastal Wildlife Alliance,New England Mutual Life Ins.,0
+Community Bank of Snyder,Community Health Systems,0
+Community Health Partnership,Community Health Systems,0
+First Choice Bank,First Chicago Corp.,0
+Becton Dickinson & Company,Becton Dickinson,1
+Center on Executive Compensation,Centerior Energy,0
+Massachusetts Public Interest Research Group,Massachusetts Mutual Life Insurance,0
+New Fuels Alliance,New England Electric Systems,0
+Louisiana Tech University,Louisiana-Pacific,0
+First American National Bank,First American Corp.,0
+Louisiana Home Builders Association,Louisiana-Pacific,0
+Marshall Medical Center,Marshall & Ilsley Corp.,0
+Blacksmiths,Blackstone Group,0
+First Horizon Home Loans,First Chicago NBD Corp.,0
+"Western Industries, Inc.",Western Union,0
+Center for Hunger-Free Communities,Centerior Energy,0
+Res,AES,0
+International Game Technology,International Game Tech.,1
+Washington Savings Bank,Washington Group Intl.,0
+Jefferson County LEPC,Jefferson-Pilot,0
+"Southwest Coaches, Inc.",Southwest Airlines,0
+Champlain Housing Trust,Champion International,0
+Massachusetts Environmental Energy Alliance,Massachusetts Mutual Life Insurance,0
+Pharmacy,Pharmacia,0
+Louisiana Association of Business & Industry,Louisiana-Pacific,0
+Riverside Bank,Alexandria Real Estate Equities,0
+American Airlines Flight Training,American Airlines Group,0
+Capital Group,Capital Cities/ABC,0
+"Express Marine, Inc.",Express Scripts,0
+Motorola Lighting Inc.,Motorola Solutions,0
+Long Island Rail Road,Long Island Lighting,0
+Burlington Electric Department,Burlington Resources,0
+Transport Workers,Transocean Ltd,0
+Franklin Savings Bank,Franklin Resources,0
+Enterprise Bank,Enterprise Products,0
+Massachusetts Affordable Housing Alliance,Massachusetts Mutual Life Insurance,0
+Commerce State Bank,Commercial Metals,0
+Southwest Ohio Regional Transit Authority,Southwest Airlines,0
+Penn State,Penn Traffic,0
+"Family Voices, Inc.",Family Dollar Stores,0
+Center for Cultural Evolution,Centerior Energy,0
+Western Minnesota Municipal Power Agency,Western & Southern Financial Group,0
+USF,USG,0
+Copper Country Alliance,Cooper Companies,0
+Sierra Pacific Mortgage,Sierra Pacific Resources,0
+Bank of New Hampshire,Bank of New York Co.,0
+TransPecos Banks,Transocean Ltd,0
+Bristol-Myers Products,Bristol-Myers Squibb,1
+"Advanced Systems Development, Inc.",Advanced Micro Devices,0
+center for cultural evolution,CenterPoint Energy,0
+Allegheny Conference on Community Development,Allegheny Technologies,0
+General Motors Technical Center,General Motors,1
+"Advanced Safety Concepts, Inc.",Advanced Micro Devices,0
+"Mastercraft Industries, Inc.",MasterCard,0
+Health Watch USA,Health Net,0
+Pacific Seed Association,Pacific Enterprises,0
+Energy Fuels Resources  Inc.,Energy Future Holdings,0
+"Vanguard Airlines, Inc.",Vanguard Health Systems,0
+Alexandra Bennewith,Alexandria Real Estate Equities,0
+"Washington, D.C.",Washington Mutual,0
+Pacific Gas & Electric,Pacific Enterprises,0
+Community Health Network of Washington,Community Health Systems,0
+Jefferson County Farm Bureau,Jefferson-Pilot,0
+"Washington Electric Cooperative, Inc.",Washington Group Intl.,0
+Community Shelter Board,Community Health Systems,0
+"Total Safety Consulting, LLC",Total System Services,0
+Center for Science In the Public Interest,Centerior Energy,0
+Target Specialty Products,Travelers Property Casualty,0
+Central Valley Ag Cooperative,Central & South West,0
+Community Banking Company of Fitzgerald,Community Health Systems,0
+Transport Logistics International,Transocean Ltd,0
+"New England Apple Council, Inc",New England Mutual Life Ins.,0
+Honeywell Flight Operations,Honeywell International,1
+Long Island Commercial Fishing Association,Long Island Lighting,0
+Alliance for a Healthier Generation,Alliance Data Systems,0
+First State Bank Union City,First American Corp.,0
+Federal Home Loan Bank,Federal Paper Board Co.,0
+First State Bank Waynesboro,First American Corp.,0
+Progress Lighting,Progressive,0
+New York Intellectual Property Law Association,New York Life Insurance,0
+New York City Transit,New York Times,0
+Trinity College Dublin,Trinity Industries,0
+Farmers Financial Solutions,Farmers Insurance Exchange,0
+Great Plains National Bank,Great Lakes Chemical,0
+Florida Organic Growers,Florida Progress,0
+Alexandria Sanitation Authority,Alexandria Real Estate Equities,0
+Texas Department of Public Safety Driver License Division,Texas Utilities,0
+STANDARD SALES CO INC,Standard Pacific,0
+Liberty Mutual Group,Liberty Mutual Insurance Group,1
+Pacific Institute,Pacific Enterprises,0
+ATLANTIC RUNNER,Atlantic Richfield,0
+Generations Bank,General Motors,0
+Rivers Workforce Investment Board,Alexandria Real Estate Equities,0
+Huntington Hospital,Huntington Bancshares,0
+Riverside Community Care,Alexander & Alexander,0
+Center for Foodborne Illness Research and Prevention,Centerior Energy,0
+Pacific Business Group,Pacific Telesis Group,0
+LYONDELL CHEM CO,Lyondell Chemical,1
+Generation Progress,General Motors,0
+Center for Educational Performance and Information,Centerior Energy,0
+Western Kentucky Gas Company,Western & Southern Financial Group,0
+Center for Economic and Policy Research,Centerior Energy,0
+Sears Applicant,Sears Roebuck,0
+ExxonMobil Oil Corporation,Exxon Mobil,1
+Universal Health Care Foundation of Connecticut,Universal Health Services,0
+Washington Community Schools,Washington Group Intl.,0
+ConAgra,ConAgra Foods,1
+Alliance of Arizona Nonprofits,Alliance Data Systems,0
+New Zealand Winegrowers,New England Mutual Life Ins.,0
+Kansas City,Kansas City Southern,0
+Louisiana Electric Utility Environmental Group,Louisiana Land & Exploration,0
+Illinois Oil & Gas Association,Illinois Tool Works,0
+Washington County Farm Bureau,Washington Post,0
+"Boston Shipping Association, Inc.",Boston Scientific,0
+Allegheny Valley Bank of Pittsburgh,Allegheny Technologies,0
+Forest Health Protection,Forest Laboratories,0
+Global Heritage Alliance,Global Payments,0
+Western Electrical Contractors Association,Western & Southern Financial Group,0
+Massachusetts Coalition for Occupational Safety and Health,Massachusetts Mutual Life Insurance,0
+Allegheny Front Alliance,Allegheny Energy,0
+Pacific West Region,Pacific Telesis Group,0
+Massachusetts Association of Conservation Commissions,Massachusetts Mutual Life Insurance,0
+Western Resources,Western Gas Resources,0
+York College Learning Center,York International,0
+Georgia Peach Council,Georgia-Pacific,0
+Old Republic Insurance Company,Old Kent Financial,0
+Sierra Club Santa Lucia,Sierra Pacific Resources,0
+"Western Kentucky Navigation, Inc.",Western Digital,0
+"Spectrum Systems, Inc.",Spectrum Group International,0
+"Alaska Tanker Company, LLC",Alaska Air Group,0
+Community Blood Center Community Tissue Services,Community Health Systems,0
+First South Bank,First Solar Inc,0
+Transystems,Transocean Ltd,0
+People For Puget Sound,Peoples Energy,0
+Georgia Health Sciences University,Georgia-Pacific,0
+Massachusetts Emergency Management Agency,Massachusetts Mutual Life Insurance,0
+Westvaco Corporation,Western Atlas,0
+Western Climate Initiative,Western & Southern Financial Group,0
+First State Banking Corporation,First American Corp.,0
+Texas SO2 Working Group,Texas Utilities,0
+Golden State Power Cooperative,Golden State Bancorp,0
+Great Lakes Timber Professionals Association,Great Lakes Chemical,0
+Massachusetts Down Syndrome Congress,Massachusetts Mutual Life Insurance,0
+"Long Island Center for Independent Living, Inc.",Long Island Lighting,0
+Northwest Clean Air Agency,Northwest Airlines,0
+Public Health Data Standards Consortium,Public Storage,0
+EAP,Gap,0
+Family Dairies USA,Family Dollar Stores,0
+Central Group,Central & South West,0
+Community National Bank of Seneca,Community Health Systems,0
+Food,Food 4 Less,0
+Baker University,Baker Hughes,0
+"Harrington Investments, Inc.",Harbinger Group Inc.,0
+Alaska Clean Seas,Alaska Air Group,0
+Massachusetts Department of Housing and Community Development,Massachusetts Mutual Life Insurance,0
+Capital,Capital Cities/ABC,0
+"Precision Combustion, Inc.",Precision Castparts,0
+Federal Home Loan Bank of Dallas,Federal Paper Board Co.,0
+Progress & Freedom Foundation,Progress Energy,0
+Travel Management Partners,Travelers Property Casualty,0
+Transportes Quintanilla S.A. de C.V.,Transocean Ltd,0
+Great Lakes Maritime Academy,Great Lakes Chemical,0
+Western New York Law Center,Western Digital,0
+"Family Forum, Inc",Family Dollar Stores,0
+Bank of Travelers Rest,Bank of America Corp.,0
+"Conagra, Inc.",ConAgra Foods,1
+Armstrong Energy Corp.,Armstrong World Industries,0
+Raymond Federal Bank,Raymond James Financial,0
+New England Fruit Consultants,New England Electric Systems,0
+"New England Tissue Issue, Inc.",New England Electric Systems,0
+New England Anti-Vivisection Society,New England Electric Systems,0
+Santa Fe Public Schools,Santa Fe Snyder Corp.,0
+Southwestern Regional Office,Southwestern Energy,0
+"Alexander and Baldwin, Inc.",Alexander & Alexander,0
+Massachusetts Eye and Ear Infirmary,Massachusetts Mutual Life Insurance,0
+New England Gas Company,New England Mutual Life Ins.,0
+Santa Fe County,Santa Fe Pacific Gold Corp.,0
+Energy West Mining Company,Energy Future Holdings,0
+Sierra Pacific Power Company,Sierra Pacific Resources,0
+Dentsply International,Dentsply Int'l,0
+Transit Authority,Transocean Ltd,0
+Performance Fibers,Performance Food Group,0
+Morgan Stanley & Co. LLC,Morgan Stanley,1

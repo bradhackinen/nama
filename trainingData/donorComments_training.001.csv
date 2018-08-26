@@ -1,0 +1,427 @@
+﻿query_string,candidate_string,match
+Express Script,Express Scripts,1
+Vanguard Health System,Vanguard Health Systems,1
+New England Electric System,New England Electric Systems,1
+Alpha Natural Resource,Alpha Natural Resources,1
+Continental Airline,Continental Airlines,1
+SunTrust Bank,SunTrust Banks,1
+New England Governors,New England Electric Systems,0
+PNC Financial Service Group,PNC Financial Services Group,1
+Whole Foods Markets,Whole Foods Market,1
+Pioneer Hi-Bred Limited,Pioneer Hi-Bred Int'l,1
+Texas Instrument,Texas Instruments,1
+Continental Airlines Pilot,Continental Airlines,
+New England Aquarium Services,New England Electric Systems,0
+"Automatic Data Processing, Inc.",Automatic Data Processing (ADP),1
+Fisher Scientific Company,Fisher Scientific Intl.,1
+Edwards LifeScience,Edwards Lifesciences,1
+Ultramar Diamond Sharmrock,Ultramar Diamond Shamrock,1
+"Expeditors International of Washington, D.C.",Expeditors International of Washington,1
+State Farm Insurance Company,State Farm Insurance Cos.,1
+Science Applications Program,Science Applications Intl.,1
+General Mills Prnts,General Mills,1
+McCormick Interiors,McCormick & Co.,0
+Continental Airlines Pilots,Continental Airlines,
+Wells Fargo Bank,Wells Fargo,1
+Transition Projects,Transitional Hospitals,0
+United Parcel Services,United Parcel Service,1
+florida health care plans,Florida Progress,0
+Continental Airline Pilot,Continental Airlines,
+Smurfit-Stone Cont Corp,Smurfit-Stone Container,1
+Hartford Financial Services Group,Hartford Financial Services,1
+GENCO,GEICO,0
+General Dynamics ATP,General Dynamics,1
+L-3 Communication,L-3 Communications,1
+Republic Free Choice,Republic Services,0
+American Electric Powert,American Electric Power,1
+Great Western Financial Group Inc,Great Western Financial Corp.,1
+Community Health Law Project,Community Health Systems,0
+"Great Lakes Airlines, Ltd.",Great Lakes Chemical,0
+"Great Western Finance, Inc.",Great Western Financial Corp.,1
+TransMontainge,TransMontaigne,1
+United Natural Food,United Natural Foods,1
+Abbott Laboratorie,Abbott Laboratories,1
+Waste Managerment,Waste Management,1
+Fidelity National Title Group,Fidelity National Financial,1
+American Airlines Crew,American Airlines Group,
+Reynolds Metal Company,Reynolds Metals,1
+Lyondell Chemicals,Lyondell Chemical,1
+Continental Airlines Airline,Continental Airlines,1
+NCA,NCR,0
+AMO,AMP,0
+Public Service Electric and Gas Company,Public Service Enterprise Group,0
+First American Bank,First American Corp.,0
+Public Service Department,Public Service Enterprise Group,0
+Public Services Department,Public Service Enterprise Group,0
+Community Bank of Delavan,Community Health Systems,0
+Tenet Healthcare AZ,Tenet Healthcare,1
+Delta Ait Lines,Delta Air Lines,1
+Continental Group,Continental,1
+Louisiana Technical Instruments,Louisiana-Pacific,0
+Great Lakes Coalition,Great Lakes Chemical,0
+USE,USG,0
+Vertex Pharmaceuticals Incorporated,Vertex Pharmaceuticals Inc.,1
+Community Health Group,Community Health Systems,0
+ICA,NCR,0
+Automatic Data Processing,Automatic Data Processing (ADP),1
+Community Healthcare Network,Community Health Systems,0
+American Family Life Assurance Company,American Family Insurance Group,1
+Performance Foodservice,Performance Food Group,1
+Fidelity National Lending,Fidelity National Information Services,0
+Burlington Northern Santa Fe Railway,Burlington Northern Santa Fe,1
+American Water Works Association (AWWA,American Water Works Company Inc,1
+Boston Post Road Dialysis Center,Boston Properties,0
+Great Lakes Anesthesia Associates,Great Lakes Chemical,0
+"Advanced Aviation Technologies Enterprise, Inc.",Advanced Micro Devices,0
+Alliant Energy Combustion,Alliant Energy Corp,1
+Pacific Egg and Poultry Association,Pacific Enterprises,0
+Great Lakes Recycling,Great Lakes Chemical,0
+"Total System Service, Inc.",Total System Services,1
+Great Lakes Airlines,Great Lakes Chemical,0
+Deni,Dell,0
+Southwest Ailrines,Southwest Airlines,1
+Community Health Centers/ Hospital,Community Health Systems,0
+Rockwell Collins Contracts,Rockwell Collins,1
+"Consolidated Care, Inc.",Consolidated Natural Gas,0
+Delta Air Lined,Delta Air Lines,1
+ServiceMaster Clean,ServiceMaster,1
+Pioneer Natural Resources USA Inc.,Pioneer Natural Resources,1
+HCR,HCA,0
+Charles Skorupa,Charles Schwab,0
+General Electronic,General Electric,
+State Farm Insurance Agent,State Farm Insurance Cos.,
+Continental Airlines ALPA,Continental Airlines,
+Pacific Seafood Group,Pacific Enterprises,
+Transport Workers Union at Cape Canaveral,Transocean Ltd,0
+Southern Pain Society,Southern Pacific Rail,0
+First Peoples Bank,First Solar Inc,0
+Continental Airlines Pilot Group,Continental Airlines,
+Fidelity National Title Company,Fidelity National Financial,0
+Adobe Systems Incorporated,Adobe Systems Inc.,1
+John Hancock Financial Services,John Hancock Financial Svcs.,1
+American Water Works Association.,American Water Works Company Inc,0
+Public Service Electric & Gas Company,Public Service Enterprise Group,1
+American Water Work Association,American Water Works Company Inc,0
+Community Health Impact Consulting,Community Health Systems,0
+"Bank of America, N.A.",Bank of America Corp.,1
+Sovereign Bank,Sovereign Bancorp,1
+MasterCard International Incorporated,MasterCard,1
+"Hartford Financial Services Group, Inc.",Hartford Financial Services,1
+New England Energy Alliance,New England Mutual Life Ins.,0
+Alexander County Head Start,Alexander & Alexander,0
+Old Republic Title Co.,Old Republic Intl.,1
+Public Service Electric and Gas Co.,Public Service Enterprise Group,1
+"Hartford Financal Services Group, Inc.",Hartford Financial Services,1
+Essex PB&R Corp.,Essex Property Trust Inc,0
+Pioneer Hibred Inc.,Pioneer Hi-Bred Int'l,1
+MeadWestvaco Nursery,MeadWestvaco,1
+Rubbermaid Incorporated,Rubbermaid Inc.,1
+KBA,KBR,0
+General Electric Motors,General Electric,1
+LEAA,Lear,0
+"Pioneer Natural Resources USA, Inc",Pioneer Natural Resources,1
+"Sierra Club, NRDC",Sierra Pacific Resources,0
+"Centerpoint Services, Inc",CenterPoint Energy,1
+Pacific Egg & Poultry Association,Pacific Enterprises,0
+Public Service Electric and Gas,Public Service Enterprise Group,1
+First Interstate Bank,First Interstate Bancorp,1
+Fisher Scientific Co. L.L.C.,Fisher Scientific Intl.,1
+Continental Alloys & Services,Continental Airlines,0
+Waste Managemnt,Waste Management,1
+Southwest Airlines Pilot,Southwest Airlines,
+"Avon Product, Inc.",Avon Products,1
+American Water Works Association,American Water Works Company Inc,0
+General & Vascular Associates,General Growth Properties,0
+American Airlines MIA-flight ops,American Airlines Group,
+Community Bank of Florida,Community Health Systems,0
+"Hudson-Mohawk Bird Club, Inc.",Hudson City Bancorp,0
+Texas Law Enforcement,Texas Utilities,0
+American Water Works Association .,American Water Works Company Inc,0
+Ingersoll Rand,Ingersoll-Rand,1
+Boise Cascade Wood Products LLC,Boise Cascade Holdings,1
+"Performance Visions, LLC",Performance Food Group,0
+"Hartford FInancial Services Group, Inc.",Hartford Financial Services,1
+Public Service Enterprise Group Incorporated,Public Service Enterprise Group,1
+Affiliated Community Medical Centers,Affiliated Computer Services,0
+"Champion Built Contracting, Inc.",Champion International,0
+"Alexandria Metal Finishers, Inc.",Alexandria Real Estate Equities,0
+Gregory Trubowitsch,Freeport-McMoRan,0
+Alexander Rinehart DC MS CCN CNS,Alexander & Alexander,0
+"Quest Diagnostic, Inc.",Quest Diagnostics,1
+PNC Financial Services,PNC Financial Services Group,1
+"Borden Light Marina, Inc.",Borden Chemical,0
+"Stone County, Arkansas",Stone Container,0
+Morrison Insurance Services,Morrison Knudsen,0
+Mead Johnson Nutrition,Mead Johnson,1
+First American Loan,First American Corp.,0
+First Fidelity Bank,First Fidelity Bancorp,1
+Kimberly Clark,Kimberly-Clark,1
+Louisiana House of Representatives,Louisiana-Pacific,0
+Western & Southern Financial,Western & Southern Financial Group,1
+Martin Marietta Incorporated,Martin Marietta,1
+Use,USG,0
+First Fidelity Title,First Fidelity Bancorp,0
+American Financial Resource,American Financial Group,0
+Fifth Third Bank,Fifth Third Bancorp,1
+Packaging Systems Inc.,Packaging Corp. of America,0
+Mercantile Bank,Mercantile Bancorp.,1
+State Street Bank and Trust Company,State Street Corp.,1
+Mid-America Apartment Communities,Mid-America Apartment Commu. Inc,1
+Consolidated Comments,Consolidated Natural Gas,0
+"Advanced Aviation Technology Enterprises, Inc.",Advanced Micro Devices,0
+Old Republic Ins. Co,Old Republic Intl.,
+General Electric Plastics,General Electric,1
+ConocoPhillip,ConocoPhillips,1
+"Sierra Club,",Sierra Pacific Resources,0
+People's Intermountain Bank,PeopleSoft Inc.,0
+Liberty Mutual Insurance Company,Liberty Mutual Insurance Group,1
+"Calumet Specialty Products Partner, L.P.",Calumet Specialty Products Partners,1
+Transport Workers Union of America,Transocean Ltd,0
+Great Lakes Commission,Great Lakes Chemical,0
+New England VR Directors Group,New England Electric Systems,0
+UEI,UGI,0
+Expeditors International Ocean,Expeditors International of Washington,1
+"Pioneer Natural Resources USA, Inc.",Pioneer Natural Resources,1
+Liberty Mutual Insurance,Liberty Mutual Insurance Group,1
+Atlantic County Utilities Authority,Atlantic Richfield,0
+"Discover Financial Services, KeyCorp",Discover Financial Services,1
+Golden State Reload,Golden State Bancorp,0
+"Great Lakes Shelters, LLC",Great Lakes Chemical,0
+Community Health Association of Spokane,Community Health Systems,0
+Kansas City Power & Light,Kansas City Southern,0
+New England Electric System Companies,New England Electric Systems,1
+Allegheny Technologies Incorporated,Allegheny Technologies,1
+Southwest Airlines Flt.Ops,Southwest Airlines,1
+"Fisher Scientific Company, L.L.C.",Fisher Scientific Intl.,1
+Pligrims Pride,Pilgrim's Pride,1
+Florida Orchestra,Florida Progress,0
+Columbia Elementary School,Columbia Energy Group,0
+HARMAN International,Harman International Industries,1
+NextEra Energy  an,NextEra Energy,1
+"Freescale Semicondutor, Inc.",Freescale Semiconductor,1
+First Church in Cambridge,First Chicago NBD Corp.,0
+New England Aquairum Services,New England Electric Systems,0
+Pioneer Coatings,Pioneer Hi-Bred Int'l,0
+Forest Park Forever,Forest Laboratories,0
+"Kansas City, Inc.",Kansas City Southern,0
+Louisiana Pacific,Louisiana-Pacific,1
+Johnson & Johnson PRD,Johnson & Johnson,1
+State Street Bank,State Street Corp.,1
+Riverside Inc.,Alexander & Alexander,0
+Community Health Alliance of Pasadena,Community Health Systems,0
+Caterpilla,Caterpillar,1
+New England Environmental Voters,New England Electric Systems,0
+Community Home Trust,Community Health Systems,0
+Long Island Science,Long Island Lighting,0
+Molina Health Care Inc.,Molina Healthcare,1
+Community Health Provider Alliance (CHPA,Community Health Systems,0
+Pacific Western Bank,Pacific Enterprises,0
+Signet Jewelers Ltd.,Signet Jewelers Limited,1
+ICR,NCR,0
+Smithfield Food Incorporated,Smithfield Foods,1
+Public Service Research Foundation,Public Service Enterprise Group,0
+Schering-Plough Animal Health,Schering-Plough,1
+Old Republic Title,Old Republic Intl.,0
+Applied Marketing Research,Applied Materials,0
+Performance Dance Center,Performance Food Group,0
+"Plains All American Pipeline, L.P.",Plains All American Pipeline,1
+United Parcel Service UPS,United Parcel Service,1
+"Clear Channel Outdoor, Inc.",Clear Channel Communications,1
+"Sierra Products, Inc.",Sierra Pacific Resources,0
+Signet Jewelers Ltd,Signet Jewelers Limited,1
+"Calumet Specialty Products Partners, L.P.",Calumet Specialty Products Partners,1
+Mead Johnson and Co.,Mead Johnson,1
+First Marblehead,First American Corp.,0
+"Southwestern Eye Center, Ltd.",Southwestern Energy,0
+GAO,Gap,0
+Southwest Airline Pilot,Southwest Airlines,
+Kansas City Care Clinic,Kansas City Southern,0
+"Jefferson Mills, Inc.",Jefferson-Pilot,0
+Louisiana Lawsuit Abuse Watch,Louisiana Land & Exploration,0
+US Airways flight attendant,US Airways Group,
+Southwest Airlines Airline Captain,Southwest Airlines,
+API,APL,0
+Eastman Chemical Chemistry,Eastman Chemical,1
+Estee Lauder Companies,Estee Lauder,1
+Community Health Care,Community Health Systems,0
+Freeport-McMoran Energy,Freeport-McMoRan,1
+State Farm Insurance Companies,State Farm Insurance Cos.,1
+Mead Johnson & Co.,Mead Johnson,1
+Fisher Scientific Company L.L.C.,Fisher Scientific Intl.,1
+"Twenty-First Century Mortgage Services, Inc.",Twenty-First Century Fox,0
+Sierra Club's,Sierra Pacific Resources,0
+Washington Grain Alliance,Washington Group Intl.,0
+Wells Fargo Home,Wells Fargo,1
+Golden State ADHC,Golden State Bancorp,0
+Genesis Health System,Genesis Healthcare,0
+New England Maglev Alliance,New England Electric Systems,0
+Manitowoc Farmco Cooperative,Manitowoc,0
+State Street Bank & Trust Company,State Street Corp.,1
+Kansas City Districts,Kansas City Southern,0
+CENTER FOR DIAGNOSTIC IMAGING,Centerior Energy,0
+"Boise Cascade Wood Products, LLC",Boise Cascade Holdings,1
+"Smurfit-Stone Container Enterprises, Inc",Smurfit-Stone Container,1
+Southwest Airlines Captain,Southwest Airlines,
+First Church of Christ,First Horizon,0
+AMA,AMR,0
+Delta Air Lines ALPA,Delta Air Lines,1
+Southwest General Health Center,Southwestern Energy,0
+"SunTrust Bank, Inc",SunTrust Banks,1
+Santa Fe Construction,Santa Fe Pacific Gold Corp.,0
+HOUSEHOLD INTL INC,Household International,1
+Procter & Gamble Mexico,Procter & Gamble,1
+Burlington Northern and Santa Fe Railway Company,Burlington Northern Santa Fe,1
+"Republic Services of Southern Nevada, Inc (RSS",Republic Services,1
+Massachusetts Zero Mercury Initiative,Massachusetts Mutual Life Insurance,0
+Mercantile Bank Corporation,Mercantile Bancorp.,1
+Jefferson Health System,Jefferson-Pilot,0
+Southwest Airlines Pilots' Association,Southwest Airlines,0
+Southwest Airline Pilots' Association,Southwest Airlines,0
+CONSTELLATION POWER SOURCE GENERATION,Constellation Energy,
+Continental Airlines Captain,Continental Airlines,
+Microchip Technology Incorporated,Microchip Technology,1
+NuStar Energy L.P.,NuStar Energy,1
+Westfalia Technological Services,Western & Southern Financial Group,0
+Monson Companies,Molson Coors Brewing,0
+"Consolidated Int. Automotive, Inc.",Consolidated Natural Gas,0
+General Electric Aviation,General Electric,1
+Western Growers Assoc.,Western Gas Resources,0
+Clear Channel Outdoor,Clear Channel Communications,1
+Southwest Airlines DAL 8TC,Southwest Airlines,1
+Public Service Enterprise Group  Fossil LLC,Public Service Enterprise Group,1
+Berkshire Hathaway Energy,Berkshire Hathaway,1
+ALLIANCE OF AM INSURERS,Alliance Data Systems,0
+Marshall Consulting,Marshall & Ilsley Corp.,0
+General Electric Transportation,General Electric,1
+"Patterson Bros. Oil & Gas, Inc.",Patterson Companies,0
+US Airways Flight Attendant,US Airways Group,
+Advanced Tissue,Advanced Micro Devices,0
+Community Health Professionals,Community Health Systems,0
+ConocoPhillips.com,ConocoPhillips,1
+"State Street Properties, Inc.",State Street Corp.,1
+UGL,UGI,0
+APN,APL,0
+Massachusetts Advocates for Nursing Home Reform,Massachusetts Mutual Life Insurance,0
+New England Wheels,New England Mutual Life Ins.,0
+Community Health Plan of Washingto,Community Health Systems,0
+Massachusetts Electric and National Grid,Massachusetts Mutual Life Insurance,0
+Kraft Foods Retired,Kraft Foods Group,1
+Marathon Pipe Line LLC,Marathon Oil,
+"Smurfit-Stone Container Enterprises, Inc.",Smurfit-Stone Container,1
+Great Lakes Capital Fund,Great Lakes Chemical,1
+"WellPoint, Inc.",WellPoint Health Networks,1
+"Performance Financial Group, LLC.",Performance Food Group,0
+Great Lakes Water Authority,Great Lakes Chemical,0
+Pacific Seed Association,Pacific Telesis Group,0
+Public Service Commission Of West Virginia,Public Service Enterprise Group,0
+Community Health Network,Community Health Systems,0
+"Great Lakes Aviation, Ltd.",Great Lakes Chemical,0
+Public Service Commission of West Virginia,Public Service Enterprise Group,0
+Healthy Lifestyle La Plata,HealthSouth,0
+Massachusetts Immigrant and Refugee Advocacy Coalition,Massachusetts Mutual Life Insurance,0
+Western Michigan University,Western & Southern Financial Group,0
+Community Bank of Mississippi,Community Health Systems,0
+Bank of America and The Clearing House,Bank of America Corp.,
+Hudson-Mohawk Bird Club,Hudson City Bancorp,0
+Fisher Scientific Regulatory Affairs,Fisher Scientific Intl.,1
+Southwest Airlines Pilots Association,Southwest Airlines,
+Prudential Florida Realty,Prudential Financial,0
+Community Health Access Network,Community Health Systems,0
+Emo,FMC,0
+Kansas City Food Circle,Kansas City Southern,0
+Louisiana Ambulance Alliance,Louisiana-Pacific,0
+Southwest Airlines Pilot's Association,Southwest Airlines,
+FRANKLIN INTL,Franklin Resources,0
+Scripps Networks Interactive,Scripps Networks Int.,1
+Associate Professor of Medicine,Associates First Capital,0
+Kansas City Power & Light Co.,Kansas City Southern,0
+General Assembly of Pennsylvania,General Cable,0
+CLG,CNF,0
+Kansas City CMDA,Kansas City Southern,0
+"EnterprisePlus, Inc.",Enterprise GP Holdings,0
+Coca-Cola Enterprises Inc.,Coca-Cola European Partners,
+Louisiana Rice Producers Group,Louisiana-Pacific,0
+Consolidated Rail Corporation,Consolidated Natural Gas,0
+New England United,New England Mutual Life Ins.,0
+ite,LTV,0
+Massachusetts Immigrant & Refugee Advocacy Coalition,Massachusetts Mutual Life Insurance,0
+Kansas City Title,Kansas City Southern,0
+wein,Dell,0
+"Kraft Foods Global, Inc.",Kraft Foods Group,1
+Community Bankers of Wisconsin,Community Health Systems,0
+Southwest Airline Pilots Association,Southwest Airlines,
+Great Lakes Home Mortgage,Great Lakes Chemical,0
+Freddie Mac & Fannie Mae,Freddie Mac,
+First American Title,First American Corp.,0
+"J.B. Hunt Transport, Inc",J.B. Hunt Transport Services,1
+Great Lakes Shipyard,Great Lakes Chemical,0
+"General Technologies, Inc.",General Mills,0
+Pioneer Community Hospital of Aberdeen,Pioneer Natural Resources,0
+Champlain College,Champion International,0
+General Assembly of New Jersey,General Cable,0
+Sierra Club Re,Sierra Pacific Resources,0
+Massachusetts Dietetic Association,Massachusetts Mutual Life Insurance,0
+Center for Digital Accessiblity,Centerior Energy,0
+Mead Johnson & Company,Mead Johnson,1
+Continental Airlines Employee,Continental Airlines,
+Boise Cascade Wood Products L.L.C.,Boise Cascade Holdings,1
+Western Growers Association,Western Gas Resources,0
+Great Oaks Management Inc.,Great Atlantic & Pacific Tea,0
+New England Office Supply,New England Mutual Life Ins.,0
+Mead Johnson and Company,Mead Johnson,1
+Fleetwood Ent. Inc.,Fleetwood Enterprises,1
+Farmers Insurance Group,Farmers Insurance Exchange,1
+John Hancock Financial,John Hancock Financial Svcs.,1
+Spectrum Residential Appraisals,Spectrum Group International,0
+"Western Medical Center, Santa Ana",Western Gas Resources,0
+Southwestern Michigan College Educational Talent Search,Southwestern Energy,0
+Southwest Airlines Pilot Association,Southwest Airlines,
+Robert Paine ENSR Corporation,Robert Half International,0
+Golden State YMCA,Golden State Bancorp,0
+"Republic Services of Kentucky, LLC",Republic Services,0
+AMK,AMP,0
+Burlington Community School District,Burlington Northern Santa Fe,0
+Charles Hall Law Firm,Charles Schwab,0
+McDonald's Tree Haven,McDonald's,0
+"Foster Quan, LLP",Foster Wheeler,0
+Hewlett-Packard Company,Hewlett Packard Enterprise Co,1
+RES,AES,0
+Community Health Center of Branch County,Community Health Systems,0
+Chesapeake Women Anglers,Chesapeake Energy,0
+Patterson Print Shops,Patterson Companies,0
+New England Aquarium comments,New England Electric Systems,0
+ConocoPhillips Marine,ConocoPhillips,1
+Continental Air Lines,Continental,0
+Louisiana Congressional Delegation,Louisiana Land & Exploration,0
+Bank of America Merrill Lynch,Bank of America Corp.,1
+Hartford Family Vineyard,Hartford Financial Services,0
+Community Health Plan of Washington,Community Health Systems,0
+Wells Fargo Bank N.A.,Wells Fargo,1
+Pacific Gas Electric Company,Pacific Enterprises,0
+"J.B. Hunt Transport, Inc.",J.B. Hunt Transport Services,1
+First Church of the Magi Inc.,First Chicago Corp.,0
+Consolidated Shoe Company,Consolidated Natural Gas,0
+Casey's General Stores Incorporated,Casey's General Stores,1
+Clear Channel Outdoor Sales,Clear Channel Communications,1
+Louisiana Association for Justice,Louisiana-Pacific,0
+United Services Automobile Association,United Services Automobile Assn.,1
+TraveLeaders,TravelCenters of America,0
+Marshall County Schools,Marshall & Ilsley Corp.,0
+"Enbridge Energy Partners, L.P.",Enbridge Energy Partners,1
+Morgan Stanley Cooney,Morgan Stanley,0
+Tad,TRW,0
+Southwestern Bell Telephone,Southwestern Energy,0
+Community Health Connections,Community Health Systems,0
+Providence Hospital,Provident Cos Inc.,0
+American Financial Network,American Financial Group,0
+"Continental Air Lines, Inc.",Continental,0
+Capital BlueCross,Capital Cities/ABC,0
+Jacobs Engineering,Jacobs Engineering Group,1
+Louisiana Livestock Marketing Association,Louisiana Land & Exploration,0
+Allegheny Center for Digestive Health,Allegheny Energy,0
+Exxon Mobile Corp,Exxon Mobil,1
+SRPS,Saks,0
+"Louisiana International Marine, L.L.C.",Louisiana Land & Exploration,0
+"Wellpoint, Inc.",WellPoint Health Networks,1
+"Plains All American Pipeline, L. P.",Plains All American Pipeline,1
+Exxon Mobile,Exxon Mobil,1
