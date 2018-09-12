@@ -4,6 +4,7 @@ import numpy as np
 import networkx as nx
 from collections import Counter
 import matplotlib.pyplot as plt
+from matplotlib import collections as mc
 
 from nama.similarity import loadModelPackage,findFuzzyMatches
 from nama.defaults import defaultSimilarityModel
@@ -13,7 +14,7 @@ from nama.hashes import *
 class Matcher():
     def __init__(self,strings=None,similarityModel=defaultSimilarityModel,cuda=False):
         self.G = nx.Graph()
-        self.stringCounts = Counter()
+        self.counts = Counter()
         self.cuda = cuda
 
         if strings:
@@ -28,81 +29,127 @@ class Matcher():
         self.similarityModel = loadModelPackage(filename,cuda=self.cuda)
 
     def addStrings(self,strings):
-        self.G.add_nodes_from(strings)
-        self.stringCounts.update(strings)
+        self.counts.update(strings)
+        self.G.add_nodes_from(((s,{'count':self.counts[s]}) for s in strings))
 
     def removeStrings(self,strings):
         self.G.remove_nodes_from(strings)
         for s in strings:
-            del self.stringCounts[s]
+            del self.counts[s]
 
-    def connect(self,string0,string1,score=1,source='manual'):
-        G.add_edge(string0,string1,score=score,method=method)
+    def addMatch(self,string0,string1,score=1,source='manual'):
+        self.G.add_edge(string0,string1,score=score,source=source)
 
-    def disconnect(self,string0,string1):
-        G.remove_edge(string0,string1)
+    def removeMatch(self,string0,string1):
+        self.G.remove_edge(string0,string1)
 
-    def addConnections(self,pairs,scores,source):
+    def addMatches(self,pairs,scores,source):
         for (s0,s1),score in zip(pairs,scores):
-            # Skip new connection if score lower than or equal to existing connection
             if self.G.has_edge(s0,s1) and self.G[s0][s1]['score'] >= score:
+                # Skip new connection if score lower than or equal to existing connection
                 continue
             self.G.add_edge(s0,s1,score=score,source=source)
 
-    def removeConnections(self,pairs):
+    def removeMatches(self,pairs):
         self.G.remove_edges_from(pairs)
 
-    def applyMatchDF(self,matchDF,score=1,source='manual'):
-        matchDF = matchDF.copy()
-        if 'score' not in matchDF.columns:
-            matchDF['score'] = score
-        if 'source' not in matchDF.columns:
-            matchDF['source'] = source
+    def filterMatches(self,filter_function):
+        for s0,s1,d in list(self.G.edges(data=True)):
+            d = d.copy()
+            d['string0'] = s0
+            d['string1'] = s1
+            if not filter_function(d):
+                self.G.remove_edge(s0,s1)
 
-        correctDF = matchDF[matchesDF['match']][['string0','string1','score','source']]
-        incorrectDF = matchDF[~matchesDF['match']][['string0','string1']]
+    def applyMatchDF(self,matchDF,source='matchDF'):
+        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source=source)
 
-        self.addConnections(zip(correctDF['string0'],correctDF['string1']),correctDF['score'],source=source)
-        self.removeConnections(zip(correctDF['string0'],correctDF['string1']))
-
-        # self.G.add_edges_from((s0,s1,{'score':score,'source':source}) for i,s0,s1,score,source in correctDF.itertuples())
-        # self.G.remove_edges_from((s0,s1) for i,s0,s1 in incorrectDF.itertuples())
+        nonMatchesDF = matchDF[matchDF['score']==0]
+        self.removeMatches(zip(nonMatchesDF['string0'],nonMatchesDF['string1']))
 
     def applyMatchCSV(self,filename,encoding='utf8'):
         matchDF = pd.read_csv(filename,encoding=encoding)
-        matchDF['match'] = matchDF['match'] > 0.5
-        matchDF['source'] = filename
-        matchDF['source'] = matchDF['source'] + ' line: ' + (matchDF.index.get_level_values(0) + -1).astype(str)
+        matchDF['line'] = matchDF.index.get_level_values(0) + 1
+        # matchDF['source'] = matchDF['source'] + ' line: ' + (matchDF.index.get_level_values(0) + -1).astype(str)
 
-    def connectHash(self,hash_function=basicHash,score=1):
+        self.applyMatchDF(matchDF,source=filename)
+
+    def matchHash(self,hash_function=basicHash,score=1):
         pairs = [(s,hash_function(s)) for s in list(self.G.nodes())]
         scores = [score]*len(pairs)
-        self.addConnections(pairs=pairs,scores=scores,source=hash_function.__name__)
-        # for s in list(self.G.nodes()):
-        #     self.G.add_edge(s,hash_function(s),score=score,source=hash_function.__name__)
+        self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
 
-    def connectSimilar(self,min_score=0.9,batch_size=100):
+    def matchSimilar(self,min_score=0.9,batch_size=100):
         if self.similarityModel is None:
             raise Exception('No similarity model loaded')
 
-        matchDF = findFuzzyMatches(self.stringCounts.keys(),self.similarityModel,min_score=min_score,batch_size=batch_size)
+        matchDF = findFuzzyMatches(self.counts.keys(),self.similarityModel,min_score=min_score,batch_size=batch_size)
 
-        self.addConnections(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
-
-        # self.G.add_edges_from((s0,s1,{'score':score,'source':'similarity'}) for i,s0,s1,score in matchDF.itertuples())
+        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
 
     def componentMap(self):
         components = nx.connected_components(self.G)
         return {s:i for i,component in enumerate(components) for s in component}
 
-    def connectionsDF(self):
-        df = pd.concat([pd.DataFrame(list(self.G.edges()),columns=['string0','string1']),
-                        pd.DataFrame([d for s0,s1,d in self.G.edges(data=True)])],axis=1)
+    def matches(self,string=None):
+        if string is None:
+            return self.G
+        else:
+            return self.G.subgraph(nx.node_connected_component(self.G,string))
+
+    def matchesDF(self,string=None):
+        G = self.matches(string)
+        df = pd.concat([pd.DataFrame(list(G.edges()),columns=['string0','string1']),
+                        pd.DataFrame([d for s0,s1,d in G.edges(data=True)])],axis=1)
         return df
 
-    def clustersDF(self):
+    def componentsDF(self):
         componentMap = self.componentMap()
-        pd.DataFrame([(s,i) for s,i in componentMap.items()],columns=['string','component'])
+
+        return pd.DataFrame([(s,i) for s,i in componentMap.items() if s in self.counts],columns=['string','component'])
+
+    def componentSummaryDF(self,sort_by='count',ascending=False):
+        df = matcher.componentsDF()
+        df['count'] = df['string'].apply(lambda s: matcher.counts[s])
+        df = componentsDF.sort_values(['component','count'],ascending=[True,False])
+        df['unique'] = 1
+        df = df.groupby('component').agg({'string':'first','count':'sum','unique':'sum'})
+
+        if sort_by is not None:
+            df = df.sort_values(sort_by,ascending=ascending)
+
+        return df
+
+    def bridgeImpacts(self,string=None):
+        G = self.matches(string)
+        impacts = {}
+        for component in nx.connected_components(G):
+            G_c = G.subgraph(component)
+
+            for s0,s1 in nx.algorithms.bridges(G_c):
+                G_b = G_c.copy()
+                G_b.remove_edge(s0,s1)
+
+                bridgedComponents = list(nx.connected_components(G_b))
+                assert len(bridgedComponents) == 2
+
+                counts = [sum(self.counts[s] for s in c) for c in bridgedComponents]
+                impact = counts[0]*counts[1]
+
+                impacts[(s0,s1)] = impact
+
+        return impacts
+
+    def bridgeImpactsDF(self,string=None):
+        impacts = self.bridgeImpacts(string=string)
+        df = pd.DataFrame([(s0,s1,impact) for (s0,s1),impact in impacts.items()],columns=['string0','string1','impact'])
+
+        df = pd.merge(df,self.matchesDF(string=string))
+
+        df = df.sort_values('impact',ascending=False)
+
+
+        return df
 
     def merge(self,leftDF,rightDF,how='inner',on=None,left_on=None,right_on=None,component_column_name='component'):
 
@@ -127,13 +174,61 @@ class Matcher():
         if how in ['inner','left']:
             leftDF = leftDF[leftDF[component_column_name].notnull()]
 
-        matchesDF = pd.merge(leftDF,rightDF,on=component_column_name,how=how)
+        return pd.merge(leftDF,rightDF,on=component_column_name,how=how)
 
-        return matchesDF
+    def plotMatches(self,string=None,ax=None,cmap='tab10'):
+        G = self.matches(string)
+
+        if string is None:
+            pos = nx.spring_layout(G,weight='score',k=0.75,iterations=50)
+        else:
+            pos = nx.kamada_kawai_layout(G)
+
+        stringNodes = self.counts.keys()
+        hashNodes = [s for s in G.nodes() if s not in self.counts]
+        sources = sorted(set(nx.get_edge_attributes(G,'source').values()))
+
+        if ax is None:
+            fig, ax = plt.subplots()
+        cmap = plt.get_cmap(cmap)
+        for i,source in enumerate(sources):
+            sourceEdges = [(s0,s1,d) for s0,s1,d in G.edges(data=True) if d['source']==source]
+            coordinates = [[pos[s0],pos[s1]] for s0,s1,d in sourceEdges]
+            alphas = [d['score'] for s0,s1,d in sourceEdges]
+
+            color = cmap(i)[:3]
+            rgba = [color+(d['score'],) for s0,s1,d in sourceEdges]
+
+            if source == 'similarity':
+                linestyles = ':'
+            else:
+                linestyles = 'solid'
+            lc = mc.LineCollection(coordinates,label=source,color=rgba,linestyles=linestyles,zorder=0)
+
+            ax.add_collection(lc)
+
+            edgeLabels = {(s0,s1):'{:.2f}'.format(d['score']) for s0,s1,d in sourceEdges if d['score']<1}
+            nx.draw_networkx_edge_labels(G,edge_labels=edgeLabels,font_color=color,pos=pos,bbox={'color':'w','linewidth':1})#,zorder=100)
+
+        nx.draw_networkx_nodes(G,node_color='w',pos=pos)
+
+        nx.draw_networkx_labels(nx.subgraph(G,stringNodes),font_color='k',pos=pos)
+        nx.draw_networkx_labels(nx.subgraph(G,hashNodes),font_color='#888888',pos=pos)
+
+        plt.legend()
+
+        ax.axis('off')
+        ax.set_xlim(-1.5,1.5)
+        ax.set_ylim(-1.5,1.5)
+
+        return ax
+
 
 
 
 if __name__ == '__main__':
+
+    # Run demo code
 
     import pandas as pd
     import nama
@@ -153,59 +248,32 @@ if __name__ == '__main__':
     # At this point we can merge on exact matches, but there isn't much point (equivalent to pandas merge function)
     matcher.merge(df1,df2,on='name')
 
-    # Connect strings if they share a hash string
+    # Match strings if they share a hash string
     # (corphash removes common prefixes and suffixes (the, inc, co, etc) and makes everything lower-case)
-    matcher.connectHash(corpHash)
+    matcher.matchHash(corpHash)
 
     # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
     matcher.merge(df1,df2,on='name')
 
     # Use fuzzy matching to find likely misses (GPU accelerated with cuda=True)
-    matcher.connectSimilar(min_score=0)
+    matcher.matchSimilar(min_score=0.5)
 
     # Review fuzzy matches
-    connectionsDF = matcher.connectionsDF()
+    matcher.matchesDF()
 
-    # Add manual match
-    matcher.connect('ABC Inc.','A.B.C. INCORPORATED')
+    # Add manual matches
+    matcher.addMatch('ABC Inc.','A.B.C. INCORPORATED')
+    matcher.addMatch('XYZ Co.','X Y Z CO')
 
-    # Drop other fuzzy matches from the graph
-    matcher.disconnectBySimilarity(min_score=1)
+    # Drop remaining fuzzy matches from the graph
+    matcher.filterMatches(lambda m: m['source'] != 'similarity')
 
-    # Final merge, ignoring fuzzy matches
+    # Final merge
     matcher.merge(df1,df2,on='name')
 
+    # We can also cluster names by connected component and assign ids to each
+    matcher.componentsDF()
 
-    # We can also cluster names and assign ids to each
-    clusterDF = matcher.clustersDF()
+    # matcher.plotMatches('abc')
 
-
-
-
-
-self = matcher
-
-pos = nx.spring_layout(self.G,weight='similarity',k=0.75)
-
-stringNodes = self.stringCounts.keys()
-hashNodes = [s for s in self.G.nodes() if s not in self.stringCounts]
-
-nx.draw_networkx_edges(nx.subgraph(self.G,hashNodes),pos=pos)
-nx.draw_networkx_nodes(nx.subgraph(self.G,hashNodes),node_color='w',pos=pos)
-nx.draw_networkx_labels(nx.subgraph(self.G,stringNodes),font_color='k',pos=pos)
-nx.draw_networkx_labels(nx.subgraph(self.G,hashNodes),font_color='r',pos=pos)
-
-ax = plt.gca()
-ax.set_xlim(-1.5,1.5)
-ax.set_ylim(-1.5,1.5)
-
-# nx.get_edge_attributes(self.G,'source')
-#
-# nx.draw_networkx(nx.subgraph(self.G,self.stringCounts.keys()),edge_color='r',pos=pos)
-#
-# nx.draw_networkx(self.G,pos=pos,node_color='w')
-#
-# self.connectionsDF()
-
-# list(matcher.G.nodes())
-# matcher.G.edges(data=True)
+    matcher.bridgeImpactsDF()

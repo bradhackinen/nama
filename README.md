@@ -14,12 +14,14 @@ Key Features:
 ```python
 import pandas as pd
 import nama
+from nama.hashes import *
 
-df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns='name')
-df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns='name')
+
+df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
+df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
 
 # Initialize the matcher
-matcher = nama.matcher()
+matcher = Matcher()
 
 # Add the strings we want to match to the match graph
 matcher.addStrings(df1['name'])
@@ -28,32 +30,31 @@ matcher.addStrings(df2['name'])
 # At this point we can merge on exact matches, but there isn't much point (equivalent to pandas merge function)
 matcher.merge(df1,df2,on='name')
 
-# Connect strings if they share a hash string
+# Match strings if they share a hash string
 # (corphash removes common prefixes and suffixes (the, inc, co, etc) and makes everything lower-case)
-matcher.connectByHash(nama.hash.corphash)
+matcher.matchHash(corpHash)
 
 # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
 matcher.merge(df1,df2,on='name')
 
 # Use fuzzy matching to find likely misses (GPU accelerated with cuda=True)
-matcher.loadSimilarityModel(cuda=True)
-matcher.connectBySimilarity(min_score=0.5)
+matcher.matchSimilar(min_score=0)
 
 # Review fuzzy matches
-fuzzyDF = matcher.edges(fuzzy=True)
+connectionsDF = matcher.matchesDF()
 
-# Add manual match
-matcher.connect('ABC Inc.','A.B.C. INCORPORATED')
+# Add manual matches
+matcher.addMatch('ABC Inc.','A.B.C. INCORPORATED')
+matcher.addMatch('XYZ Co.','X Y Z CO')
 
-# Drop other fuzzy matches from the graph
-matcher.disconnectBySimilarity(min_score=1)
+# Drop remaining fuzzy matches from the graph
+matcher.filterMatches(lambda m: m['source'] == 'similarity')
 
-# Final merge, ignoring fuzzy matches
+# Final merge
 matcher.merge(df1,df2,on='name')
 
-
 # We can also cluster names and assign ids to each
-clusterDF = matcher.clusters()
+clusterDF = matcher.clustersDF()
 ```
 
 
