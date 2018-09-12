@@ -45,10 +45,11 @@ class Matcher():
 
     def addMatches(self,pairs,scores,source):
         for (s0,s1),score in zip(pairs,scores):
-            if self.G.has_edge(s0,s1) and self.G[s0][s1]['score'] >= score:
-                # Skip new connection if score lower than or equal to existing connection
-                continue
-            self.G.add_edge(s0,s1,score=score,source=source)
+            if s0 != s1:
+                if self.G.has_edge(s0,s1) and self.G[s0][s1]['score'] >= score:
+                    # Skip new connection if score lower than or equal to existing connection
+                    continue
+                self.G.add_edge(s0,s1,score=score,source=source)
 
     def removeMatches(self,pairs):
         self.G.remove_edges_from(pairs)
@@ -61,29 +62,55 @@ class Matcher():
             if not filter_function(d):
                 self.G.remove_edge(s0,s1)
 
+    def removeUnused(self):
+        '''
+        Removes any nodes that do not connect counted strings
+        '''
+        while True:
+            # Repeatedly find and remove uncounted leaf nodes
+            unused = [s for s in self.G.nodes() if (s not in self.counts) and (self.G.degree[s] <= 1)]
+            for s in unused:
+                self.G.remove_node(s)
+
+            if not unused:
+                # Break out of loop when there are no more nodes to remove
+                break
+
+
     def applyMatchDF(self,matchDF,source='matchDF'):
-        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source=source)
+        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source=source,remove_unused=remove_unused)
 
         nonMatchesDF = matchDF[matchDF['score']==0]
         self.removeMatches(zip(nonMatchesDF['string0'],nonMatchesDF['string1']))
 
-    def applyMatchCSV(self,filename,encoding='utf8'):
-        matchDF = pd.read_csv(filename,encoding=encoding)
-        matchDF['line'] = matchDF.index.get_level_values(0) + 1
-        # matchDF['source'] = matchDF['source'] + ' line: ' + (matchDF.index.get_level_values(0) + -1).astype(str)
+    # def applyMatchCSV(self,filename,encoding='utf8'):
+    #     matchDF = pd.read_csv(filename,encoding=encoding)
+    #     matchDF['line'] = matchDF.index.get_level_values(0) + 1
+    #     # matchDF['source'] = matchDF['source'] + ' line: ' + (matchDF.index.get_level_values(0) + -1).astype(str)
+    #
+    #     self.applyMatchDF(matchDF,source=filename)
 
-        self.applyMatchDF(matchDF,source=filename)
+    def matchHash(self,hash_function=basicHash,score=1,min_string_count=1):
+        # df = pd.DataFrame(list(self.counts.keys()),columns=['string0'])
+        # df['string1'] = df['string0'].apply(hash_function)
+        #
+        # if drop_unused:
+        #     # Only add hash strings if they connect two other strings
+        #     df = df[df.groupby('string1')['string0'].transform(len)>1]
+        #     df['score'] = 1
+        #
+        # self.applyMatchDF(df,source=hash_function.__name__)
 
-    def matchHash(self,hash_function=basicHash,score=1):
-        pairs = [(s,hash_function(s)) for s in list(self.G.nodes())]
+        pairs = [(s,hash_function(s)) for s in self.G.nodes() if self.counts[s] >= min_count]
         scores = [score]*len(pairs)
         self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
 
-    def matchSimilar(self,min_score=0.9,batch_size=100):
+    def matchSimilar(self,min_score=0.9,batch_size=100,min_string_count=1):
         if self.similarityModel is None:
             raise Exception('No similarity model loaded')
 
-        matchDF = findFuzzyMatches(self.counts.keys(),self.similarityModel,min_score=min_score,batch_size=batch_size)
+        matchDF = findFuzzyMatches((s for s in self.G.nodes() if self.counts[s] >= min_count),
+                            self.similarityModel,min_score=min_score,batch_size=batch_size)
 
         self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
 
@@ -124,19 +151,28 @@ class Matcher():
         G = self.matches(string)
         impacts = {}
         for component in nx.connected_components(G):
-            G_c = G.subgraph(component)
 
-            for s0,s1 in nx.algorithms.bridges(G_c):
-                G_b = G_c.copy()
-                G_b.remove_edge(s0,s1)
+            if len(component) == 1:
+                continue
 
-                bridgedComponents = list(nx.connected_components(G_b))
-                assert len(bridgedComponents) == 2
+            elif len(component) == 2:
+                s0,s1 = component
+                impacts[(s0,s1)] = self.counts[s0]*self.counts[s1]
 
-                counts = [sum(self.counts[s] for s in c) for c in bridgedComponents]
-                impact = counts[0]*counts[1]
+            else:
+                G_c = G.subgraph(component)
 
-                impacts[(s0,s1)] = impact
+                for s0,s1 in nx.algorithms.bridges(G_c):
+                    G_b = G_c.copy()
+                    G_b.remove_edge(s0,s1)
+
+                    bridgedComponents = list(nx.connected_components(G_b))
+                    assert len(bridgedComponents) == 2
+
+                    counts = [sum(self.counts[s] for s in c) for c in bridgedComponents]
+                    impact = counts[0]*counts[1]
+
+                    impacts[(s0,s1)] = impact
 
         return impacts
 
@@ -274,6 +310,14 @@ if __name__ == '__main__':
     # We can also cluster names by connected component and assign ids to each
     matcher.componentsDF()
 
-    # matcher.plotMatches('abc')
+    # matcher.plotMatches()
 
     matcher.bridgeImpactsDF()
+
+
+    matcher.plotMatches()
+
+    matcher.addMatch('xyz','123')
+    matcher.addMatch('456','123')
+
+    matcher.removeUnused()
