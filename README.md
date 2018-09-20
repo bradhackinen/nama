@@ -1,5 +1,5 @@
 # nama
-_super fast fuzzy name matching using pytorch and skearn_
+_Fast, flexible name matching for large datasets_
 
 Nama solves the problem of merging datasets by name (particularly company names) when the names might not be represented identically. It is particularly useful when you have thousands or millions of names. In this case manually finding correct matches is almost impossible, and even algorithms that iterate over all the possible pairs of names will be very slow. Nama will probably not completely replace the need to manually review pairs of names, but it makes the task it much more efficient by quickly generating potential matches and providing tools to prioritize matches for review and adjustment.
 
