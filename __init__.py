@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 from collections import Counter
+from itertools import combinations
 import matplotlib.pyplot as plt
 from matplotlib import collections as mc
 
@@ -62,46 +63,28 @@ class Matcher():
             if not filter_function(d):
                 self.G.remove_edge(s0,s1)
 
-    def removeUnused(self):
+    def simplify(self):
         '''
-        Removes any nodes that do not connect counted strings
+        Removes any node that is not on a shortest path between counted strings
         '''
-        while True:
-            # Repeatedly find and remove uncounted leaf nodes
-            unused = [s for s in self.G.nodes() if (s not in self.counts) and (self.G.degree[s] <= 1)]
-            for s in unused:
+        for component in list(nx.connected_components(self.G)):
+            counted = [s for s in component if self.counts[s]]
+            keep = set(counted)
+            for s0,s1 in combinations(counted,2):
+                for path in nx.all_shortest_paths(self.G,s0,s1):
+                    keep.update(path)
+            for s in [s for s in component if s not in keep]:
                 self.G.remove_node(s)
 
-            if not unused:
-                # Break out of loop when there are no more nodes to remove
-                break
-
-
     def applyMatchDF(self,matchDF,source='matchDF'):
-        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source=source,remove_unused=remove_unused)
+        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source=source)
 
         nonMatchesDF = matchDF[matchDF['score']==0]
         self.removeMatches(zip(nonMatchesDF['string0'],nonMatchesDF['string1']))
 
-    # def applyMatchCSV(self,filename,encoding='utf8'):
-    #     matchDF = pd.read_csv(filename,encoding=encoding)
-    #     matchDF['line'] = matchDF.index.get_level_values(0) + 1
-    #     # matchDF['source'] = matchDF['source'] + ' line: ' + (matchDF.index.get_level_values(0) + -1).astype(str)
-    #
-    #     self.applyMatchDF(matchDF,source=filename)
 
     def matchHash(self,hash_function=basicHash,score=1,min_string_count=1):
-        # df = pd.DataFrame(list(self.counts.keys()),columns=['string0'])
-        # df['string1'] = df['string0'].apply(hash_function)
-        #
-        # if drop_unused:
-        #     # Only add hash strings if they connect two other strings
-        #     df = df[df.groupby('string1')['string0'].transform(len)>1]
-        #     df['score'] = 1
-        #
-        # self.applyMatchDF(df,source=hash_function.__name__)
-
-        pairs = [(s,hash_function(s)) for s in self.G.nodes() if self.counts[s] >= min_count]
+        pairs = [(s,hash_function(s)) for s in self.G.nodes() if self.counts[s] >= min_string_count]
         scores = [score]*len(pairs)
         self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
 
@@ -109,7 +92,7 @@ class Matcher():
         if self.similarityModel is None:
             raise Exception('No similarity model loaded')
 
-        matchDF = findFuzzyMatches((s for s in self.G.nodes() if self.counts[s] >= min_count),
+        matchDF = findFuzzyMatches((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
                             self.similarityModel,min_score=min_score,batch_size=batch_size)
 
         self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
@@ -136,9 +119,9 @@ class Matcher():
         return pd.DataFrame([(s,i) for s,i in componentMap.items() if s in self.counts],columns=['string','component'])
 
     def componentSummaryDF(self,sort_by='count',ascending=False):
-        df = matcher.componentsDF()
-        df['count'] = df['string'].apply(lambda s: matcher.counts[s])
-        df = componentsDF.sort_values(['component','count'],ascending=[True,False])
+        df = self.componentsDF()
+        df['count'] = df['string'].apply(lambda s: self.counts[s])
+        df = df.sort_values(['component','count'],ascending=[True,False])
         df['unique'] = 1
         df = df.groupby('component').agg({'string':'first','count':'sum','unique':'sum'})
 
@@ -147,7 +130,7 @@ class Matcher():
 
         return df
 
-    def bridgeImpacts(self,string=None):
+    def matchImpacts(self,string=None):
         G = self.matches(string)
         impacts = {}
         for component in nx.connected_components(G):
@@ -176,8 +159,8 @@ class Matcher():
 
         return impacts
 
-    def bridgeImpactsDF(self,string=None):
-        impacts = self.bridgeImpacts(string=string)
+    def matchImpactsDF(self,string=None):
+        impacts = self.matchImpacts(string=string)
         df = pd.DataFrame([(s0,s1,impact) for (s0,s1),impact in impacts.items()],columns=['string0','string1','impact'])
 
         df = pd.merge(df,self.matchesDF(string=string))
@@ -204,11 +187,8 @@ class Matcher():
         leftDF[component_column_name] = leftDF[left_on].apply(lambda s: componentMap.get(s,np.nan))
         rightDF[component_column_name] = rightDF[right_on].apply(lambda s: componentMap.get(s,np.nan))
 
-        if how in ['inner','right']:
-            leftDF = leftDF[leftDF[component_column_name].notnull()]
-
-        if how in ['inner','left']:
-            leftDF = leftDF[leftDF[component_column_name].notnull()]
+        leftDF = leftDF[leftDF[component_column_name].notnull()]
+        rightDF = rightDF[rightDF[component_column_name].notnull()]
 
         return pd.merge(leftDF,rightDF,on=component_column_name,how=how)
 
@@ -292,7 +272,7 @@ if __name__ == '__main__':
     matcher.merge(df1,df2,on='name')
 
     # Use fuzzy matching to find likely misses (GPU accelerated with cuda=True)
-    matcher.matchSimilar(min_score=0.5)
+    matcher.matchSimilar(min_score=0.1)
 
     # Review fuzzy matches
     matcher.matchesDF()
@@ -309,15 +289,43 @@ if __name__ == '__main__':
 
     # We can also cluster names by connected component and assign ids to each
     matcher.componentsDF()
+    matcher.componentSummaryDF()
 
     # matcher.plotMatches()
 
-    matcher.bridgeImpactsDF()
-
+    matcher.matchImpactsDF()
 
     matcher.plotMatches()
+    matcher.plotMatches('xyz')
 
     matcher.addMatch('xyz','123')
     matcher.addMatch('456','123')
 
-    matcher.removeUnused()
+
+    # min_string_count test
+    matcher = Matcher()
+
+    matcher.addStrings(['google inc','alphabet inc'])
+    matcher.addMatch('Google Inc','Alphabet Inc')
+    matcher.plotMatches()
+
+    matcher.matchHash(corpHash)
+    matcher.plotMatches()
+
+    matcher.matchHash(corpHash,min_string_count=0)
+    matcher.plotMatches()
+
+
+    # Simplification test
+    matcher.addMatch('google','1')
+    matcher.addMatch('1','2')
+    matcher.addMatch('2','Google Inc')
+    matcher.addMatch('alphabet inc','3')
+    matcher.addMatch('3','4')
+    matcher.addMatch('4','5')
+    matcher.addMatch('5','3')
+    matcher.addMatch('google inc','6')
+    matcher.plotMatches()
+
+    matcher.simplify()
+    matcher.plotMatches()
