@@ -14,7 +14,7 @@ Key Features:
 # Quick start
 ```python
 import pandas as pd
-import nama
+from nama.matcher import Matcher
 from nama.hashes import *
 
 
