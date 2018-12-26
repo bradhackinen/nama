@@ -11,14 +11,17 @@ from nama.defaults import defaultSimilarityModel
 from nama.hashes import *
 
 
+
 class Matcher():
     def __init__(self,G=None,counts=None,strings=None):
         if G:
+            assert type(G) == nx.Graph
             self.G = G
         else:
             self.G = nx.Graph()
 
         if counts:
+            assert type(counts) == Counter
             self.counts = counts
         else:
             self.counts = Counter()
@@ -162,7 +165,6 @@ class Matcher():
         df = pd.merge(df,self.matchesDF(string=string))
 
         df = df.sort_values('impact',ascending=False)
-
 
         return df
 
