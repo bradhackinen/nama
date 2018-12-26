@@ -7,27 +7,24 @@ from itertools import combinations
 import matplotlib.pyplot as plt
 from matplotlib import collections as mc
 
-from nama.similarity import loadModelPackage,findFuzzyMatches
 from nama.defaults import defaultSimilarityModel
 from nama.hashes import *
 
 
 class Matcher():
-    def __init__(self,strings=None,similarityModel=defaultSimilarityModel,cuda=False):
-        self.G = nx.Graph()
-        self.counts = Counter()
-        self.cuda = cuda
+    def __init__(self,G=None,counts=None,strings=None):
+        if G:
+            self.G = G
+        else:
+            self.G = nx.Graph()
+
+        if counts:
+            self.counts = counts
+        else:
+            self.counts = Counter()
 
         if strings:
             self.addStrings(strings)
-
-        if similarityModel:
-            self.loadSimilarityModel(similarityModel)
-        else:
-            self.similarityModel = None
-
-    def loadSimilarityModel(self,filename=defaultSimilarityModel):
-        self.similarityModel = loadModelPackage(filename,cuda=self.cuda)
 
     def addStrings(self,strings):
         self.counts.update(strings)
@@ -82,24 +79,23 @@ class Matcher():
         nonMatchesDF = matchDF[matchDF['score']==0]
         self.removeMatches(zip(nonMatchesDF['string0'],nonMatchesDF['string1']))
 
-
     def matchHash(self,hash_function=basicHash,score=1,min_string_count=1):
         pairs = [(s,hash_function(s)) for s in self.G.nodes() if self.counts[s] >= min_string_count]
+
         scores = [score]*len(pairs)
         self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
 
-    def matchSimilar(self,min_score=0.9,batch_size=100,min_string_count=1):
-        if self.similarityModel is None:
-            raise Exception('No similarity model loaded')
-
-        matchDF = findFuzzyMatches((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
-                            self.similarityModel,min_score=min_score,batch_size=batch_size)
+    def matchSimilar(self,similarityModel,min_score=0.9,batch_size=100,min_string_count=1):
+        matchDF = similarityModel.findSimilar((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
+                                                min_score=min_score,batch_size=batch_size)
 
         self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
 
+    def components(self):
+        return nx.connected_components(self.G)
+
     def componentMap(self):
-        components = nx.connected_components(self.G)
-        return {s:i for i,component in enumerate(components) for s in component}
+        return {s:i for i,component in enumerate(self.components()) for s in component}
 
     def matches(self,string=None):
         if string is None:
