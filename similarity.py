@@ -193,7 +193,7 @@ class SimilarityModel():
                 self.save(save_as)
                 if verbose: print('Model saved as ',save_as)
 
-        return self.lossHistory
+        return self.lossHistory[self.lossHistory['epoch']>=startingEpoch]
 
 
 
@@ -327,7 +327,7 @@ if __name__ == '__main__':
     import time
 
     t0 = time.time()
-    historyDF = similarityModel.train(matcher,epochs=3)
+    newHistoryDF = similarityModel.train(matcher,epochs=3)
     print(time.time()-t0)
 
     similarityModel.save(os.path.join(modelDir,'test_model.bin'))
