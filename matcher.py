@@ -13,7 +13,7 @@ from nama.hashes import *
 
 
 class Matcher():
-    def __init__(self,G=None,counts=None,strings=None):
+    def __init__(self,strings=None,counts=None,G=None):
         if G:
             assert type(G) == nx.Graph
             self.G = G
@@ -93,6 +93,21 @@ class Matcher():
                                                 min_score=min_score,batch_size=batch_size)
 
         self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
+
+    def suggestMatches(self,similarityModel,within_component=False,min_score=0.9,batch_size=100,min_string_count=1):
+        matchDF = similarityModel.findSimilar((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
+                                                min_score=min_score,batch_size=batch_size)
+
+        componentMap = self.componentMap()
+        matchDF['within_component'] = matchDF['string0'].apply(lambda s: componentMap[s]) == matchDF['string1'].apply(lambda s: componentMap[s])
+
+        if not within_component:
+            # Select only matches that are between components
+            matchDF = matchDF[~matchDF['within_component']]
+
+        matchDF = matchDF.sort_values('score',ascending=False)
+
+        return matchDF
 
     def components(self):
         return nx.connected_components(self.G)
@@ -236,7 +251,6 @@ class Matcher():
         ax.set_ylim(-1.5,1.5)
 
         return ax
-
 
 
 
