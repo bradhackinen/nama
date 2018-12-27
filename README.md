@@ -13,10 +13,6 @@ Key Features:
 
 # Quick start
 ```python
-import pandas as pd
-from nama.matcher import Matcher
-from nama.hashes import *
-
 
 df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
 df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
@@ -39,23 +35,31 @@ matcher.matchHash(corpHash)
 matcher.merge(df1,df2,on='name')
 
 # Use fuzzy matching to find likely misses (GPU accelerated with cuda=True)
-matcher.matchSimilar(min_score=0.1)
+similarityModel = loadSimilarityModel(os.path.join(modelDir,'demoModel.bin'),cuda=False)
 
-# Review fuzzy matches
+# Preview similar matches without applying them
+# (Useful for choosing a cutoff or manually reviewing each one)
+matcher.suggestMatches(similarityModel,min_score=0)
+
+# Add all similarity matches with score >= 0.5
+# (Alternaticely, use the matcher.applyMatchDF method to add selected matches)
+matcher.matchSimilar(similarityModel,min_score=0.5)
+
+# Review matches - looks good!
 matcher.matchesDF()
-
-# Add manual matches
-matcher.addMatch('ABC Inc.','A.B.C. INCORPORATED')
-matcher.addMatch('XYZ Co.','X Y Z CO')
-
-# Drop remaining fuzzy matches from the graph
-matcher.filterMatches(lambda m: m['source'] != 'similarity')
 
 # Final merge
 matcher.merge(df1,df2,on='name')
 
 # We can also cluster names by connected component and assign ids to each
 matcher.componentsDF()
+matcher.componentSummaryDF()
+
+# Or review matches that critical for linking components
+matcher.matchImpactsDF()
+
+# Or visualize the match graph
+matcher.plotMatches()
 ```
 
 # Installation
