@@ -300,38 +300,38 @@ if __name__ == '__main__':
 
     # Test code
 
-    import nama
-    from nama.matcher import Matcher
-    df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
-    df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
-
-    # Initialize the matcher
-    matcher = Matcher()
-
-    # Add the strings we want to match to the match graph
-    matcher.addStrings(df1['name'])
-    matcher.addStrings(df2['name'])
-    matcher.addStrings(['other'])
-
-
-    matcher.matchHash(nama.hashes.corpHash)
-
-    matcher.G.edges()
-
-    similarityModel = SimilarityModel(cuda=True,d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
-
-    matcher.matchSimilar(similarityModel)
-
-    matcher.matchesDF()
-
-    import time
-
-    t0 = time.time()
-    newHistoryDF = similarityModel.train(matcher,epochs=3)
-    print(time.time()-t0)
-
-    similarityModel.save(os.path.join(modelDir,'test_model.bin'))
-
-    loadedModel = loadSimilarityModel(os.path.join(modelDir,'test_model.bin'))
-
-    loadedModel.train(matcher,epochs=3)
+    # import nama
+    # from nama.matcher import Matcher
+    # df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
+    # df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
+    #
+    # # Initialize the matcher
+    # matcher = Matcher()
+    #
+    # # Add the strings we want to match to the match graph
+    # matcher.addStrings(df1['name'])
+    # matcher.addStrings(df2['name'])
+    # matcher.addStrings(['other'])
+    #
+    #
+    # matcher.matchHash(nama.hashes.corpHash)
+    #
+    # matcher.G.edges()
+    #
+    # similarityModel = SimilarityModel(cuda=True,d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
+    #
+    # matcher.matchSimilar(similarityModel)
+    #
+    # matcher.matchesDF()
+    #
+    # import time
+    #
+    # t0 = time.time()
+    # newHistoryDF = similarityModel.train(matcher,epochs=3)
+    # print(time.time()-t0)
+    #
+    # similarityModel.save(os.path.join(modelDir,'test_model.bin'))
+    #
+    # loadedModel = loadSimilarityModel(os.path.join(modelDir,'test_model.bin'))
+    #
+    # loadedModel.train(matcher,epochs=3)
