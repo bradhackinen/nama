@@ -88,15 +88,15 @@ class Matcher():
         scores = [score]*len(pairs)
         self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
 
-    def matchSimilar(self,similarityModel,min_score=0.9,batch_size=100,min_string_count=1):
+    def matchSimilar(self,similarityModel,min_score=0.95,min_string_count=1,**args):
         matchDF = similarityModel.findSimilar((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
-                                                min_score=min_score,batch_size=batch_size)
+                                                min_score=min_score,**args)
 
         self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
 
-    def suggestMatches(self,similarityModel,within_component=False,min_score=0.9,batch_size=100,min_string_count=1):
+    def suggestMatches(self,similarityModel,within_component=False,min_score=0.95,min_string_count=1,**args):
         matchDF = similarityModel.findSimilar((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
-                                                min_score=min_score,batch_size=batch_size)
+                                                min_score=min_score,**args)
 
         componentMap = self.componentMap()
         matchDF['within_component'] = matchDF['string0'].apply(lambda s: componentMap[s]) == matchDF['string1'].apply(lambda s: componentMap[s])
