@@ -15,11 +15,36 @@ import regex as re
 import matplotlib.pyplot as plt
 import seaborn as sb
 
-from defaults import *
-
 
 def stringToChars(s,max_len=200):
     return b'<' + stringToAscii(s)[:max_len] + b'>'
+
+
+# def batchedNearestNeighbors(vecs,radius,metric,batch_size=100000):
+#     for i in range(0,vecs.shape[0],batch_size):
+#
+#         nearestNeighbors = NearestNeighbors(radius=radius,metric=metric)
+#         nearestNeighbors.fit(vecs[i:i+batch_size])
+#
+#         for j in range(0,vecs.shape[0],batch_size):
+#             distances,matches = nearestNeighbors.radius_neighbors(vecs[j:j+batch_size])
+#
+#             for q,(query_distances,query_matches) in enumerate(zip(distances,matches)):
+#                 for d,k in zip(query_distances,query_matches):
+#                     yield (i+k,j+q),d
+#
+#
+# def batchedNearestNeighbors(vecs,radius,metric,batch_size=100000):
+#     for b in range(0,vecs.shape[0],batch_size):
+#
+#         nearestNeighbors = NearestNeighbors(radius=radius,metric=metric)
+#         nearestNeighbors.fit(vecs[b:b+batch_size])
+#
+#         distances,matches = nearestNeighbors.k_neighbors(vecs)
+#
+#         for j,(query_distances,query_matches) in enumerate(zip(distances,matches)):
+#             for d,i in zip(query_distances,query_matches):
+#                 yield (b+i,j),d
 
 
 class VectorModel(nn.Module):
@@ -69,10 +94,10 @@ class SimilarityModel():
         self.lossHistory = pd.DataFrame()
 
 
-    def trainMinibatch(self,componentData,componentWeightsDF,batch_size):
+    def trainMinibatch(self,components,componentWeights,batch_size):
         cuda = next(self.model.parameters()).is_cuda
 
-        if not batch_size <= 0.5*len(componentData):
+        if not batch_size <= 0.5*len(components):
             raise Exception('Batch size must be smaller than half the number of components')
 
         h = {'batch_size':batch_size,'between_loss':0,'within_loss':0,'within_size':0}
@@ -83,8 +108,11 @@ class SimilarityModel():
             target = target.cuda()
 
         self.optimizer.zero_grad()
-        for pair in np.random.choice(componentWeightsDF['component'],size=(batch_size,2),p=componentWeightsDF['weight'],replace=False):
-            pairData = [componentData[i] for i in pair]
+        for pair in np.random.choice(components,size=(batch_size,2),p=componentWeights,replace=False):
+            pairChars = [set(stringToChars(s) for s in component) for component in pair]
+
+            with torch.no_grad():
+                pairData = [bytesToPacked1Hot(chars,clamp_range=(31,126))[0] for chars in pairChars]
 
             if cuda:
                 pairData = [packedToCuda(packed) for packed in pairData]
@@ -131,21 +159,9 @@ class SimilarityModel():
         cuda = next(self.model.parameters()).is_cuda
         self.model.train()
 
-        componentsDF = matcher.componentsDF()
-        componentsDF['count'] = componentsDF['string'].apply(lambda s: matcher.counts[s])
-
-        componentWeightsDF = componentsDF.groupby('component')['count'].sum().to_frame('weight').reset_index()
-        componentWeightsDF['weight'] = componentWeightsDF['weight'] / componentWeightsDF['weight'].sum()
-
-        # Compile each component into a packed sequence
-        componentData = []
-        for i,df in componentsDF.groupby('component'):
-            chars = df['string'].apply(stringToChars)
-            packed,chars = bytesToPacked1Hot(chars,clamp_range=(31,126))
-
-            assert i == len(componentData)
-            componentData.append(packed)
-
+        components = list(matcher.components())
+        componentWeights = np.array([sum(matcher.counts[s] for s in component) for component in components])
+        componentWeights = componentWeights / componentWeights.sum()
 
         # Set up batch size and learning rate schedules
         try:
@@ -173,7 +189,7 @@ class SimilarityModel():
 
             epochHistory = []
             for b in range(epoch_size):
-                h = self.trainMinibatch(componentData,componentWeightsDF,b_schedule[i])
+                h = self.trainMinibatch(components,componentWeights,b_schedule[i])
                 h['batch'] = b
                 epochHistory.append(h)
 
@@ -217,35 +233,58 @@ class SimilarityModel():
         return np.vstack(vecs)
 
 
-    def findSimilar(self,strings,min_score=0.95,batch_size=100,drop_duplicates=True):
+    def findSimilar(self,strings,min_score=0,n=10,batch_size=100,leaf_size=50,drop_duplicates=True):
         strings = sorted(set(strings))
+        n = min(n,len(strings))
 
         vecs = self.vectorizeStrings(strings,batch_size=batch_size)
 
-        radius = -np.log(max(min_score,1e-8))
+        # radius = np.sqrt(-np.log(max(min_score,1e-8)))
 
-        nearestNeighbors = NearestNeighbors(radius=radius,metric='euclidean')
+        # print(list(batchedNearestNeighbors(vecs,radius=radius,metric='l2',batch_size=neighbor_batch_size)))
+
+        # matchPairs,matchDistances = zip(*batchedNearestNeighbors(vecs,radius=radius,metric='l2',batch_size=neighbor_batch_size))
+        # matchScores = np.exp(-np.array(matchDistances)**2)
+
+        nearestNeighbors = NearestNeighbors(n_neighbors=n,algorithm='ball_tree',leaf_size=leaf_size)
         nearestNeighbors.fit(vecs)
 
-        distances,matches = nearestNeighbors.radius_neighbors(vecs)
+        distances,matches = nearestNeighbors.kneighbors(vecs)
 
-        matchPairs = [(i,j) for i,query_matches in enumerate(matches) for j in query_matches]
-        pairDistances = np.array([d for query_distances in distances for d in query_distances])
-        scores = np.exp(-pairDistances**2)
+        matchPairs = np.vstack([np.kron(np.arange(len(strings)),np.ones(n).astype(int)),matches.ravel()]).T
 
-        if drop_duplicates:
-            matchDF = pd.DataFrame([(strings[i],strings[j]) for i,j in matchPairs],columns=['string0','string1'])
-            matchDF['score'] = scores
+        print(matchPairs)
+        matchPairs = np.sort(np.array(matchPairs),axis=1)
 
-        if drop_duplicates:
-            matchPairs = np.sort(np.array(matchPairs),axis=1)
+        matchScores = np.exp(-distances.ravel()**2)
 
-            matchDF = pd.DataFrame([(strings[i],strings[j]) for i,j in matchPairs],columns=['string0','string1'])
-            matchDF['score'] = scores
+        # radius = np.sqrt(-np.log(max(min_score,1e-8)))
+        #
+        # nearestNeighbors = NearestNeighbors(radius=radius,algorithm='ball_tree',leaf_size=leaf_size)
+        # nearestNeighbors.fit(vecs)
+        #
+        # distances,matches = nearestNeighbors.radius_neighbors(vecs)
+        #
+        # matchPairs = [(i,j) for i,query_matches in enumerate(matches) for j in query_matches]
+        # # pairDistances = np.array([d for query_distances in distances for d in query_distances])
+        # pairDistances = np.hstack(distances)
+        # matchScores = np.exp(-pairDistances**2)
 
-            matchDF = matchDF.drop_duplicates(['string0','string1'])
+        matchDF = pd.DataFrame(matchPairs,columns=['string0','string1'])
+        matchDF['score'] = matchScores
 
         matchDF = matchDF[matchDF['string0'] != matchDF['string1']].copy()
+
+        if min_score > 0:
+            matchDF = matchDF[matchDF['score'] >= min_score]
+
+        if drop_duplicates:
+            matchDF = matchDF.drop_duplicates(['string0','string1'])
+
+        for c in 'string0','string1':
+            matchDF[c] = matchDF.apply(lambda i: strings[i])
+
+        matchDF = matchDF.reset_index(drop=True)
 
         return matchDF
 
@@ -258,8 +297,6 @@ class SimilarityModel():
         'loss_history':self.lossHistory
         }
         torch.save(state,filename)
-
-
 
 def loadSimilarityModel(filename,cuda=False):
     state = torch.load(filename)
@@ -296,42 +333,40 @@ def plotLossHistory(historyDF):
 
 
 
-# if __name__ == '__main__':
-#
-#     Test code
-#
-#     import nama
-#     from nama.matcher import Matcher
-#     df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
-#     df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
-#
-#     # Initialize the matcher
-#     matcher = Matcher()
-#
-#     # Add the strings we want to match to the match graph
-#     matcher.addStrings(df1['name'])
-#     matcher.addStrings(df2['name'])
-#     matcher.addStrings(['other'])
-#
-#
-#     matcher.matchHash(nama.hashes.corpHash)
-#
-#     matcher.G.edges()
-#
-#     similarityModel = SimilarityModel(cuda=True,d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
-#
-#     matcher.matchSimilar(similarityModel)
-#
-#     matcher.matchesDF()
-#
-#     import time
-#
-#     t0 = time.time()
-#     newHistoryDF = similarityModel.train(matcher,epochs=3)
-#     print(time.time()-t0)
-#
-#     similarityModel.save(os.path.join(modelDir,'test_model.bin'))
-#
-#     loadedModel = loadSimilarityModel(os.path.join(modelDir,'test_model.bin'))
-#
-#     loadedModel.train(matcher,epochs=3)
+if __name__ == '__main__':
+
+    # Test code
+    import nama
+    from nama.matcher import Matcher
+    import cProfile as profile
+
+    # Initialize the matcher
+    matcher = Matcher(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO','ABC Inc.','XYZ Co.'])
+
+    # Add some corpHash matches
+    matcher.matchHash(nama.hashes.corpHash)
+
+    # Initalize a new, untrained similarity model
+    similarityModel = SimilarityModel(cuda=True,d=20,d_recurrent=20,recurrent_layers=2,bidirectional=True)
+
+    matcher.suggestMatches(similarityModel,min_score=0)
+
+
+    profile.run('similarityModel.train(matcher,epochs=1)',sort='tottime')
+
+    profile.run('matcher.suggestMatches(similarityModel,min_score=0)',sort='tottime')
+
+
+
+    df0 = matcher.suggestMatches(similarityModel,min_score=0,leaf_size=2)
+
+
+    df0 = matcher.suggestMatches(similarityModel,min_score=0)
+    df1 = matcher.suggestMatches(similarityModel,min_score=0,neighbor_batch_size=2)
+    df2 = matcher.suggestMatches(similarityModel,min_score=0,neighbor_batch_size=3)
+
+
+np.array([[1,2,3],[4,5,6]]).ravel()
+
+
+np.kron(np.arange(5),np.ones(3).astype(int))
