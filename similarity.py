@@ -20,33 +20,6 @@ def stringToChars(s,max_len=200):
     return b'<' + stringToAscii(s)[:max_len] + b'>'
 
 
-# def batchedNearestNeighbors(vecs,radius,metric,batch_size=100000):
-#     for i in range(0,vecs.shape[0],batch_size):
-#
-#         nearestNeighbors = NearestNeighbors(radius=radius,metric=metric)
-#         nearestNeighbors.fit(vecs[i:i+batch_size])
-#
-#         for j in range(0,vecs.shape[0],batch_size):
-#             distances,matches = nearestNeighbors.radius_neighbors(vecs[j:j+batch_size])
-#
-#             for q,(query_distances,query_matches) in enumerate(zip(distances,matches)):
-#                 for d,k in zip(query_distances,query_matches):
-#                     yield (i+k,j+q),d
-#
-#
-# def batchedNearestNeighbors(vecs,radius,metric,batch_size=100000):
-#     for b in range(0,vecs.shape[0],batch_size):
-#
-#         nearestNeighbors = NearestNeighbors(radius=radius,metric=metric)
-#         nearestNeighbors.fit(vecs[b:b+batch_size])
-#
-#         distances,matches = nearestNeighbors.k_neighbors(vecs)
-#
-#         for j,(query_distances,query_matches) in enumerate(zip(distances,matches)):
-#             for d,i in zip(query_distances,query_matches):
-#                 yield (b+i,j),d
-
-
 class VectorModel(nn.Module):
     def __init__(self,d_in=96,d_recurrent=300,d_out=300,recurrent_layers=1,bidirectional=False):
         super().__init__()
@@ -94,7 +67,7 @@ class SimilarityModel():
         self.lossHistory = pd.DataFrame()
 
 
-    def trainMinibatch(self,components,componentWeights,batch_size):
+    def trainMinibatch(self,components,componentWeights,batch_size,within_weight=1):
         cuda = next(self.model.parameters()).is_cuda
 
         if not batch_size <= 0.5*len(components):
@@ -131,7 +104,7 @@ class SimilarityModel():
                     score = (-d).exp()
                     score = torch.clamp(score,min=0,max=1)
 
-                    withinLoss = F.binary_cross_entropy(score,target[1]) / float(batch_size)
+                    withinLoss = within_weight*F.binary_cross_entropy(score,target[1]) / 2*float(batch_size)
                     withinLoss.backward(retain_graph=True)
 
                     h['within_loss'] += withinLoss.item()
@@ -155,7 +128,7 @@ class SimilarityModel():
 
 
 
-    def train(self,matcher,epochs=10,epoch_size=100,minibatch_size=1,lr=0.001,weight_decay=1e-6,save_as=None,verbose=True):
+    def train(self,matcher,epochs=10,epoch_size=100,minibatch_size=1,lr=0.001,weight_decay=1e-6,within_weight=1,save_as=None,verbose=True):
         cuda = next(self.model.parameters()).is_cuda
         self.model.train()
 
@@ -176,7 +149,7 @@ class SimilarityModel():
         except:
             b_schedule = minibatch_size*np.ones(epochs).astype(int)
 
-        bar_freq = epoch_size//100
+        bar_freq = epoch_size//20 + 1
 
         startingEpoch = self.lossHistory['epoch'].max() + 1 if len(self.lossHistory) else 0
         for i,epoch in enumerate(range(startingEpoch,startingEpoch + epochs)):
@@ -189,7 +162,7 @@ class SimilarityModel():
 
             epochHistory = []
             for b in range(epoch_size):
-                h = self.trainMinibatch(components,componentWeights,b_schedule[i])
+                h = self.trainMinibatch(components,componentWeights,b_schedule[i],within_weight=within_weight)
                 h['batch'] = b
                 epochHistory.append(h)
 
@@ -239,13 +212,6 @@ class SimilarityModel():
 
         vecs = self.vectorizeStrings(strings,batch_size=batch_size)
 
-        # radius = np.sqrt(-np.log(max(min_score,1e-8)))
-
-        # print(list(batchedNearestNeighbors(vecs,radius=radius,metric='l2',batch_size=neighbor_batch_size)))
-
-        # matchPairs,matchDistances = zip(*batchedNearestNeighbors(vecs,radius=radius,metric='l2',batch_size=neighbor_batch_size))
-        # matchScores = np.exp(-np.array(matchDistances)**2)
-
         nearestNeighbors = NearestNeighbors(n_neighbors=n,algorithm='ball_tree',leaf_size=leaf_size)
         nearestNeighbors.fit(vecs)
 
@@ -253,22 +219,11 @@ class SimilarityModel():
 
         matchPairs = np.vstack([np.kron(np.arange(len(strings)),np.ones(n).astype(int)),matches.ravel()]).T
 
-        print(matchPairs)
-        matchPairs = np.sort(np.array(matchPairs),axis=1)
+        if drop_duplicates:
+            matchPairs = np.sort(np.array(matchPairs),axis=1)
 
         matchScores = np.exp(-distances.ravel()**2)
 
-        # radius = np.sqrt(-np.log(max(min_score,1e-8)))
-        #
-        # nearestNeighbors = NearestNeighbors(radius=radius,algorithm='ball_tree',leaf_size=leaf_size)
-        # nearestNeighbors.fit(vecs)
-        #
-        # distances,matches = nearestNeighbors.radius_neighbors(vecs)
-        #
-        # matchPairs = [(i,j) for i,query_matches in enumerate(matches) for j in query_matches]
-        # # pairDistances = np.array([d for query_distances in distances for d in query_distances])
-        # pairDistances = np.hstack(distances)
-        # matchScores = np.exp(-pairDistances**2)
 
         matchDF = pd.DataFrame(matchPairs,columns=['string0','string1'])
         matchDF['score'] = matchScores
@@ -282,7 +237,7 @@ class SimilarityModel():
             matchDF = matchDF.drop_duplicates(['string0','string1'])
 
         for c in 'string0','string1':
-            matchDF[c] = matchDF.apply(lambda i: strings[i])
+            matchDF[c] = matchDF[c].apply(lambda i: strings[i])
 
         matchDF = matchDF.reset_index(drop=True)
 
@@ -347,12 +302,12 @@ if __name__ == '__main__':
     matcher.matchHash(nama.hashes.corpHash)
 
     # Initalize a new, untrained similarity model
-    similarityModel = SimilarityModel(cuda=True,d=20,d_recurrent=20,recurrent_layers=2,bidirectional=True)
+    similarityModel = SimilarityModel(cuda=True,d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
 
     matcher.suggestMatches(similarityModel,min_score=0)
 
 
-    profile.run('similarityModel.train(matcher,epochs=1)',sort='tottime')
+    profile.run('similarityModel.train(matcher,epochs=1,within_weight=0.1)',sort='tottime')
 
     profile.run('matcher.suggestMatches(similarityModel,min_score=0)',sort='tottime')
 
@@ -366,7 +321,47 @@ if __name__ == '__main__':
     df2 = matcher.suggestMatches(similarityModel,min_score=0,neighbor_batch_size=3)
 
 
-np.array([[1,2,3],[4,5,6]]).ravel()
+    # Initialize the matcher
+    from nama.defaults import *
+    trainingDF = pd.read_csv(os.path.join(trainingDir,'lobbyingClients_training.csv'))
+
+    samplePairsDF = trainingDF.sample(100)
+    sampleSinglesDF = trainingDF.sample(10000)
+    strings = set(samplePairsDF[['candidate_string','query_string']].values.ravel()) \
+            | set(sampleSinglesDF['query_string'])
+    matcher = Matcher(strings)
+
+    # Add some corpHash matches
+    matcher.matchHash(nama.hashes.corpHash)
+
+    matcher.simplify()
+
+    matcher.matchesDF()
+
+    similarityModel = SimilarityModel(cuda=True,d=20,d_recurrent=20,recurrent_layers=2,bidirectional=True)
+
+    profile.run('similarityModel.train(matcher,epochs=1)',sort='tottime')
 
 
-np.kron(np.arange(5),np.ones(3).astype(int))
+    profile.run('matcher.suggestMatches(similarityModel,min_score=0)',sort='tottime')
+
+
+    df = matcher.suggestMatches(similarityModel,n=5)
+
+    resultsDF = pd.DataFrame()
+    for minibatch_size in 1,10:
+        for lr in 1e-6,1e-7:
+            print('\n\nminibatch_size={}'.format(minibatch_size))
+            similarityModel = SimilarityModel(cuda=True,d=20,d_recurrent=20,recurrent_layers=2,bidirectional=True)
+
+            # profile.run('similarityModel.train(matcher,epochs=10,epoch_size=1000//b,minibatch_size=b,lr=lr)',sort='tottime')
+            historyDF = similarityModel.train(matcher,epochs=10,epoch_size=1000//minibatch_size,minibatch_size=minibatch_size,lr=lr)
+            suggestedDF = matcher.suggestMatches(similarityModel,n=5,min_score=0)
+            # print('Mean nearest neighbor score: {:0.3f}'.format(historyDF['score'].mean()))
+
+            df = historyDF[['within_loss','between_loss','within_size']].tail(1000).mean().to_frame().T
+            df['minibatch_size'] = minibatch_size
+            df['lr'] = lr
+            df['mean_nn_score'] = suggestedDF['score'].mean()
+
+            resultsDF = resultsDF.append(df)
