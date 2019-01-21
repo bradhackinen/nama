@@ -51,7 +51,7 @@ similarityModel = loadSimilarityModel(os.path.join(modelDir,'demoModel.bin'),cud
 matcher.suggestMatches(similarityModel,min_score=0)
 
 # Add all similarity matches with score >= 0.5
-# (Alternaticely, use the matcher.applyMatchDF method to add selected matches)
+# (Alternatively, use the matcher.applyMatchDF method to add selected matches)
 matcher.matchSimilar(similarityModel,min_score=0.5)
 
 # Review matches - looks good!
