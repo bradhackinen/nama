@@ -21,7 +21,7 @@ matcher.suggestMatches(similarityModel)
 
 
 # Train model using existing matches
-similarityModel.train(matcher,epochs=1)
+similarityModel.train(matcher,epochs=3)
 
 # Suggestions are now much better
 matcher.suggestMatches(similarityModel,min_score=0)
