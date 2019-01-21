@@ -1,7 +1,7 @@
 # nama
 _Fast, flexible name matching for large datasets_
 
-Nama solves the problem of merging datasets by name (particularly company names) when the names might not be represented identically. It is particularly useful when you have thousands or millions of names. In this case manually finding correct matches is almost impossible, and even algorithms that iterate over all the possible pairs of names will be very slow. Nama will probably not completely replace the need to manually review pairs of names, but it makes the task it much more efficient by quickly generating potential matches and providing tools to prioritize matches for review and adjustment.
+`nama` solves the problem of merging datasets by name (particularly company names) when the names might not be represented identically. It is particularly useful when you have thousands or millions of names. In this case manually finding correct matches is almost impossible, and even algorithms that iterate over all the possible pairs of names will be very slow. `nama` will probably not completely replace the need to manually review pairs of names, but it makes the task it much more efficient by quickly generating potential matches and providing tools to prioritize matches for review and adjustment.
 
 
 Key Features:
@@ -12,7 +12,16 @@ Key Features:
 - Interrogate the match graph to see how each match was found and highlight important links
 
 # Quick start
+The following code demonstrates how to match strings using hash collisions and similarity matching
 ```python
+import os
+import pandas as pd
+from nama.matcher import Matcher
+from nama.hashes import corpHash
+from nama.similarity import loadSimilarityModel
+
+from nama.defaults import *
+
 
 df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
 df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
@@ -62,6 +71,58 @@ matcher.matchImpactsDF()
 matcher.plotMatches()
 ```
 
+# Similarity scoring and training
+Similarity models are trained on a match graph. `nama` trains a character-level recurrent neural network (RNN) to produce a vector for each string such that:
+- Strings from the same component produce similar vectors (i.e., near in Euclidian space)
+- Strings from different components are spread apart
+
+When the `suggestMatches` or `matchSimilar` functions are called, `nama` generates the vectors for all strings and uses an efficient nearest neighbours-algorithm from `scikit-learn` to find close matches. The similarity score reflects the distance of the vectors in Euclidian space.
+
+Because the similarity model finds it 'easier' to generate similar output from similar strings, misclassification is informative. String pairs with very high scores that aren't in the same component often indicate spelling mistakes or other errors in the match graph, and string pairs with very low score within a component suggest that two very different appearing names have been linked, which might be worth reviewing.
+
+The following code demonstrates how to train a new similarity model on a small number of strings linked by hash collisions. Note that for large datasets (millions of strings), training a new model can take several hours.
+```python
+import nama
+from nama.matcher import Matcher
+from nama.similarity import SimilarityModel
+
+from nama.defaults import *
+
+
+# Initialize the matcher
+matcher = Matcher(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO','ABC Inc.','XYZ Co.'])
+
+# Add some corpHash matches
+matcher.matchHash(nama.hashes.corpHash)
+
+
+# Initalize a new, untrained similarity model
+similarityModel = SimilarityModel(cuda=True,d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
+
+
+# Observe that untrained suggestions are poor quality (though not entirely useless - neat!)
+matcher.suggestMatches(similarityModel)
+
+
+# Train model using existing matches
+similarityModel.train(matcher,epochs=1)
+
+# Suggestions are now much better
+matcher.suggestMatches(similarityModel,min_score=0)
+
+# Save similarity model
+similarityModel.save(os.path.join(modelDir,'demoModel.bin'))
+
+
+# Too much training on a small set of strings can lead to over-fitting
+similarityModel.train(matcher,epochs=3)
+
+# --> All suggestions now have very low scores
+matcher.suggestMatches(similarityModel,min_score=0)
+
+```
+
+
 # Installation
 ## Requirements
 - Python 3
@@ -71,30 +132,3 @@ matcher.plotMatches()
 - matplotlib
 - PyTorch
 - sci-kit learn
-
-
-# Documentation
-## Introduction to the match graph
-
-Nama is built around the concept of a _match graph_. The match graph is a network of strings where edges represent matches between pairs. Matching is performed by first building the match graph, and then looking for connected strings, either in a pairwise way (is "_ABC Inc._" connected to "_the ABC company_"?) or by clustering components of connected strings. The match graph allows multiple types of matches to be combined, and it allows nama to infer that if A is linked to B and B is linked to C that A should also be linked to C.
-
-
- (powered by the excellent `networkx` module)
-
-
- There are many measures of text similarity between strings, but when the number of names is large (say, a few hundred thousand or more in each list), pairwise comparison takes a very long time. Nama uses multiple passes to efficiently match names:
-1. Direct substition of training pairs
-2. Matching by string 'hash' collisions (for example, linking all strings that have the same lower-case representation)
-3. A novel neural network-based string embedding algorithm that produces vector representations of each name and uses an efficient nearest neighbors search to find fuzzy matches in linear time. Powered by PyTorch and scikit-learn.
-
-## Merging and clustering
-
-## Match review
-### Plotting
-
-### Prioritization
-
-
-## Similarity Matching
-
-## Similarity training
