@@ -6,9 +6,8 @@ from itertools import combinations
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchUtilities import *
+from nama.utilities import *
 from sklearn.neighbors import NearestNeighbors
-from pandasUtilities import dfChunks
 import networkx as nx
 import regex as re
 
