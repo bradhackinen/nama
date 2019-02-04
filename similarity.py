@@ -12,7 +12,6 @@ import networkx as nx
 import regex as re
 
 import matplotlib.pyplot as plt
-import seaborn as sb
 
 
 def stringToChars(s,max_len=200):
