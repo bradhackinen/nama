@@ -29,8 +29,8 @@ matcher.matchHash(corpHash)
 # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
 matcher.merge(df1,df2,on='name')
 
-# Use fuzzy matching to find likely misses (GPU accelerated with cuda=True)
-similarityModel = loadSimilarityModel(os.path.join(modelDir,'demoModel.bin'),cuda=False)
+# Use fuzzy matching to find likely misses (GPU accelerated with device='cuda')
+similarityModel = loadSimilarityModel(os.path.join(modelDir,'demoModel.bin'))
 
 # Preview similar matches without applying them
 # (Useful for choosing a cutoff or manually reviewing each one)

@@ -45,7 +45,7 @@ class VectorModel(nn.Module):
 
 
 class SimilarityModel():
-    def __init__(self,cuda=False,d=300,d_recurrent=None,recurrent_layers=1,bidirectional=False):
+    def __init__(self,device='cpu',d=300,d_recurrent=None,recurrent_layers=1,bidirectional=False):
         self.args = locals()
         del self.args['self']
 
@@ -56,8 +56,7 @@ class SimilarityModel():
 
         self.model = VectorModel(d_recurrent=d,d_out=d,recurrent_layers=recurrent_layers,bidirectional=bidirectional)
 
-        if cuda:
-            self.model = self.model.cuda()
+        self.model.to(torch.device(device))
 
         self.params = {'params':self.model.parameters()}
 
@@ -67,7 +66,7 @@ class SimilarityModel():
 
 
     def trainMinibatch(self,components,componentWeights,batch_size,within_weight=1):
-        cuda = next(self.model.parameters()).is_cuda
+        device = next(self.model.parameters()).device
 
         if not batch_size <= 0.5*len(components):
             raise Exception('Batch size must be smaller than half the number of components')
@@ -75,9 +74,7 @@ class SimilarityModel():
         h = {'batch_size':batch_size,'between_loss':0,'within_loss':0,'within_size':0}
 
         # Make a little utility vector that contains 0 and 1 for entering into the loss function
-        target = torch.tensor([0,1]).float()
-        if cuda:
-            target = target.cuda()
+        target = torch.tensor([0,1]).float().to(device)
 
         self.optimizer.zero_grad()
         for pair in np.random.choice(components,size=(batch_size,2),p=componentWeights,replace=False):
@@ -86,8 +83,7 @@ class SimilarityModel():
             with torch.no_grad():
                 pairData = [bytesToPacked1Hot(chars,clamp_range=(31,126))[0] for chars in pairChars]
 
-            if cuda:
-                pairData = [packedToCuda(packed) for packed in pairData]
+            pairData = [packedTo(packed,device) for packed in pairData]
 
             # Compute vectors for each pair
             v = [self.model(packed) for packed in pairData]
@@ -128,7 +124,6 @@ class SimilarityModel():
 
 
     def train(self,matcher,epochs=10,epoch_size=100,minibatch_size=1,lr=0.001,weight_decay=1e-6,within_weight=1,save_as=None,verbose=True):
-        cuda = next(self.model.parameters()).is_cuda
         self.model.train()
 
         components = list(matcher.components())
@@ -187,7 +182,7 @@ class SimilarityModel():
 
     def vectorizeStrings(self,strings,batch_size=100,max_len=200):
         self.model.eval()
-        cuda = next(self.model.parameters()).is_cuda
+        device = next(self.model.parameters()).device
 
         chars = [stringToChars(s,max_len=max_len) for s in strings]
         vecs = []
@@ -195,11 +190,12 @@ class SimilarityModel():
             batchChars = chars[i:i+batch_size]
             packed,sorted_chars = bytesToPacked1Hot(batchChars,clamp_range=(31,126))
             chars_to_id = {s:i for i,s in enumerate(sorted_chars)}
-            if cuda:
-                packed = packedToCuda(packed)
+            packed = packedTo(packed,device)
+
             sorted_vecs = self.model(packed).data.cpu().numpy()
             selector = np.array([chars_to_id[s] for s in batchChars])
             batch_vecs = sorted_vecs[selector,:]
+
             vecs.append(batch_vecs)
 
         return np.vstack(vecs)
@@ -252,10 +248,11 @@ class SimilarityModel():
         }
         torch.save(state,filename)
 
-def loadSimilarityModel(filename,cuda=False):
-    state = torch.load(filename)
 
-    state['args'].update({'cuda':cuda})
+def loadSimilarityModel(filename,device='cpu'):
+    state = torch.load(filename,map_location=torch.device(device))
+
+    state['args']['device'] = device
 
     similarityModel = SimilarityModel(**state['args'])
     similarityModel.model.load_state_dict(state['model_state'])
@@ -301,7 +298,7 @@ if __name__ == '__main__':
     matcher.matchHash(nama.hashes.corpHash)
 
     # Initalize a new, untrained similarity model
-    similarityModel = SimilarityModel(cuda=True,d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
+    similarityModel = SimilarityModel(device='cuda',d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
 
     matcher.suggestMatches(similarityModel,min_score=0)
 
@@ -337,7 +334,7 @@ if __name__ == '__main__':
 
     matcher.matchesDF()
 
-    similarityModel = SimilarityModel(cuda=True,d=20,d_recurrent=20,recurrent_layers=2,bidirectional=True)
+    similarityModel = SimilarityModel(device='cuda',d=20,d_recurrent=20,recurrent_layers=2,bidirectional=True)
 
     profile.run('similarityModel.train(matcher,epochs=1)',sort='tottime')
 
@@ -351,7 +348,7 @@ if __name__ == '__main__':
     for minibatch_size in 1,10:
         for lr in 1e-6,1e-7:
             print('\n\nminibatch_size={}'.format(minibatch_size))
-            similarityModel = SimilarityModel(cuda=True,d=20,d_recurrent=20,recurrent_layers=2,bidirectional=True)
+            similarityModel = SimilarityModel(device='cuda',d=20,d_recurrent=20,recurrent_layers=2,bidirectional=True)
 
             # profile.run('similarityModel.train(matcher,epochs=10,epoch_size=1000//b,minibatch_size=b,lr=lr)',sort='tottime')
             historyDF = similarityModel.train(matcher,epochs=10,epoch_size=1000//minibatch_size,minibatch_size=minibatch_size,lr=lr)
@@ -364,3 +361,14 @@ if __name__ == '__main__':
             df['mean_nn_score'] = suggestedDF['score'].mean()
 
             resultsDF = resultsDF.append(df)
+
+
+    # Test saving and loading across devices
+
+    for device in ['cpu','cuda']:
+
+        model = SimilarityModel(device=device)
+        model.save(os.path.join(modelDir,'temp.bin'))
+
+        loadSimilarityModel(os.path.join(modelDir,'temp.bin'))
+        loadSimilarityModel(os.path.join(modelDir,'temp.bin'),device='cuda')

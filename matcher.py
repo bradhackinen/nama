@@ -283,7 +283,7 @@ if __name__ == '__main__':
     # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
     matcher.merge(df1,df2,on='name')
 
-    # Use fuzzy matching to find likely misses (GPU accelerated with cuda=True)
+    # Use fuzzy matching to find likely misses (GPU accelerated with device='cuda')
     matcher.matchSimilar(min_score=0.1)
 
     # Review fuzzy matches
