@@ -96,8 +96,8 @@ matcher = Matcher(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company',
 matcher.matchHash(nama.hashes.corpHash)
 
 
-# Initalize a new, untrained similarity model
-similarityModel = SimilarityModel(cuda=True,d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
+# Initalize a new, untrained similarity model (GPU accelerated with device='cuda')
+similarityModel = SimilarityModel(d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
 
 
 # Observe that untrained suggestions are poor quality (though not entirely useless - neat!)
