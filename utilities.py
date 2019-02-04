@@ -61,74 +61,14 @@ def bytesToPacked1Hot(byteStrings,clamp_range=None,presorted=False):
     return packed1hot,byteStrings
 
 
-def packedToCuda(packedSequence):
-    return PackedSequence(packedSequence.data.cuda(),packedSequence.batch_sizes)
+def packedTo(packedSequence,device):
+    return PackedSequence(packedSequence.data.to(device),packedSequence.batch_sizes)
 
 
 def charIdsToString(charIds):
     '''Only intended for debugging'''
     chars = ''.join(chr(i+32) for i in charIds)
     return chars
-
-
-def trainWithHistory(batch_train_fuction,epoch_batch_iterator,historyDF=None,exit_function=None,verbose=True,bar_freq=1):
-    '''
-    Tracks training history for a training function exucuted over a nested
-    epoch-batch iterator
-    '''
-
-    if historyDF is None:
-        historyDF = pd.DataFrame()
-
-    try:
-        start_epoch = historyDF['epoch'].max() + 1
-    except:
-        start_epoch = 0
-
-    for epoch,batch_iterator in enumerate(epoch_batch_iterator,start_epoch):
-        epochHistory = []
-        if verbose: print('\nTraining epoch {}'.format(epoch))
-        for batch,batchData in enumerate(batch_iterator):
-
-            batchHistory = batch_train_fuction(batchData)
-
-            batchHistory['batch'] = batch
-            epochHistory.append(batchHistory)
-
-            if verbose and not (batch + 1) % bar_freq: print('|',end='')
-
-        epochHistoryDF = pd.DataFrame(epochHistory)
-
-        epochHistoryDF['epoch'] = epoch
-
-        historyDF = historyDF.append(epochHistoryDF)
-
-        if verbose: print('\nMean loss: {}'.format(epochHistoryDF['loss'].sum()/epochHistoryDF['size'].sum()))
-
-        if not exit_function is None:
-            if exit_function(historyDF):
-                break
-
-    return historyDF
-
-
-
-def plotLossHistory(historyDF,ylim=None,scatter_alpha=0.25,max_points=10000):
-    historyDF = historyDF.copy()
-    historyDF['x'] = historyDF['size'].cumsum()
-    if len(historyDF) > max_points:
-        historyDF = historyDF.sample(max_points).sort_values('x')
-    bw = len(historyDF)/20
-    historyDF['smoothed_loss'] = (historyDF['loss']/historyDF['size']).rolling(window=math.ceil(bw*4),center=True,min_periods=1,win_type='gaussian').mean(std=bw)
-
-    plt.scatter(x=historyDF['x'],y=historyDF['loss']/historyDF['size'],s=3,alpha=scatter_alpha)
-    plt.plot(historyDF['x'],historyDF['smoothed_loss'])
-    if ylim:
-        plt.gca().set_ylim(*ylim)
-    plt.show()
-
-
-
 
 
 def dfChunks(df,chunk_size):
