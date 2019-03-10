@@ -10,8 +10,10 @@ from nama.utilities import *
 from sklearn.neighbors import NearestNeighbors
 import networkx as nx
 import regex as re
-
+import inspect
 import matplotlib.pyplot as plt
+
+from nama.defaults import *
 
 
 def stringToChars(s,max_len=200):
@@ -251,6 +253,15 @@ class SimilarityModel():
 def loadSimilarityModel(filename,device='cpu'):
     state = torch.load(filename,map_location=torch.device(device))
 
+    # For backwards compatibility, limit to current valid args
+    validArgs = inspect.getfullargspec(SimilarityModel.__init__).args
+    validArgs.remove('self')
+
+    invalidArgs = {arg for arg in state['args'].keys() if arg not in validArgs}
+    if invalidArgs:
+        print('Warning: Loaded model includes invalid initalization args {}. They will be ignored.'.format(invalidArgs))
+
+    state['args'] = {arg:value for arg,value in state['args'].items() if arg in validArgs}
     state['args']['device'] = device
 
     similarityModel = SimilarityModel(**state['args'])
@@ -371,3 +382,6 @@ if __name__ == '__main__':
 
         loadSimilarityModel(os.path.join(modelDir,'temp.bin'))
         loadSimilarityModel(os.path.join(modelDir,'temp.bin'),device='cuda')
+
+    # test compatibility with models saved from older version
+    loadSimilarityModel(os.path.join(modelDir,'grantOrgsSimilarityModel.003.bin'))
