@@ -46,11 +46,8 @@ def findNearestMatches(strings,similarityModel,n=10,drop_duplicates=True,normali
     return matchDF
 
 
-def scoreCurve(d,a=1,b=1):
-    return np.exp(-(np.abs(a)*d + np.abs(b)*(d**2)))
-
-
-def calibrateScores(matchDF,matcher,max_sample=10000,show_plot=False,plot_res=100):
+def calibrateMatchScores(matchDF,matcher,max_sample=10000,show_plot=False,plot_res=100):
+    matchDF = matchDF.copy()
 
     componentMap = matcher.componentMap()
     for i in [0,1]:
@@ -58,27 +55,27 @@ def calibrateScores(matchDF,matcher,max_sample=10000,show_plot=False,plot_res=10
 
     matchDF['within_component'] = matchDF['component0'] == matchDF['component1']
 
-    sampleDF = matchDF[matchDF['score']<1]
-    if len(sampleDF) > max_sample:
-        sampleDF = sampleDF.sample(max_sample)
-
-    if sampleDF['within_component'].std() == 0:
+    if len(set(sampleDF['within_component'])) < 2:
         raise Exception('Warning: Need both within and between-component matches with imperfect scores to calibrate.')
 
-    sampleDF = sampleDF.sort_values('score')
 
-    try:
-        (a,b),cov = curve_fit(scoreCurve,sampleDF['distance'].values,sampleDF['within_component'].values)
-    except:
-        b=1
-        a,cov = curve_fit(lambda d,a: scoreCurve(d,a,b),sampleDF['distance'].values,sampleDF['within_component'].values)
+    if len(matchDF) > max_sample:
+        # TODO: Need to take a stratified sample
+        sampleDF = sampleDF.sample(max_sample)
+    else:
+        sampleDF = matchDF
+
+    def gammaCurve(x,gamma):
+        return x**gamma
+
+    gamma,cov = curve_fit(gammaCurve,sampleDF['score'].values,sampleDF['within_component'].values)
 
     if show_plot:
-        plt.scatter(x='distance',y='within_component',data=matchDF)
-        x = np.linspace(0,matchDF['distance'].max(),plot_res)
-        plt.plot(x,scoreCurve(x,a,b))
+        plt.scatter(x='score',y='within_component',data=matchDF)
+        x = np.linspace(0,1,plot_res)
+        plt.plot(x,gammaCurve(x,a,b))
 
-    matchDF['score'] = scoreCurve(matchDF['distance'],a,b)
+    matchDF['score'] = scoreCurve(matchDF['score'],gamma)
 
     return matchDF
 

@@ -7,9 +7,8 @@ from itertools import combinations
 import matplotlib.pyplot as plt
 from matplotlib import collections as mc
 
-from nama.defaults import defaultSimilarityModel
 from nama.hashes import *
-
+import nama.similarity as similarity
 
 
 class Matcher():
@@ -28,6 +27,9 @@ class Matcher():
 
         if strings:
             self.addStrings(strings)
+
+    def strings(self):
+        return self.counts.keys()
 
     def addStrings(self,strings):
         self.counts.update(strings)
@@ -55,6 +57,12 @@ class Matcher():
     def removeMatches(self,pairs):
         self.G.remove_edges_from(pairs)
 
+    def addMatchDF(self,matchDF,source='matchDF'):
+        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source=source)
+
+    def removeMatchDF(self,matchDF):
+        self.removeMatches(zip(matchDF['string0'],matchDF['string1']))
+
     def filterMatches(self,filter_function):
         for s0,s1,d in list(self.G.edges(data=True)):
             d = d.copy()
@@ -76,38 +84,31 @@ class Matcher():
             for s in [s for s in component if s not in keep]:
                 self.G.remove_node(s)
 
-    def applyMatchDF(self,matchDF,source='matchDF'):
-        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source=source)
-
-        nonMatchesDF = matchDF[matchDF['score']==0]
-        self.removeMatches(zip(nonMatchesDF['string0'],nonMatchesDF['string1']))
-
     def matchHash(self,hash_function=basicHash,score=1,min_string_count=1):
         pairs = [(s,hash_function(s)) for s in self.G.nodes() if self.counts[s] >= min_string_count]
 
         scores = [score]*len(pairs)
         self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
 
-    def matchSimilar(self,similarityModel,min_score=0.95,min_string_count=1,**args):
-        matchDF = similarityModel.findSimilar((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
-                                                min_score=min_score,**args)
+    def suggestMatches(self,similarityModel,within_component=False,min_string_count=1,show_plot=False,**args):
+        matchDF = similarity.findNearestMatches((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
+                                            similarityModel,**args)
 
-        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
+        matchDF = similarity.scoreSimilarity(matchDF,self,show_plot=show_plot)
 
-    def suggestMatches(self,similarityModel,within_component=False,min_score=0.95,min_string_count=1,**args):
-        matchDF = similarityModel.findSimilar((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
-                                                min_score=min_score,**args)
-
-        componentMap = self.componentMap()
-        matchDF['within_component'] = matchDF['string0'].apply(lambda s: componentMap[s]) == matchDF['string1'].apply(lambda s: componentMap[s])
-
-        if not within_component:
-            # Select only matches that are between components
-            matchDF = matchDF[~matchDF['within_component']]
-
-        matchDF = matchDF.sort_values('score',ascending=False)
+        matchDF = matchDF[~matchDF['within_component']]
 
         return matchDF
+
+    def matchSimilar(self,similarityModel,min_score=0.5,max_distance=None,min_string_count=1,show_plot=False,**args):
+        matchDF = self.suggestMatches(similarityModel,within_component=False,min_string_count=1,show_plot=False,**args)
+
+        matchDF = matchDF[matchDF['score']>=min_score]
+
+        if max_distance is not None:
+            matchDF = matchDF[matchDF['distance'] <= max_distance]
+
+        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
 
     def components(self):
         return nx.connected_components(self.G)
@@ -261,6 +262,7 @@ if __name__ == '__main__':
     import pandas as pd
     from nama.matcher import Matcher
     from nama.hashes import *
+    from nama.lsa import LSAModel
 
 
     df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
@@ -283,8 +285,11 @@ if __name__ == '__main__':
     # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
     matcher.merge(df1,df2,on='name')
 
-    # Use fuzzy matching to find likely misses (GPU accelerated with device='cuda')
-    matcher.matchSimilar(min_score=0.1)
+    # Fit a LSA model to generate similarity measures
+    lsa = LSAModel(matcher.strings())
+
+    # Use fuzzy matching to find likely misses
+    matcher.matchSimilar(lsa)
 
     # Review fuzzy matches
     matcher.matchesDF()
