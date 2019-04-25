@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from collections import Counter
 import scipy.sparse as sparse
+from unidecode import unidecode
 
 
 def stringToAscii(s):

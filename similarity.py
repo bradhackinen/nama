@@ -46,16 +46,21 @@ def findNearestMatches(strings,similarityModel,n=10,drop_duplicates=True,normali
     return matchDF
 
 
-def calibrateMatchScores(matchDF,matcher,max_sample=10000,show_plot=False,plot_res=100):
-    matchDF = matchDF.copy()
+def withinComponent(matchDF,matcher):
 
     componentMap = matcher.componentMap()
     for i in [0,1]:
         matchDF['component{}'.format(i)] = matchDF['string{}'.format(i)].apply(lambda s: componentMap[s])
 
-    matchDF['within_component'] = matchDF['component0'] == matchDF['component1']
+    return matchDF['component0'] == matchDF['component1']
 
-    if len(set(sampleDF['within_component'])) < 2:
+
+def calibrateMatchScores(matchDF,matcher,max_sample=10000,show_plot=False,plot_res=100):
+    matchDF = matchDF.copy()
+
+    matchDF['within_component'] = withinComponent(matchDF,matcher)
+
+    if len(set(matchDF['within_component'])) < 2:
         raise Exception('Warning: Need both within and between-component matches with imperfect scores to calibrate.')
 
 

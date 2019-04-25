@@ -5,6 +5,7 @@ import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.utils.rnn import PackedSequence
 from sklearn.neighbors import NearestNeighbors
 import inspect
 import matplotlib.pyplot as plt
@@ -92,7 +93,7 @@ class VectorModel(nn.Module):
 
 
 
-class rnnEmbeddingModel():
+class RnnEmbeddingModel():
     def __init__(self,device='cpu',d=300,d_recurrent=None,recurrent_layers=1,bidirectional=False):
         self.args = locals()
         del self.args['self']
@@ -228,7 +229,7 @@ class rnnEmbeddingModel():
 
 
 
-    def vectorizeStrings(self,strings,**):
+    def vectorizeStrings(self,strings,batch_size=100,max_len=100):
         self.model.eval()
         device = next(self.model.parameters()).device
 
@@ -297,11 +298,11 @@ class rnnEmbeddingModel():
         torch.save(state,filename)
 
 
-def loadrnnEmbeddingModel(filename,device='cpu'):
+def loadRnnEmbeddingModel(filename,device='cpu'):
     state = torch.load(filename,map_location=torch.device(device))
 
     # For backwards compatibility, limit to current valid args
-    validArgs = inspect.getfullargspec(rnnEmbeddingModel.__init__).args
+    validArgs = inspect.getfullargspec(RnnEmbeddingModel.__init__).args
     validArgs.remove('self')
 
     invalidArgs = {arg for arg in state['args'].keys() if arg not in validArgs}
@@ -311,7 +312,7 @@ def loadrnnEmbeddingModel(filename,device='cpu'):
     state['args'] = {arg:value for arg,value in state['args'].items() if arg in validArgs}
     state['args']['device'] = device
 
-    rnnEmbeddingModel = rnnEmbeddingModel(**state['args'])
+    rnnEmbeddingModel = RnnEmbeddingModel(**state['args'])
     rnnEmbeddingModel.model.load_state_dict(state['model_state'])
     rnnEmbeddingModel.optimizer.load_state_dict(state['optimizer_state'])
 
@@ -427,8 +428,8 @@ if __name__ == '__main__':
         model = rnnEmbeddingModel(device=device)
         model.save(os.path.join(modelDir,'temp.bin'))
 
-        loadrnnEmbeddingModel(os.path.join(modelDir,'temp.bin'))
-        loadrnnEmbeddingModel(os.path.join(modelDir,'temp.bin'),device='cuda')
+        loadRnnEmbeddingModel(os.path.join(modelDir,'temp.bin'))
+        loadRnnEmbeddingModel(os.path.join(modelDir,'temp.bin'),device='cuda')
 
     # test compatibility with models saved from older version
-    loadrnnEmbeddingModel(os.path.join(modelDir,'grantOrgsrnnEmbeddingModel.003.bin'))
+    loadRnnEmbeddingModel(os.path.join(modelDir,'grantOrgsrnnEmbeddingModel.003.bin'))

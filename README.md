@@ -14,14 +14,6 @@ Key Features:
 # Quick start
 The following code demonstrates how to match strings using hash collisions and similarity matching
 ```python
-import os
-import pandas as pd
-from nama.matcher import Matcher
-from nama.hashes import corpHash
-from nama.similarity import loadSimilarityModel
-
-from nama.defaults import *
-
 
 df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
 df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
@@ -44,7 +36,7 @@ matcher.matchHash(corpHash)
 matcher.merge(df1,df2,on='name')
 
 # Use fuzzy matching to find likely misses (GPU accelerated with device='cuda')
-similarityModel = loadSimilarityModel(os.path.join(modelDir,'demoModel.bin'))
+similarityModel = loadRnnEmbeddingModel(os.path.join(modelDir,'demoModel.bin'))
 
 # Preview similar matches without applying them
 # (Useful for choosing a cutoff or manually reviewing each one)
@@ -69,6 +61,7 @@ matcher.matchImpactsDF()
 
 # Or visualize the match graph
 matcher.plotMatches()
+
 ```
 
 # Similarity scoring and training
@@ -82,12 +75,6 @@ Because the similarity model finds it 'easier' to generate similar output from s
 
 The following code demonstrates how to train a new similarity model on a small number of strings linked by hash collisions. Note that for large datasets (millions of strings), training a new model can take several hours.
 ```python
-import nama
-from nama.matcher import Matcher
-from nama.similarity import SimilarityModel
-
-from nama.defaults import *
-
 
 # Initialize the matcher
 matcher = Matcher(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO','ABC Inc.','XYZ Co.'])
@@ -96,8 +83,8 @@ matcher = Matcher(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company',
 matcher.matchHash(nama.hashes.corpHash)
 
 
-# Initalize a new, untrained similarity model (GPU accelerated with device='cuda')
-similarityModel = SimilarityModel(d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
+# Initalize a new, untrained similarity model (gpu accelerated with device='cuda')
+similarityModel = RnnEmbeddingModel(d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
 
 
 # Observe that untrained suggestions are poor quality (though not entirely useless - neat!)
@@ -108,18 +95,17 @@ matcher.suggestMatches(similarityModel)
 similarityModel.train(matcher,epochs=1)
 
 # Suggestions are now much better
-matcher.suggestMatches(similarityModel,min_score=0)
+matcher.suggestMatches(similarityModel)
 
 # Save similarity model
 similarityModel.save(os.path.join(modelDir,'demoModel.bin'))
 
 
 # Too much training on a small set of strings can lead to over-fitting
-similarityModel.train(matcher,epochs=3)
+similarityModel.train(matcher,epochs=10)
 
 # --> All suggestions now have very low scores
-matcher.suggestMatches(similarityModel,min_score=0)
-
+matcher.suggestMatches(similarityModel)
 ```
 
 

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from nama.matcher import Matcher
 from nama.hashes import corpHash
-from nama.similarity import loadSimilarityModel
+from nama.rnnEmbedding import loadRnnEmbeddingModel
 
 from nama.defaults import *
 
@@ -30,7 +30,7 @@ matcher.matchHash(corpHash)
 matcher.merge(df1,df2,on='name')
 
 # Use fuzzy matching to find likely misses (GPU accelerated with device='cuda')
-similarityModel = loadSimilarityModel(os.path.join(modelDir,'demoModel.bin'))
+similarityModel = loadRnnEmbeddingModel(os.path.join(modelDir,'demoModel.bin'))
 
 # Preview similar matches without applying them
 # (Useful for choosing a cutoff or manually reviewing each one)

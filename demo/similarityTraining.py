@@ -1,6 +1,6 @@
 import nama
 from nama.matcher import Matcher
-from nama.similarity import SimilarityModel
+from nama.rnnEmbedding import RnnEmbeddingModel
 
 from nama.defaults import *
 
@@ -13,7 +13,7 @@ matcher.matchHash(nama.hashes.corpHash)
 
 
 # Initalize a new, untrained similarity model (gpu accelerated with device='cuda')
-similarityModel = SimilarityModel(d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
+similarityModel = RnnEmbeddingModel(d=100,d_recurrent=100,recurrent_layers=2,bidirectional=True)
 
 
 # Observe that untrained suggestions are poor quality (though not entirely useless - neat!)
@@ -24,14 +24,20 @@ matcher.suggestMatches(similarityModel)
 similarityModel.train(matcher,epochs=1)
 
 # Suggestions are now much better
-matcher.suggestMatches(similarityModel,min_score=0)
+matcher.suggestMatches(similarityModel)
 
 # Save similarity model
 similarityModel.save(os.path.join(modelDir,'demoModel.bin'))
 
 
 # Too much training on a small set of strings can lead to over-fitting
-similarityModel.train(matcher,epochs=3)
+similarityModel.train(matcher,epochs=10)
 
 # --> All suggestions now have very low scores
-matcher.suggestMatches(similarityModel,min_score=0)
+matcher.suggestMatches(similarityModel)
+
+
+# Note: On a larger set of strings, it is important to train for a much longer time
+# But the best training amount is unclear (hours or days for very large datasets)
+# Total training = n_epochs*epoch_size
+# Results will probably depend on details of the data and the settings of the rnnEmbeddingModel

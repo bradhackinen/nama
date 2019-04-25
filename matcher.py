@@ -90,15 +90,17 @@ class Matcher():
         scores = [score]*len(pairs)
         self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
 
-    def suggestMatches(self,similarityModel,within_component=False,min_string_count=1,show_plot=False,**args):
+    def suggestMatches(self,similarityModel,min_score=0,within_component=False,min_string_count=1,show_plot=False,**args):
         matchDF = similarity.findNearestMatches((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
                                             similarityModel,**args)
 
-        matchDF = similarity.scoreSimilarity(matchDF,self,show_plot=show_plot)
+        matchDF = matchDF[matchDF['score']>=min_score]
 
-        matchDF = matchDF[~matchDF['within_component']]
+        # matchDF = similarity.scoreSimilarity(matchDF,self,show_plot=show_plot)
+        if not within_component:
+            matchDF = matchDF[~similarity.withinComponent(matchDF,self)]
 
-        return matchDF
+        return matchDF.copy()
 
     def matchSimilar(self,similarityModel,min_score=0.5,max_distance=None,min_string_count=1,show_plot=False,**args):
         matchDF = self.suggestMatches(similarityModel,within_component=False,min_string_count=1,show_plot=False,**args)
