@@ -28,8 +28,11 @@ class Matcher():
         if strings:
             self.addStrings(strings)
 
-    def strings(self):
-        return self.counts.keys()
+    def strings(self,min_count=1):
+        if min_count:
+            return [s for s,c in self.counts.items() if c >= min_count]
+        else:
+            return list(self.G.nodes())
 
     def addStrings(self,strings):
         self.counts.update(strings)
@@ -85,14 +88,13 @@ class Matcher():
                 self.G.remove_node(s)
 
     def matchHash(self,hash_function=basicHash,score=1,min_string_count=1):
-        pairs = [(s,hash_function(s)) for s in self.G.nodes() if self.counts[s] >= min_string_count]
+        pairs = [(s,hash_function(s)) for s in self.strings(min_string_count)]
 
         scores = [score]*len(pairs)
         self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
 
     def suggestMatches(self,similarityModel,min_score=0,within_component=False,min_string_count=1,show_plot=False,**args):
-        matchDF = similarity.findNearestMatches((s for s in self.G.nodes() if self.counts[s] >= min_string_count),
-                                            similarityModel,**args)
+        matchDF = similarity.findNearestMatches(self.strings(min_string_count),similarityModel,**args)
 
         matchDF = matchDF[matchDF['score']>=min_score]
 
@@ -186,19 +188,22 @@ class Matcher():
 
         return df
 
-    def merge(self,leftDF,rightDF,how='inner',on=None,left_on=None,right_on=None,component_column_name='component'):
+    def merge(self,leftDF,rightDF,how='inner',on=None,left_on=None,right_on=None,score_pairs=True,component_column_name='component',suffixes=('_x','_y')):
 
-        if on is not None:
-            left_on = on
-            right_on = on
-
-        if left_on is None or right_on is None:
-            raise Exception('Must provide column to merge on')
-
-        componentMap = self.componentMap()
+        if ((left_on is None) or (right_on is None)) and (on is None):
+            raise Exception('Must provide column(s) to merge on')
 
         leftDF = leftDF.copy()
         rightDF = rightDF.copy()
+
+        if on is not None:
+            left_on = on + suffixes[0]
+            right_on = on + suffixes[1]
+
+            leftDF = leftDF.rename(columns={on:left_on})
+            rightDF = rightDF.rename(columns={on:right_on})
+
+        componentMap = self.componentMap()
 
         leftDF[component_column_name] = leftDF[left_on].apply(lambda s: componentMap.get(s,np.nan))
         rightDF[component_column_name] = rightDF[right_on].apply(lambda s: componentMap.get(s,np.nan))
@@ -206,7 +211,19 @@ class Matcher():
         leftDF = leftDF[leftDF[component_column_name].notnull()]
         rightDF = rightDF[rightDF[component_column_name].notnull()]
 
-        return pd.merge(leftDF,rightDF,on=component_column_name,how=how)
+        mergedDF = pd.merge(leftDF,rightDF,on=component_column_name,how=how,suffixes=suffixes)
+
+        if score_pairs:
+            '''
+            Compute pairwise score from shortest path between nodes, assuming
+                score = exp(-distance)
+            (Equivalent to finding path that maximizes product of scores)
+            '''
+            edgeDistance = lambda i,j,d: -np.log(d['score'])
+            shortestDistance = lambda i,j: nx.algorithms.shortest_paths.weighted.dijkstra_path_length(self.G,i,j,edgeDistance)
+            mergedDF['score'] = [np.exp(-shortestDistance(i,j)) for i,j in mergedDF[[left_on,right_on]].itertuples(index=False)]
+
+        return mergedDF
 
     def plotMatches(self,string=None,ax=None,cmap='tab10'):
         G = self.matches(string)
@@ -257,6 +274,7 @@ class Matcher():
 
 
 
+
 if __name__ == '__main__':
 
     # Run demo code
@@ -288,10 +306,10 @@ if __name__ == '__main__':
     matcher.merge(df1,df2,on='name')
 
     # Fit a LSA model to generate similarity measures
-    lsa = LSAModel(matcher.strings())
+    lsa = LSAModel(matcher)
 
     # Use fuzzy matching to find likely misses
-    matcher.matchSimilar(lsa)
+    matcher.suggestMatches(lsa)
 
     # Review fuzzy matches
     matcher.matchesDF()
@@ -348,3 +366,24 @@ if __name__ == '__main__':
 
     matcher.simplify()
     matcher.plotMatches()
+
+
+
+    # Tests
+    leftDF = pd.DataFrame(['a'],columns=['left'])
+    rightDF = pd.DataFrame(['b','c'],columns=['right'])
+
+    matcher = Matcher(['a','b','c'])
+
+    matcher.addMatch('a','b',score=0.5)
+
+
+    assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 0.5
+
+    matcher.addMatch('b','c',score=0.5)
+
+    assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 0.375
+
+    matcher.addMatch('a','c',score=1)
+
+    assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 0.75

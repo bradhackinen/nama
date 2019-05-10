@@ -21,21 +21,21 @@ def dfChunks(df,chunk_size):
 
 class BOW():
     def fit(self,docs,no_below=2,returnCountMatrix=True):
-        occurrences = self.occurrences(docs)
+        occurrences,J = self.occurrences(docs)
 
         # Prepare token vocabulary information
         docCounts = Counter(t for (i,t) in occurrences.keys())
-        self.tokensDF = pd.DataFrame(Counter(t for (i,t) in occurrences.keys()).most_common(),columns=['token','n_docs'])
-        self.tokensDF = self.tokensDF[self.tokensDF['n_docs']>=no_below].copy().reset_index(drop=True)
+        self.tokensDF = pd.DataFrame([(t,c) for t,c in docCounts.items() if c>=no_below],columns=['token','n_docs'])
+        self.tokensDF = self.tokensDF.sort_values('n_docs',ascending=False).reset_index(drop=True)
 
         self.tokenid = {t:i for i,t in enumerate(self.tokensDF['token'])}
 
         # Optionally compute and return countMatrix (saves second pass of counting occurrences)
         if returnCountMatrix:
-            return self.occurrencesToCountMatrix(occurrences)
+            return self.occurrencesToCountMatrix(occurrences,J)
 
     def countMatrix(self,docs):
-        C = self.occurrencesToCountMatrix(self.occurrences(docs))
+        C = self.occurrencesToCountMatrix(*self.occurrences(docs))
 
         return C
 
@@ -45,13 +45,19 @@ class BOW():
 
         return F
 
-    def occurrencesToCountMatrix(self,occurrences):
+    def occurrencesToCountMatrix(self,occurrences,J=None):
         C = np.array([(self.tokenid[t],j,c) for (j,t),c in occurrences.items() if t in self.tokenid])
-        C = sparse.coo_matrix((C[:,2],(C[:,0],C[:,1])),shape=(len(self.tokensDF),C[:,1].max()+1)).tocsc()
+
+        if J is None:
+            J = C[:,1].max()+1
+
+        C = sparse.coo_matrix((C[:,2],(C[:,0],C[:,1])),shape=(len(self.tokensDF),J)).tocsc()
 
         return C
 
     def occurrences(self,docs):
-        occurrences = Counter((j,t) for j,doc in enumerate(docs) for t in doc)
+        occurrences = Counter()
+        for j,doc in enumerate(docs):
+            occurrences.update((j,t) for t in doc)
 
-        return occurrences
+        return occurrences,j+1

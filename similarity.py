@@ -5,7 +5,7 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
 
-def findNearestMatches(strings,similarityModel,n=10,drop_duplicates=True,normalize=False,drop_zero_vecs=True,**nearestNeighborsArgs):
+def findNearestMatches(strings,similarityModel,n=10,drop_duplicates=True,drop_zero_vecs=True,**nearestNeighborsArgs):
     strings = np.array(sorted(set(strings)))
     n = min(n,len(strings))
 
@@ -16,9 +16,6 @@ def findNearestMatches(strings,similarityModel,n=10,drop_duplicates=True,normali
         nonzero = (vecs != 0).max(axis=1)
         strings = strings[nonzero]
         vecs = vecs[nonzero,:]
-
-    if normalize:
-        vecs = vecs / np.sqrt((vecs**2).sum(axis=1))[:,np.newaxis]
 
     nearestNeighbors = NearestNeighbors(n_neighbors=n,**nearestNeighborsArgs)
     nearestNeighbors.fit(vecs)

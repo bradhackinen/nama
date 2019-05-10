@@ -15,6 +15,12 @@ Key Features:
 The following code demonstrates how to match strings using hash collisions and similarity matching
 ```python
 
+import pandas as pd
+from nama.matcher import Matcher
+from nama.hashes import *
+from nama.lsa import LSAModel
+
+
 df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
 df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
 
@@ -35,19 +41,21 @@ matcher.matchHash(corpHash)
 # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
 matcher.merge(df1,df2,on='name')
 
-# Use fuzzy matching to find likely misses (GPU accelerated with device='cuda')
-similarityModel = loadRnnEmbeddingModel(os.path.join(modelDir,'demoModel.bin'))
+# Fit a LSA model to generate similarity measures
+lsa = LSAModel(matcher)
 
-# Preview similar matches without applying them
-# (Useful for choosing a cutoff or manually reviewing each one)
-matcher.suggestMatches(similarityModel,min_score=0)
+# Use fuzzy matching to find likely misses
+matcher.suggestMatches(lsa)
 
-# Add all similarity matches with score >= 0.5
-# (Alternatively, use the matcher.applyMatchDF method to add selected matches)
-matcher.matchSimilar(similarityModel,min_score=0.5)
-
-# Review matches - looks good!
+# Review fuzzy matches
 matcher.matchesDF()
+
+# Add manual matches
+matcher.addMatch('ABC Inc.','A.B.C. INCORPORATED')
+matcher.addMatch('XYZ Co.','X Y Z CO')
+
+# Drop remaining fuzzy matches from the graph
+matcher.filterMatches(lambda m: m['source'] != 'similarity')
 
 # Final merge
 matcher.merge(df1,df2,on='name')
@@ -56,11 +64,45 @@ matcher.merge(df1,df2,on='name')
 matcher.componentsDF()
 matcher.componentSummaryDF()
 
-# Or review matches that critical for linking components
+# matcher.plotMatches()
+
 matcher.matchImpactsDF()
 
-# Or visualize the match graph
 matcher.plotMatches()
+matcher.plotMatches('xyz')
+
+matcher.addMatch('xyz','123')
+matcher.addMatch('456','123')
+
+
+# min_string_count test
+matcher = Matcher()
+
+matcher.addStrings(['google inc','alphabet inc'])
+matcher.addMatch('Google Inc','Alphabet Inc')
+matcher.plotMatches()
+
+matcher.matchHash(corpHash)
+matcher.plotMatches()
+
+matcher.matchHash(corpHash,min_string_count=0)
+matcher.plotMatches()
+
+
+# Simplification test
+matcher.addMatch('google','1')
+matcher.addMatch('1','2')
+matcher.addMatch('2','Google Inc')
+matcher.addMatch('alphabet inc','3')
+matcher.addMatch('3','4')
+matcher.addMatch('4','5')
+matcher.addMatch('5','3')
+matcher.addMatch('google inc','6')
+matcher.plotMatches()
+
+matcher.simplify()
+matcher.plotMatches()
+
 
 ```
 

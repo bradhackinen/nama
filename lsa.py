@@ -11,7 +11,8 @@ from nama.tokenizers import *
 
 class LSAModel():
 
-    def __init__(self,strings,hasher=None,tokenizer=lambda s: ngrams(s,2),k=50,weighting='norm',no_below=1):
+    def __init__(self,matcher,hasher=None,tokenizer=lambda s: nmgrams(s,1,3),k=50,weighting='norm',no_below=1,use_components=True):
+
         self.bow = BOW()
         self.hasher = hasher
         self.tokenizer = tokenizer
@@ -19,7 +20,12 @@ class LSAModel():
         self.weighting = weighting
         self.no_below = no_below
 
-        C = self.bow.fit((self.tokenizer(string) for string in strings),no_below=self.no_below)
+        if use_components:
+            componentTokens = ((t for s in c for t in self.tokenizer(s)) for c in matcher.components())
+            C = self.bow.fit(componentTokens,no_below=self.no_below)
+
+        else:
+            C = self.bow.fit((self.tokenizer(s) for s in matcher.G.nodes()),no_below=self.no_below)
 
         if weighting:
             if weighting == 'norm':
@@ -45,9 +51,12 @@ class LSAModel():
         self.V = V / s[:,np.newaxis]
 
 
-    def vectorizeStrings(self,strings,epsilon=1e-9):
+    def vectorizeStrings(self,strings,epsilon=1e-9,normalize=True):
         C = self.bow.countMatrix((self.tokenizer(string) for string in strings))
         vecs = C.T.dot(self.V.T)
+
+        if normalize:
+            vecs = vecs / np.sqrt((vecs**2).sum(axis=1))[:,np.newaxis]
 
         return vecs
 
@@ -69,11 +78,8 @@ if __name__ == '__main__':
     matcher.matchHash(nama.hashes.corpHash)
 
     # Initalize a new, untrained similarity model
-    tokenizer = lambda s: ngrams(corpHash(s),3)
-    lsaModel = LSAModel(matcher.strings(),tokenizer=tokenizer,k=100)
-    lsaModel.vectorizeStrings(matcher.strings())
-    matchDF = similarity.findNearestMatches(matcher.strings(),lsaModel)
-    matchDF = similarity.scoreSimilarity(matchDF,matcher,show_plot=True)
+    lsa = LSAModel(matcher)
+    lsa.vectorizeStrings(matcher.strings())
+    matcher.suggestMatches(lsa,min_string_count=0)
 
-
-    # matcher.suggestMatches(lsaModel,min_score=0)
+    matcher.plotMatches()
