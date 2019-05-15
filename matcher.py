@@ -203,7 +203,8 @@ class Matcher():
             leftDF = leftDF.rename(columns={on:left_on})
             rightDF = rightDF.rename(columns={on:right_on})
 
-        componentMap = self.componentMap()
+        components = list(nx.connected_components(self.G))
+        componentMap = {s:i for i,component in enumerate(components) for s in component}
 
         leftDF[component_column_name] = leftDF[left_on].apply(lambda s: componentMap.get(s,np.nan))
         rightDF[component_column_name] = rightDF[right_on].apply(lambda s: componentMap.get(s,np.nan))
@@ -219,11 +220,66 @@ class Matcher():
                 score = exp(-distance)
             (Equivalent to finding path that maximizes product of scores)
             '''
+
+            pairs = [tuple(sorted([s0,s1])) for s0,s1 in mergedDF[[left_on,right_on]].itertuples(index=False)]
+            uniquePairs = set(pairs)
+
+            # pairsDF = pd.DataFrame([tuple(sorted([s0,s1])) for s0,s1 in mergedDF[[left_on,right_on]].itertuples(index=False)],columns=['i','j'])
+            #
+            # uniqueDF = pairsDF.drop_duplicates()
+            # uniqueDF['component'] = uniqueDF['i'].apply(lambda i:componentMap[i])
+            #
+            # for c,componentPairsDF in uniqueDF.groupby('component'):
+            #     H = G.subgraph(components[c])
+            #     nx.set_edge_attributes(H,{(i,j):{'weight':-np.log(d['score'])} for (i,j),d in H.edges(data=True)})
+            #
+            #     for i,j in componentPairsDF[['i'.'j']].itertuples(index=False):
+            #         pairDistances[pair] = nx.algorithms.shortest_paths.weighted.dijkstra_path_length(H,i,j)
+
+            #
+            # # print('pairs:',pairs)
+            #
+            # componentPairs = {}
+            # for i,j in uniquePairs:
+            #     c = componentMap[i]
+            #     if c not in componentPairs:
+            #         componentPairs[c] = []
+            #     componentPairs[c].append((i,j))
+            #
+            # # print('componentPairs:',componentPairs)
+            #
+            # pairDistances = {}
+            # for c,cPairs in componentPairs.items():
+            #     H = self.G.subgraph(components[c])
+            #     weights = {(i,j):{'weight':-np.log(d['score'])} for i,j,d in H.edges(data=True)}
+            #     nx.set_edge_attributes(H,weights)
+            #
+            #     for i,j in cPairs:
+            #         pairDistances[(i,j)] = nx.algorithms.shortest_paths.weighted.dijkstra_path_length(H,i,j)
+            #
+            # mergedDF['score'] = [np.exp(-pairDistances[pair]) for pair in pairs]
+
+            # pairComponents = {pair:componentMap[pair[0]] for pair in uniquePairs]
+            #
+            #
+            # First pass: Identify pairs with score=1
+            H = self.G.edge_subgraph((i,j) for i,j,d in self.G.edges(data=True) if d['score']>=1)
+            comp = {s:i for i,component in enumerate(nx.connected_components(H)) for s in component}
+
+            pairDistances = {(i,j):1.0 for i,j in uniquePairs if (i in comp) and (j in comp) and (comp[i]==comp[j])}
+
+            # Now do more expensive shortest-distance computation for remaining pairs
+            remainingPairs = set(pair for pair in uniquePairs if pair not in pairDistances)
+
             edgeDistance = lambda i,j,d: -np.log(d['score'])
             shortestDistance = lambda i,j: nx.algorithms.shortest_paths.weighted.dijkstra_path_length(self.G,i,j,edgeDistance)
-            mergedDF['score'] = [np.exp(-shortestDistance(i,j)) for i,j in mergedDF[[left_on,right_on]].itertuples(index=False)]
+            pairDistances.update({(i,j):np.exp(-shortestDistance(i,j)) for i,j in remainingPairs})
+            # pairDistances = {(i,j):np.exp(-shortestDistance(i,j)) for i,j in uniquePairs}
+
+            mergedDF['score'] = [pairDistances[pair] for pair in pairs]
 
         return mergedDF
+
 
     def plotMatches(self,string=None,ax=None,cmap='tab10'):
         G = self.matches(string)
@@ -387,3 +443,13 @@ if __name__ == '__main__':
     matcher.addMatch('a','c',score=1)
 
     assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 0.75
+
+    matcher.addMatch('a','d',score=1)
+    matcher.addMatch('d','b',score=1)
+
+    assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 1.0
+
+    # matcher.plotMatches()
+
+
+# matcher.merge(leftDF,rightDF,left_on='left',right_on='right'),score_pairs=False)
