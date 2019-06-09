@@ -286,6 +286,7 @@ class Matcher():
         ax.axis('off')
         ax.set_xlim(-1.5,1.5)
         ax.set_ylim(-1.5,1.5)
+        plt.show()
 
         return ax
 
