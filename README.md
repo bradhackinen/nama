@@ -158,5 +158,5 @@ matcher.suggestMatches(similarityModel)
 - pandas
 - numpy
 - matplotlib
-- PyTorch
-- sci-kit learn
+- torch 
+- scikit-learn
