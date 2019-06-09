@@ -159,4 +159,4 @@ matcher.suggestMatches(similarityModel)
 - numpy
 - matplotlib
 - PyTorch
-- sci-kit learn
+- scikit-learn
