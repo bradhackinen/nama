@@ -35,9 +35,10 @@ class Matcher():
             return list(self.G.nodes())
 
     def addStrings(self,strings):
-        self.counts.update(strings)
-        self.G.add_nodes_from(((s,{'count':self.counts[s]}) for s in strings))
-
+        for s in strings:
+            self.counts[s] += 1
+            self.G.add_node(s)
+            
     def removeStrings(self,strings):
         self.G.remove_nodes_from(strings)
         for s in strings:
@@ -203,8 +204,7 @@ class Matcher():
             leftDF = leftDF.rename(columns={on:left_on})
             rightDF = rightDF.rename(columns={on:right_on})
 
-        components = list(nx.connected_components(self.G))
-        componentMap = {s:i for i,component in enumerate(components) for s in component}
+        componentMap = self.componentMap()
 
         leftDF[component_column_name] = leftDF[left_on].apply(lambda s: componentMap.get(s,np.nan))
         rightDF[component_column_name] = rightDF[right_on].apply(lambda s: componentMap.get(s,np.nan))
