@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from sparsesvd import sparsesvd
+from scipy.sparse.linalg import svds
 
 from nama.utilities import *
 from nama.defaults import *
@@ -9,14 +9,14 @@ from nama.tokenizers import *
 
 
 
-class LSAModel():
+class LSIModel():
 
-    def __init__(self,matcher,hasher=None,tokenizer=lambda s: nmgrams(s,1,3),k=50,weighting='norm',no_below=1,use_components=True):
+    def __init__(self,matcher,hasher=None,tokenizer=lambda s: nmgrams(s,1,3),k_max=50,weighting='idf',no_below=1,use_components=True):
 
         self.bow = BOW()
         self.hasher = hasher
         self.tokenizer = tokenizer
-        self.k = k
+        self.k_max = k_max
         self.weighting = weighting
         self.no_below = no_below
 
@@ -47,13 +47,16 @@ class LSAModel():
         else:
             self.w = np.ones((len(self.bow.tokensDF),1))
 
-        V,s,_ = sparsesvd(C.multiply(self.w).tocsc(),k=k)
-        self.V = V / s[:,np.newaxis]
+        M = C.multiply(self.w).tocsc()
+
+        V,s,_ = svds(M,k=min(k_max,min(M.shape)-1))
+        self.V = V * s#[:,np.newaxis]
 
 
     def vectorizeStrings(self,strings,epsilon=1e-9,normalize=True):
         C = self.bow.countMatrix((self.tokenizer(string) for string in strings))
-        vecs = C.T.dot(self.V.T)
+
+        vecs = C.T.dot(self.V)
 
         if normalize:
             vecs = vecs / np.sqrt((vecs**2).sum(axis=1))[:,np.newaxis]
@@ -78,7 +81,7 @@ if __name__ == '__main__':
     matcher.matchHash(nama.hashes.corpHash)
 
     # Initalize a new, untrained similarity model
-    lsa = LSAModel(matcher)
+    lsa = LSIModel(matcher)
     lsa.vectorizeStrings(matcher.strings())
     matcher.suggestMatches(lsa,min_string_count=0)
 

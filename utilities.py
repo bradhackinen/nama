@@ -21,7 +21,7 @@ def dfChunks(df,chunk_size):
 
 class BOW():
     def fit(self,docs,no_below=2,returnCountMatrix=True):
-        occurrences,J = self.occurrences(docs)
+        occurrences,n_docs = self.occurrences(docs)
 
         # Prepare token vocabulary information
         docCounts = Counter(t for (i,t) in occurrences.keys())
@@ -32,7 +32,7 @@ class BOW():
 
         # Optionally compute and return countMatrix (saves second pass of counting occurrences)
         if returnCountMatrix:
-            return self.occurrencesToCountMatrix(occurrences,J)
+            return self.occurrencesToCountMatrix(occurrences,n_docs)
 
     def countMatrix(self,docs):
         C = self.occurrencesToCountMatrix(*self.occurrences(docs))
@@ -45,19 +45,21 @@ class BOW():
 
         return F
 
-    def occurrencesToCountMatrix(self,occurrences,J=None):
+    def occurrencesToCountMatrix(self,occurrences,n_docs=None):
         C = np.array([(self.tokenid[t],j,c) for (j,t),c in occurrences.items() if t in self.tokenid])
 
-        if J is None:
-            J = C[:,1].max()+1
+        if n_docs is None:
+            n_docs = C[:,1].max()+1
 
-        C = sparse.coo_matrix((C[:,2],(C[:,0],C[:,1])),shape=(len(self.tokensDF),J)).tocsc()
+        C = sparse.coo_matrix((C[:,2],(C[:,0],C[:,1])),shape=(len(self.tokensDF),n_docs)).tocsc()
 
         return C
 
     def occurrences(self,docs):
         occurrences = Counter()
+        n_docs = 0
         for j,doc in enumerate(docs):
             occurrences.update((j,t) for t in doc)
+            n_docs += 1
 
-        return occurrences,j+1
+        return occurrences,n_docs

@@ -18,7 +18,7 @@ The following code demonstrates how to match strings using hash collisions and s
 import pandas as pd
 from nama.matcher import Matcher
 from nama.hashes import *
-from nama.lsa import LSAModel
+from nama.lsi import LSIModel
 
 
 df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
@@ -41,11 +41,11 @@ matcher.matchHash(corpHash)
 # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
 matcher.merge(df1,df2,on='name')
 
-# Fit a LSA model to generate similarity measures
-lsa = LSAModel(matcher)
+# Fit an LSI model to generate similarity measures
+lsi = LSIModel(matcher)
 
 # Use fuzzy matching to find likely misses
-matcher.suggestMatches(lsa)
+matcher.suggestMatches(lsi)
 
 # Review fuzzy matches
 matcher.matchesDF()
@@ -158,5 +158,5 @@ matcher.suggestMatches(similarityModel)
 - pandas
 - numpy
 - matplotlib
-- torch 
+- torch
 - scikit-learn
