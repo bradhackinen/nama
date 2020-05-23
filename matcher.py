@@ -38,7 +38,7 @@ class Matcher():
         for s in strings:
             self.counts[s] += 1
             self.G.add_node(s)
-            
+
     def removeStrings(self,strings):
         self.G.remove_nodes_from(strings)
         for s in strings:
@@ -300,7 +300,7 @@ if __name__ == '__main__':
     import pandas as pd
     from nama.matcher import Matcher
     from nama.hashes import *
-    from nama.lsa import LSAModel
+    from nama.lsi import LSIModel
 
 
     df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
@@ -323,11 +323,11 @@ if __name__ == '__main__':
     # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
     matcher.merge(df1,df2,on='name')
 
-    # Fit a LSA model to generate similarity measures
-    lsa = LSAModel(matcher)
+    # Fit a LSI model to generate similarity measures
+    lsi = LSIModel(matcher)
 
     # Use fuzzy matching to find likely misses
-    matcher.suggestMatches(lsa)
+    matcher.suggestMatches(lsi)
 
     # Review fuzzy matches
     matcher.matchesDF()
