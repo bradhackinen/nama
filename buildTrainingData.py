@@ -1,127 +1,167 @@
-import os
+'''
+This script builds training data from lobbying filings that have been manually
+cleaned by the Center for Responsive Politics. The source data is available from
+www.opensecrets.org.
+
+The openSecrets data loader used in this script is available here:
+https://github.com/bradhackinen/openSecrets
+
+
+NOTE: As currently written, the script generates train, validate and test files
+that contain non-overlapping sets of string pairs. BUT, the same individual
+string can appear in all three files if it is part of multiple pairs. This
+occurs with high frequency for the cleaned version of some organization names.
+
+In the future it might be useful to distinguish between testing few-shot and
+zero-shot learning, based on whether the one of the strings in a validation or
+test pair ever appears in the training data.
+'''
+
+from pathlib import Path
 import pandas as pd
 import numpy as np
 
+import openSecrets
 
-trainingDir = r'C:\Users\Brad\Google Drive\Research\Python3\nama\trainingData'
-
-
-#Convert old nama training sets-------------------------------------------------
-def convertOldTrainingSet(oldFile,newFile):
-    trainingDF = pd.read_csv(oldFile,encoding='mbcs')
-    trainingDF = trainingDF.rename(columns={'string_0':'query_string','string_1':'candidate_string'})
-    trainingDF = trainingDF[trainingDF['query_string']!=trainingDF['candidate_string']]
-
-    trainingDF.to_csv(newFile,index=False,encoding='utf8')
+from nama import trainingDir
 
 
-convertOldTrainingSet(r'C:\Users\Brad\Google Drive\Research\US Clean Power Plan\Python\Data Processing\namaTrainingSet_capIQ.csv',
-                        os.path.join(trainingDir,'energyIndustryCapIQ_training.csv'))
-
-convertOldTrainingSet(r'C:\Users\Brad\Google Drive\Research\US Clean Power Plan\Python\Data Processing\namaTrainingSet_capIQ_comments.csv',
-                        os.path.join(trainingDir,'energyIndustryCommentsCapIQ_training.csv'))
-
-convertOldTrainingSet(r'C:\Users\Brad\Google Drive\Research\RegulatoryComments\CRSPNamaTrainingSet.csv',
-                        os.path.join(trainingDir,'commentsCRSP_training.csv'))
+import re
+from random import sample
 
 
-#Build training set from lobbying data------------------------------------------
-#Note: Will contain only positive matches
-from openSecrets import lobbying
-from vectorizedMinHash import fastNGramHashes
-filingsDF = lobbying.loadDF('filings')
+# Load cleaned and raw client strings from lobbying data
+filingsDF = openSecrets.load('lobbying.filings')
 
-clientsDF = filingsDF[['client','client_raw']].drop_duplicates()
-# del filingsDF
+clientsDF = filingsDF[['client','client_raw']].drop_duplicates().dropna()
+clientsDF.columns = ['string0','string1']
+
+registrantsDF = filingsDF[['registrant','registrant_raw']].drop_duplicates().dropna()
+registrantsDF.columns = ['string0','string1']
+
+pairsDF = pd.concat([clientsDF,registrantsDF])
 
 
-# clientsDF['client_raw_cleaned'] = clientsDF['client_raw'].str.replace(r'\(?(f/?k/?a|formerly known as).+','',case=False)
-# clientsDF['client_raw_cleaned'] = clientsDF['client_raw_cleaned'].str.replace(r'.+(on behalf of|\(for)\s+','',case=False)
-# clientsDF['client_raw_cleaned'] = clientsDF['client_raw_cleaned'].str.replace(r'\(.*\)','',case=False)
-# clientsDF['client_raw_cleaned'] = clientsDF['client_raw_cleaned'].str.replace(r'[\(\)]','',case=False)
-# clientsDF['client_raw_cleaned'] = clientsDF['client_raw_cleaned'].str.strip()
+# Standardize whitespace (precautionary)
+for c in ['string0','string1']:
+    pairsDF[c] = [re.sub(r'\s+',' ',s.strip()) for s in pairsDF[c]]
+
+# Drop cases where the clean and raw strings are identical (not useful for training)
+pairsDF = pairsDF[pairsDF['string0']!=pairsDF['string1']]
+
+# Drop raw strings that look like they contain multiple names
+pairsDF = pairsDF[~pairsDF['string1'].str.contains(r'([/\(\)\[\]\{\}]|f[/\.]?k[/\.]?a|formerly|on behalf of|\(for|doing business as|d/?b/?a)',case=False)]
+
+pairsDF.to_csv(trainingDir/'lobbyingOrgs.csv',index=False)
 
 
 
+'''
+Split out train, validate, and test sets
 
-clientsDF = clientsDF.dropna(axis=0)
+'''
+# Shuffle
+pairsDF = pairsDF.sample(frac=1).reset_index(drop=True)
 
-clientsDF = clientsDF[~clientsDF['client_raw'].str.contains(r'([/\(\)\[\]\{\}]|f/?k/?a|formerly|on behalf of|\(for|doing business as|d/?b/?a)',case=False)]
-clientsDF['client_raw'] = clientsDF['client_raw'].str.strip()
+validateDF = pairsDF.loc[:9999,:]
+testDF = pairsDF.loc[10000:19999,:]
+trainDF = pairsDF.loc[20000:]
 
-clientsDF[clientsDF[]]
-
-for c in '','_raw':
-    clientsDF['client{}_ngrams'.format(c)] = clientsDF['client{}'.format(c)].apply(lambda s: set(fastNGramHashes(s.lower().encode('utf8'),n=2)))
-
-clientsDF['jaccard'] = [len(s0 & s1)/len(s0 | s1) for i,s0,s1 in clientsDF[['client_ngrams','client_raw_ngrams']].itertuples()]
-
-for c in '','_raw':
-    clientsDF['client{}_acronym'.format(c)] = clientsDF['client{}'.format(c)].str.title()
-    clientsDF['client{}_acronym'.format(c)] = clientsDF['client{}_acronym'.format(c)].str.replace(r'[^A-Z]','')
-
-clientsDF['acronym_intersection'] = [(a0 in a1) or (a1 in a0) for i,a0,a1 in clientsDF[['client_acronym','client_raw_acronym']].itertuples()]
-
-# Select high quality matches only
-trainingDF = clientsDF[clientsDF['acronym_intersection'] | (clientsDF['jaccard'] > 0.1)]
-
-trainingDF = trainingDF[['client','client_raw']]
-trainingDF = trainingDF.rename(columns={'client':'candidate_string','client_raw':'query_string'})
-trainingDF = trainingDF.replace('',np.nan)
-trainingDF = trainingDF.dropna(axis=0)
-trainingDF = trainingDF[trainingDF['query_string']!=trainingDF['candidate_string']]
-trainingDF['match'] = 1
+validateDF.to_csv(trainingDir/'validate.csv',index=False)
+testDF.to_csv(trainingDir/'test.csv',index=False)
+trainDF.to_csv(trainingDir/'train.csv',index=False)
 
 
+'''
+Build augmented training data by mutating strings from the training set
+'''
 
-trainingDF.to_csv(os.path.join(trainingDir,'lobbyingClients_training.csv'),index=False,encoding='utf8')
+def removeRandomChar(s):
+    if len(s) >= 2:
+        i = np.random.randint(len(s))
+        s = s[:i] + s[i+1:]
+    return s
+
+def replicateRandomChar(s):
+    if len(s) >= 2:
+        i = np.random.randint(len(s))
+        j = np.random.randint(len(s))
+        s = s[:i] + s[j] + s[i:]
+    return s
+
+def stripThe(s):
+    s = re.sub(r'(^the )|(, the$)','',s,flags=re.IGNORECASE)
+    return s
+
+def swapAnd(s):
+    if '&' in s:
+        s = s.replace(' & ',' and ')
+    else:
+        s = re.sub(' and ',' & ',s,flags=re.IGNORECASE)
+    return s
+
+def stripLegal(s):
+    s = re.sub(',?( (group|holding(s)?( co)?|inc(orporated)?|ltd|l\.?l?\.?[cp]|co(rp(oration)?|mpany)?|s\.?[ae]|p\.?l\.?c)[,\.]*)$','',s,count=1,flags=re.IGNORECASE)
+    return s
+
+def toAcronym(s):
+    s = stripThe(s)
+    s = stripLegal(s)
+    s = re.sub(' and ',' ',s,flags=re.IGNORECASE)
+
+    tokens = s.split()
+    if len(tokens) > 1:
+        return ''.join(t[0].upper() for t in tokens if t.lower() not in ['of','the','for'])
+    else:
+        return s.upper()
+
+def truncateWords(s):
+    tokens = []
+    for t in s.split():
+        if len(t) >= 6:
+            tokens.append(t[:np.random.randint(2,len(t)-2)])
+        else:
+            tokens.append(t)
+    s = ' '.join(tokens)
+    return s
 
 
+mutations = [
+            stripLegal,
+            lambda s: stripLegal(stripLegal(s)),
+            stripThe,
+            swapAnd,
+            removeRandomChar,
+            replicateRandomChar,
+            toAcronym,
+            truncateWords,
+            lambda s: ' '.join(s.split()[:-1]),
+            lambda s: re.sub(r',.*','',s,flags=re.IGNORECASE),
+            lambda s: re.sub(r'[.,:;]','',s),
+            lambda s: re.sub(r'[.,:;\-]',' ',s).strip(),
+            lambda s: re.sub(r'(?<=\w)[aeiouy]','',s,flags=re.IGNORECASE),
+            lambda s: s.title(),
+            lambda s: s.upper()
+            ]
 
-#Build training data from compustat company name and legal name fields
-compustatDF = pd.read_csv(r'E:\Data\WRDS\compustat_annualSummary_2000-2018.csv')
-trainingDF = compustatDF[compustatDF['conm']!=compustatDF['conml']][['conm','conml']].drop_duplicates()
-trainingDF.columns = ['query_string','candidate_string']
-trainingDF['match'] = 1
-
-
-trainingDF.to_csv(os.path.join(trainingDir,'compustatLegalName_training.csv'),index=False,encoding='utf8')
-
-
-
-
-#Build training data from simple modifications
-trainingFiles = [os.path.join(trainingDir,f) for f in os.listdir(trainingDir) if f.endswith('.csv')]
-trainingDF = pd.concat([pd.read_csv(f,encoding='utf8') for f in trainingFiles])
-
-
-#Create training data with simple puctuation modifications
-punctuationDF = pd.DataFrame(list(set(trainingDF['query_string']) | set(trainingDF['candidate_string'])),columns=['query_string'])
-punctuationDF['candidate_string'] = punctuationDF['query_string']
-punctuationDF['candidate_string'] = punctuationDF['candidate_string'].str.replace(r'[\.,]',' ')
-punctuationDF['candidate_string'] = punctuationDF['candidate_string'].str.replace(r'\s+',' ')
-punctuationDF['candidate_string'] = punctuationDF['candidate_string'].str.strip()
-punctuationDF = punctuationDF[punctuationDF['candidate_string'] != punctuationDF['query_string']]
-punctuationDF['match'] = 1
-
-punctuationDF.sample(10000).to_csv(os.path.join(trainingDir,'puctuation_training.csv'),index=False,encoding='utf8')
+def randomMutation(s,n=1):
+    for m in sample(mutations,n):
+        s = m(s)
+    return s
 
 
-#Create training data with simple puctuation modifications
-capitalizationDF = pd.DataFrame(list(set(trainingDF['query_string']) | set(trainingDF['candidate_string'])),columns=['query_string'])
-capitalizationDF['candidate_string'] = capitalizationDF['query_string']
-capitalizationDF['candidate_string'] = capitalizationDF['candidate_string'].str.upper()
-capitalizationDF = capitalizationDF[capitalizationDF['candidate_string'] != capitalizationDF['query_string']]
-capitalizationDF['match'] = 1
-
-capitalizationDF.sample(10000).to_csv(os.path.join(trainingDir,'capitalization_training.csv'),index=False,encoding='utf8')
+orgStrings = set(trainDF['string0']) | set(trainDF['string1'])
 
 
-#Create training data with 'The' prefix removed
-thePrefixDF = pd.DataFrame(list(set(trainingDF['query_string']) | set(trainingDF['candidate_string'])),columns=['query_string'])
-thePrefixDF['candidate_string'] = thePrefixDF['query_string']
-thePrefixDF['candidate_string'] = thePrefixDF['candidate_string'].str.replace(r'^the ','',case=False)
-thePrefixDF = thePrefixDF[thePrefixDF['candidate_string'] != thePrefixDF['query_string']]
-thePrefixDF['match'] = 1
+n_samples = 3
+df = pd.DataFrame([(s,randomMutation(s,1)) for s in orgStrings for i in range(n_samples)],columns=['string0','string1'])
 
-thePrefixDF.to_csv(os.path.join(trainingDir,'the_training.csv'),index=False,encoding='utf8')
+df = df[df['string0'] != df['string1']]
+df = df[df['string1'].str.len() >=2]
+
+df = pd.concat([trainDF,df])
+
+df = df.drop_duplicates()
+df = df.sample(frac=1)
+
+df.to_csv(trainingDir/f'train_augmented.csv',index=False)
