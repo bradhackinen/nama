@@ -288,18 +288,21 @@ class Matcher():
             left_on = on + suffixes[0]
             right_on = on + suffixes[1]
 
-            leftDF = leftDF.rename(columns={on:left_on})
-            rightDF = rightDF.rename(columns={on:right_on})
+            leftDF = leftDF.rename(columns={on: left_on})
+            rightDF = rightDF.rename(columns={on: right_on})
 
         componentMap = self.componentMap()
 
-        leftDF[component_column_name] = leftDF[left_on].apply(lambda s: componentMap.get(s,np.nan))
-        rightDF[component_column_name] = rightDF[right_on].apply(lambda s: componentMap.get(s,np.nan))
+        leftDF[component_column_name] = leftDF[left_on].apply(
+            lambda s: componentMap.get(s, np.nan))
+        rightDF[component_column_name] = rightDF[right_on].apply(
+            lambda s: componentMap.get(s, np.nan))
 
         leftDF = leftDF[leftDF[component_column_name].notnull()]
         rightDF = rightDF[rightDF[component_column_name].notnull()]
 
-        mergedDF = pd.merge(leftDF,rightDF,on=component_column_name,how=how,suffixes=suffixes)
+        mergedDF = pd.merge(
+            leftDF, rightDF, on=component_column_name, how=how, suffixes=suffixes)
 
         if score_pairs:
             '''
@@ -308,76 +311,88 @@ class Matcher():
             (Equivalent to finding path that maximizes product of scores)
             '''
 
-            pairs = [tuple(sorted([s0,s1])) for s0,s1 in mergedDF[[left_on,right_on]].itertuples(index=False)]
+            pairs = [tuple(sorted([s0, s1])) for s0, s1 in mergedDF[[
+                left_on, right_on]].itertuples(index=False)]
             uniquePairs = set(pairs)
 
             # First pass: Identify pairs with score=1
-            H = self.G.edge_subgraph((i,j) for i,j,d in self.G.edges(data=True) if d['score']>=1)
-            comp = {s:i for i,component in enumerate(nx.connected_components(H)) for s in component}
+            H = self.G.edge_subgraph(
+                (i, j) for i, j, d in self.G.edges(data=True) if d['score'] >= 1)
+            comp = {s: i for i, component in enumerate(
+                nx.connected_components(H)) for s in component}
 
-            pairDistances = {(i,j):1.0 for i,j in uniquePairs if (i in comp) and (j in comp) and (comp[i]==comp[j])}
+            pairDistances = {(i, j): 1.0 for i, j in uniquePairs if (
+                i in comp) and (j in comp) and (comp[i] == comp[j])}
 
             # Now do more expensive shortest-distance computation for remaining pairs
-            remainingPairs = set(pair for pair in uniquePairs if pair not in pairDistances)
+            remainingPairs = set(
+                pair for pair in uniquePairs if pair not in pairDistances)
 
-            edgeDistance = lambda i,j,d: -np.log(d['score'])
-            shortestDistance = lambda i,j: nx.algorithms.shortest_paths.weighted.dijkstra_path_length(self.G,i,j,edgeDistance)
-            pairDistances.update({(i,j):np.exp(-shortestDistance(i,j)) for i,j in remainingPairs})
+            def edgeDistance(i, j, d): return -np.log(d['score'])
+            def shortestDistance(i, j): return nx.algorithms.shortest_paths.weighted.dijkstra_path_length(
+                self.G, i, j, edgeDistance)
+            pairDistances.update(
+                {(i, j): np.exp(-shortestDistance(i, j)) for i, j in remainingPairs})
 
             mergedDF['score'] = [pairDistances[pair] for pair in pairs]
 
         return mergedDF
 
-
-    def plotMatches(self,string=None,ax=None,cmap='tab10'):
+    def plotMatches(self, saveFile=True, string=None, ax=None, cmap='tab10'):
         G = self.matches(string)
 
         if string is None:
-            pos = nx.spring_layout(G,weight='score',k=0.75,iterations=50)
+            pos = nx.spring_layout(G, weight='score', k=0.75, iterations=50)
         else:
             pos = nx.kamada_kawai_layout(G)
 
         stringNodes = self.counts.keys()
         hashNodes = [s for s in G.nodes() if s not in self.counts]
-        sources = sorted(set(nx.get_edge_attributes(G,'source').values()))
+        sources = sorted(set(nx.get_edge_attributes(G, 'source').values()))
 
         if ax is None:
             fig, ax = plt.subplots()
         cmap = plt.get_cmap(cmap)
-        for i,source in enumerate(sources):
-            sourceEdges = [(s0,s1,d) for s0,s1,d in G.edges(data=True) if d['source']==source]
-            coordinates = [[pos[s0],pos[s1]] for s0,s1,d in sourceEdges]
-            alphas = [d['score'] for s0,s1,d in sourceEdges]
+        for i, source in enumerate(sources):
+            sourceEdges = [(s0, s1, d) for s0, s1, d in G.edges(
+                data=True) if d['source'] == source]
+            coordinates = [[pos[s0], pos[s1]] for s0, s1, d in sourceEdges]
+            alphas = [d['score'] for s0, s1, d in sourceEdges]
 
             color = cmap(i)[:3]
-            rgba = [color+(d['score'],) for s0,s1,d in sourceEdges]
+            rgba = [color+(d['score'],) for s0, s1, d in sourceEdges]
 
             if source == 'similarity':
                 linestyles = ':'
             else:
                 linestyles = 'solid'
-            lc = mc.LineCollection(coordinates,label=source,color=rgba,linestyles=linestyles,zorder=0)
+            lc = mc.LineCollection(
+                coordinates, label=source, color=rgba, linestyles=linestyles, zorder=0)
 
             ax.add_collection(lc)
 
-            edgeLabels = {(s0,s1):'{:.2f}'.format(d['score']) for s0,s1,d in sourceEdges if d['score']<1}
-            nx.draw_networkx_edge_labels(G,edge_labels=edgeLabels,font_color=color,pos=pos,bbox={'color':'w','linewidth':1})#,zorder=100)
+            edgeLabels = {(s0, s1): '{:.2f}'.format(
+                d['score']) for s0, s1, d in sourceEdges if d['score'] < 1}
+            nx.draw_networkx_edge_labels(G, edge_labels=edgeLabels, font_color=color, pos=pos, bbox={
+                                         'color': 'w', 'linewidth': 1})  # ,zorder=100)
 
-        nx.draw_networkx_nodes(G,node_color='w',pos=pos)
+        nx.draw_networkx_nodes(G, node_color='w', pos=pos)
 
-        nx.draw_networkx_labels(nx.subgraph(G,stringNodes),font_color='k',pos=pos)
-        nx.draw_networkx_labels(nx.subgraph(G,hashNodes),font_color='#888888',pos=pos)
+        nx.draw_networkx_labels(nx.subgraph(
+            G, stringNodes), font_color='k', pos=pos)
+        nx.draw_networkx_labels(nx.subgraph(
+            G, hashNodes), font_color='#888888', pos=pos)
 
         plt.legend()
 
         ax.axis('off')
-        ax.set_xlim(-1.5,1.5)
-        ax.set_ylim(-1.5,1.5)
+        ax.set_xlim(-1.5, 1.5)
+        ax.set_ylim(-1.5, 1.5)
+        if saveFile:
+            plt.savefig('plt.png')
         plt.show()
 
         return ax
-
-
 
 
 if __name__ == '__main__':
@@ -389,9 +404,9 @@ if __name__ == '__main__':
     from nama.hashes import *
     from nama.lsi import LSIModel
 
-
-    df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
-    df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
+    df1 = pd.DataFrame(['ABC Inc.', 'abc inc', 'A.B.C. INCORPORATED',
+                        'The XYZ Company', 'X Y Z CO'], columns=['name'])
+    df2 = pd.DataFrame(['ABC Inc.', 'XYZ Co.'], columns=['name'])
 
     # Initialize the matcher
     matcher = Matcher()
@@ -401,14 +416,14 @@ if __name__ == '__main__':
     matcher.addStrings(df2['name'])
 
     # At this point we can merge on exact matches, but there isn't much point (equivalent to pandas merge function)
-    matcher.merge(df1,df2,on='name')
+    matcher.merge(df1, df2, on='name')
 
     # Match strings if they share a hash string
     # (corphash removes common prefixes and suffixes (the, inc, co, etc) and makes everything lower-case)
     matcher.matchHash(corpHash)
 
     # Now merge will find all the matches we want except  'ABC Inc.' <--> 'A.B.C. INCORPORATED'
-    matcher.merge(df1,df2,on='name')
+    matcher.merge(df1, df2, on='name')
 
     # Fit a LSI model to generate similarity measures
     lsi = LSIModel(matcher)
@@ -420,14 +435,14 @@ if __name__ == '__main__':
     matcher.matchesDF()
 
     # Add manual matches
-    matcher.addMatch('ABC Inc.','A.B.C. INCORPORATED')
-    matcher.addMatch('XYZ Co.','X Y Z CO')
+    matcher.addMatch('ABC Inc.', 'A.B.C. INCORPORATED')
+    matcher.addMatch('XYZ Co.', 'X Y Z CO')
 
     # Drop remaining fuzzy matches from the graph
     matcher.filterMatches(lambda m: m['source'] != 'similarity')
 
     # Final merge
-    matcher.merge(df1,df2,on='name')
+    matcher.merge(df1, df2, on='name')
 
     # We can also cluster names by connected component and assign ids to each
     matcher.componentsDF()
@@ -440,63 +455,62 @@ if __name__ == '__main__':
     matcher.plotMatches()
     matcher.plotMatches('xyz')
 
-    matcher.addMatch('xyz','123')
-    matcher.addMatch('456','123')
-
+    matcher.addMatch('xyz', '123')
+    matcher.addMatch('456', '123')
 
     # min_string_count test
     matcher = Matcher()
 
-    matcher.addStrings(['google inc','alphabet inc'])
-    matcher.addMatch('Google Inc','Alphabet Inc')
+    matcher.addStrings(['google inc', 'alphabet inc'])
+    matcher.addMatch('Google Inc', 'Alphabet Inc')
     matcher.plotMatches()
 
     matcher.matchHash(corpHash)
     matcher.plotMatches()
 
-    matcher.matchHash(corpHash,min_string_count=0)
+    matcher.matchHash(corpHash, min_string_count=0)
     matcher.plotMatches()
 
-
     # Simplification test
-    matcher.addMatch('google','1')
-    matcher.addMatch('1','2')
-    matcher.addMatch('2','Google Inc')
-    matcher.addMatch('alphabet inc','3')
-    matcher.addMatch('3','4')
-    matcher.addMatch('4','5')
-    matcher.addMatch('5','3')
-    matcher.addMatch('google inc','6')
+    matcher.addMatch('google', '1')
+    matcher.addMatch('1', '2')
+    matcher.addMatch('2', 'Google Inc')
+    matcher.addMatch('alphabet inc', '3')
+    matcher.addMatch('3', '4')
+    matcher.addMatch('4', '5')
+    matcher.addMatch('5', '3')
+    matcher.addMatch('google inc', '6')
     matcher.plotMatches()
 
     matcher.simplify()
     matcher.plotMatches()
 
-
-
     # Tests
-    leftDF = pd.DataFrame(['a'],columns=['left'])
-    rightDF = pd.DataFrame(['b','c'],columns=['right'])
+    leftDF = pd.DataFrame(['a'], columns=['left'])
+    rightDF = pd.DataFrame(['b', 'c'], columns=['right'])
 
-    matcher = Matcher(['a','b','c'])
+    matcher = Matcher(['a', 'b', 'c'])
 
-    matcher.addMatch('a','b',score=0.5)
+    matcher.addMatch('a', 'b', score=0.5)
 
+    assert matcher.merge(leftDF, rightDF, left_on='left',
+                         right_on='right')['score'].mean() == 0.5
 
-    assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 0.5
+    matcher.addMatch('b', 'c', score=0.5)
 
-    matcher.addMatch('b','c',score=0.5)
+    assert matcher.merge(leftDF, rightDF, left_on='left', right_on='right')[
+        'score'].mean() == 0.375
 
-    assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 0.375
+    matcher.addMatch('a', 'c', score=1)
 
-    matcher.addMatch('a','c',score=1)
+    assert matcher.merge(leftDF, rightDF, left_on='left', right_on='right')[
+        'score'].mean() == 0.75
 
-    assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 0.75
+    matcher.addMatch('a', 'd', score=1)
+    matcher.addMatch('d', 'b', score=1)
 
-    matcher.addMatch('a','d',score=1)
-    matcher.addMatch('d','b',score=1)
-
-    assert matcher.merge(leftDF,rightDF,left_on='left',right_on='right')['score'].mean() == 1.0
+    assert matcher.merge(leftDF, rightDF, left_on='left',
+                         right_on='right')['score'].mean() == 1.0
 
     # matcher.plotMatches()
 
