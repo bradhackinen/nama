@@ -13,7 +13,7 @@ import nama.similarity as similarity
 
 
 class Matcher():
-    def __init__(self,strings=None,counts=None,G=None):
+    def __init__(self, strings=None, counts=None, G=None):
         if G:
             assert type(G) == nx.Graph
             self.G = G
@@ -29,52 +29,53 @@ class Matcher():
         if strings:
             self.addStrings(strings)
 
-    def strings(self,min_count=1):
+    def strings(self, min_count=1):
         if min_count:
-            return [s for s,c in self.counts.items() if c >= min_count]
+            return [s for s, c in self.counts.items() if c >= min_count]
         else:
             return list(self.G.nodes())
 
-    def addStrings(self,strings):
+    def addStrings(self, strings):
         for s in strings:
             self.counts[s] += 1
             self.G.add_node(s)
 
-    def removeStrings(self,strings):
+    def removeStrings(self, strings):
         self.G.remove_nodes_from(strings)
         for s in strings:
             del self.counts[s]
 
-    def addMatch(self,string0,string1,score=1,source='manual'):
-        self.G.add_edge(string0,string1,score=score,source=source)
+    def addMatch(self, string0, string1, score=1, source='manual'):
+        self.G.add_edge(string0, string1, score=score, source=source)
 
-    def removeMatch(self,string0,string1):
-        self.G.remove_edge(string0,string1)
+    def removeMatch(self, string0, string1):
+        self.G.remove_edge(string0, string1)
 
-    def addMatches(self,pairs,scores,source):
-        for (s0,s1),score in zip(pairs,scores):
+    def addMatches(self, pairs, scores, source):
+        for (s0, s1), score in zip(pairs, scores):
             if s0 != s1:
-                if self.G.has_edge(s0,s1) and self.G[s0][s1]['score'] >= score:
+                if self.G.has_edge(s0, s1) and self.G[s0][s1]['score'] >= score:
                     # Skip new connection if score lower than or equal to existing connection
                     continue
-                self.G.add_edge(s0,s1,score=score,source=source)
+                self.G.add_edge(s0, s1, score=score, source=source)
 
-    def removeMatches(self,pairs):
+    def removeMatches(self, pairs):
         self.G.remove_edges_from(pairs)
 
-    def addMatchDF(self,matchDF,source='matchDF'):
-        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source=source)
+    def addMatchDF(self, matchDF, source='matchDF'):
+        self.addMatches(
+            zip(matchDF['string0'], matchDF['string1']), matchDF['score'], source=source)
 
-    def removeMatchDF(self,matchDF):
-        self.removeMatches(zip(matchDF['string0'],matchDF['string1']))
+    def removeMatchDF(self, matchDF):
+        self.removeMatches(zip(matchDF['string0'], matchDF['string1']))
 
-    def filterMatches(self,filter_function):
-        for s0,s1,d in list(self.G.edges(data=True)):
+    def filterMatches(self, filter_function):
+        for s0, s1, d in list(self.G.edges(data=True)):
             d = d.copy()
             d['string0'] = s0
             d['string1'] = s1
             if not filter_function(d):
-                self.G.remove_edge(s0,s1)
+                self.G.remove_edge(s0, s1)
 
     def simplify(self):
         '''
@@ -83,75 +84,80 @@ class Matcher():
         for component in list(nx.connected_components(self.G)):
             counted = [s for s in component if self.counts[s]]
             keep = set(counted)
-            for s0,s1 in combinations(counted,2):
-                for path in nx.all_shortest_paths(self.G,s0,s1):
+            for s0, s1 in combinations(counted, 2):
+                for path in nx.all_shortest_paths(self.G, s0, s1):
                     keep.update(path)
             for s in [s for s in component if s not in keep]:
                 self.G.remove_node(s)
 
-    def matchHash(self,hash_function=basicHash,score=1,min_string_count=1):
-        pairs = [(s,hash_function(s)) for s in self.strings(min_string_count)]
+    def matchHash(self, hash_function=basicHash, score=1, min_string_count=1):
+        pairs = [(s, hash_function(s)) for s in self.strings(min_string_count)]
 
         scores = [score]*len(pairs)
-        self.addMatches(pairs=pairs,scores=scores,source=hash_function.__name__)
+        self.addMatches(pairs=pairs, scores=scores,
+                        source=hash_function.__name__)
 
-    def suggestMatches(self,similarityModel,min_score=0,within_component=False,min_string_count=1,show_plot=False,**args):
-        matchDF = similarity.findNearestMatches(self.strings(min_string_count),similarityModel,**args)
+    def suggestMatches(self, similarityModel, min_score=0, within_component=False, min_string_count=1, show_plot=False, **args):
+        matchDF = similarity.findNearestMatches(
+            self.strings(min_string_count), similarityModel, **args)
 
-        matchDF = matchDF[matchDF['score']>=min_score]
+        matchDF = matchDF[matchDF['score'] >= min_score]
 
         # matchDF = similarity.scoreSimilarity(matchDF,self,show_plot=show_plot)
         if not within_component:
-            matchDF = matchDF[~similarity.withinComponent(matchDF,self)]
+            matchDF = matchDF[~similarity.withinComponent(matchDF, self)]
 
         return matchDF.copy()
 
-    def matchSimilar(self,similarityModel,min_score=0.5,max_distance=None,min_string_count=1,show_plot=False,**args):
-        matchDF = self.suggestMatches(similarityModel,within_component=False,min_string_count=1,show_plot=False,**args)
+    def matchSimilar(self, similarityModel, min_score=0.5, max_distance=None, min_string_count=1, show_plot=False, **args):
+        matchDF = self.suggestMatches(
+            similarityModel, within_component=False, min_string_count=1, show_plot=False, **args)
 
-        matchDF = matchDF[matchDF['score']>=min_score]
+        matchDF = matchDF[matchDF['score'] >= min_score]
 
         if max_distance is not None:
             matchDF = matchDF[matchDF['distance'] <= max_distance]
 
-        self.addMatches(zip(matchDF['string0'],matchDF['string1']),matchDF['score'],source='similarity')
+        self.addMatches(zip(
+            matchDF['string0'], matchDF['string1']), matchDF['score'], source='similarity')
 
     def components(self):
         return nx.connected_components(self.G)
 
     def componentMap(self):
-        return {s:i for i,component in enumerate(self.components()) for s in component}
+        return {s: i for i, component in enumerate(self.components()) for s in component}
 
-    def matches(self,string=None):
+    def matches(self, string=None):
         if string is None:
             return self.G
         else:
-            return self.G.subgraph(nx.node_connected_component(self.G,string))
+            return self.G.subgraph(nx.node_connected_component(self.G, string))
 
-    def matchesDF(self,string=None):
+    def matchesDF(self, string=None):
         G = self.matches(string)
-        df = pd.concat([pd.DataFrame(list(G.edges()),columns=['string0','string1']),
-                        pd.DataFrame([d for s0,s1,d in G.edges(data=True)])],axis=1)
+        df = pd.concat([pd.DataFrame(list(G.edges()), columns=['string0', 'string1']),
+                        pd.DataFrame([d for s0, s1, d in G.edges(data=True)])], axis=1)
         return df
 
     def componentsDF(self):
         componentMap = self.componentMap()
 
-        return pd.DataFrame([(s,i) for s,i in componentMap.items() if s in self.counts],columns=['string','component'])
+        return pd.DataFrame([(s, i) for s, i in componentMap.items() if s in self.counts], columns=['string', 'component'])
 
-    def componentSummaryDF(self,sort_by='count',ascending=False):
+    def componentSummaryDF(self, sort_by='count', ascending=False):
         df = self.componentsDF()
         df['count'] = df['string'].apply(lambda s: self.counts[s])
-        df = df.sort_values(['component','count'],ascending=[True,False])
+        df = df.sort_values(['component', 'count'], ascending=[True, False])
         df['unique'] = 1
-        df = df.groupby('component').agg({'string':'first','count':'sum','unique':'sum'})
+        df = df.groupby('component').agg(
+            {'string': 'first', 'count': 'sum', 'unique': 'sum'})
 
         if sort_by is not None:
-            df = df.sort_values(sort_by,ascending=ascending)
+            df = df.sort_values(sort_by, ascending=ascending)
 
         return df
 
-    def matchImpacts(self,string=None):
+    def matchImpacts(self, string=None):
         G = self.matches(string)
         impacts = {}
         for component in nx.connected_components(G):
