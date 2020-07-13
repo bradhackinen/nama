@@ -404,8 +404,7 @@ if __name__ == '__main__':
     from nama.hashes import *
     from nama.lsi import LSIModel
 
-    df1 = pd.DataFrame(['ABC Inc.', 'abc inc', 'A.B.C. INCORPORATED',
-                        'The XYZ Company', 'X Y Z CO'], columns=['name'])
+    df1 = pd.DataFrame(['ABC Inc.', 'abc inc', 'A.B.C. INCORPORATED', 'The XYZ Company', 'X Y Z CO'], columns=['name'])
     df2 = pd.DataFrame(['ABC Inc.', 'XYZ Co.'], columns=['name'])
 
     # Initialize the matcher
