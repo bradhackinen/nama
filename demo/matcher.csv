@@ -1,0 +1,7 @@
+string,count,group
+ABC Inc.,2,ABC Inc.
+A.B.C. INCORPORATED,1,ABC Inc.
+abc inc,1,ABC Inc.
+The XYZ Company,1,The XYZ Company
+X Y Z CO,1,The XYZ Company
+XYZ Co.,1,The XYZ Company

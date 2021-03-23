@@ -1,18 +1,3 @@
-# nama
-
-*Fast, flexible name matching for large datasets*
-
-***Warning:*** **nama is being refactored and revised. Current code is not final.**
-
-
-
-
-# Demo Code
-
-The following code (from `nama/demo/demo.py`) illustrates how to match strings using string simplification and token similarity measures .
-
-```python
-
 import os
 import pandas as pd
 
@@ -144,6 +129,3 @@ loaded_matcher = nama.read_csv(demo_dir/'matcher.csv')
 
 # Visually verify that the saved and loaded matchers are the same
 nama.plot([matcher,loaded_matcher],matcher.strings(),matcher_names=['saved','loaded'])
-
-
-```
