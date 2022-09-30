@@ -3,11 +3,12 @@ import pandas as pd
 
 import nama
 
-# Create some simple dataframes to match
+# Create some simple dataframes with names to match
 df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
 df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
+df3 = pd.DataFrame(['A.B.C. Inc.','XYZ Company, The'],columns=['name'])
 
-print(f'Toy data:\ndf1=\n{df1}\ndf2=\n{df2}')
+print(f'Toy data:\ndf1=\n{df1}\ndf2=\n{df2}\ndf3=\n{df3}')
 
 # Nama is built around an object called a "matcher", which holds matching
 # information about a set of strings and partitions the strings into
@@ -24,13 +25,14 @@ matcher = nama.Matcher()
 
 # First we need to add all the strings we want to match to the matcher
 # (in this case the strings the name column of each dataframe)
-matcher = matcher.add(df1['name'])
-matcher = matcher.add(df2['name'])
+matcher = matcher.add_strings(df1['name'])
+matcher = matcher.add_strings(df2['name'])
+matcher = matcher.add_strings(df3['name'])
 
 # Initially, strings are automatically assigned to singleton groups
-# (Groups are automatically labelled according to the most common string,
-# with ties broken alphabetically)
-print(f'Initial string groups:\n{matcher.groups}')
+# Printing a matcher will show the first 50 strings, with empty lines indicating
+# separations between groups.
+print(f'\nInitial matcher:\n\n{matcher}')
 
 # At this point we can merge on exact matches, but there isn't much point
 # (equivalent to pandas merge function)
@@ -39,7 +41,7 @@ print(f"Exact matching with singleton groups:\n{matcher.merge_dfs(df1,df2,on='na
 # To get better results, we need to modify the matcher.
 # Unite merges all groups that contain the passed strings.
 matcher = matcher.unite(['X Y Z CO','XYZ Co.'])
-print(f'Updated string groups:\n{matcher.groups}')
+print(f'\nUpdated matcher:\n\n{matcher}')
 
 # Unite is very flexible. We can pass a single set of strings, a nested list
 # of strings, or mapping from strings to group labels. The mapping can even
@@ -56,13 +58,13 @@ print(f'Updated string groups:\n{matcher.groups}')
 
 from nama.strings import simplify_corp
 
-# Make a new matcher for comparison
-corp_matcher = nama.Matcher(matcher.strings())
+# Make a new matcher for comparison and split all the groups for a fresh start
+corp_matcher = matcher.split_all()
 
 # Unite strings with the same simplified representation
 corp_matcher = corp_matcher.unite(simplify_corp)
 
-print(f'Groups after uniting by simplify_corp:\n{corp_matcher.groups}')
+print(f'\nMatcher after uniting by simplify_corp:\n\n{corp_matcher}')
 
 # Another useful approach to matching is to construct a similarity measure
 # between strings. The standard way to do this is to break strings into "tokens"
@@ -74,23 +76,58 @@ print(f'Groups after uniting by simplify_corp:\n{corp_matcher.groups}')
 # First, create a TokenSimilarity model. This can be customized with different
 # tokenizers, similarity measures, and token weighting methods.
 
-from nama.token_similarity import TokenSimilarity
+from nama.embedding_similarity import EmbeddingSimilarityModel
 
-token_model = TokenSimilarity()
+# Creating a new similarity model
+similarity_model = EmbeddingSimilarityModel()
 
-# In the future: Use a training set to automatically pick the optimal similarity
-# threshold for uniting strings.
-# For now: Just set the threshold manually.
+# Training a similarity model
+similarity_model.train(training_matcher)
+
+
+# Loading and saving
+save_file = nama.root_dir/'_review'/'temp.bin'
+similarity_model.save(save_file)
+
+similarity_model = nama.embedding_similarity.load(save_file)
+
+
+
 
 # Then we can use the similarity model to predict matches between the matcher
 # strings. The predict method returns a new matcher.
-token_matcher = token_model.predict(matcher.strings(),threshold=0.05)
+predicted = similarity_model.predict(matcher,threshold=0.5)
+
+separated = similarity_model.separate(predicted,['A','B','C'])
 
 
+
+
+matcher.iter_scored_pairs(simi)
+
+similarity_model.iter_scored_pairs(matcher)
+
+
+
+
+
+predicted = matcher.predict(similarity_model,threshold=0.5)
+
+
+separated = matcher.separate(['A','B','C'],similarity_model)
+
+
+
+
+
+
+similarity_model.top_scored_pairs(matcher,is_match=False,min_score=0,sort_by='score',ascending=False)
+
+print(sim_matcher)
 # The nama.plot() function can help visualize the how strings are grouped in
 # multiple matchers at the same time.
 
-nama.plot([corp_matcher,token_matcher],matcher.strings(),matcher_names=['corp_matcher','token_matcher'])
+nama.plot([corp_matcher,sim_matcher],matcher.strings(),matcher_names=['corp_matcher','token_matcher'])
 
 # Notice that the combination of the two matchers correctly groups all the
 # strings. It is often useful to combine multiple matching techniques.
@@ -99,7 +136,7 @@ nama.plot([corp_matcher,token_matcher],matcher.strings(),matcher_names=['corp_ma
 # with unite.
 
 matcher = matcher.unite(corp_matcher)
-matcher = matcher.unite(token_matcher)
+matcher = matcher.unite(sim_matcher)
 
 nama.plot(matcher,matcher.strings())
 

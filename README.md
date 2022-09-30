@@ -39,8 +39,8 @@ matcher = nama.Matcher()
 
 # First we need to add all the strings we want to match to the matcher
 # (in this case the strings the name column of each dataframe)
-matcher = matcher.add(df1['name'])
-matcher = matcher.add(df2['name'])
+matcher = matcher.add_strings(df1['name'])
+matcher = matcher.add_strings(df2['name'])
 
 # Initially, strings are automatically assigned to singleton groups
 # (Groups are automatically labelled according to the most common string,

@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+# Nama settings
+_old/
+_review/
+config.py
