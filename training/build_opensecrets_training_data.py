@@ -14,7 +14,7 @@ import re
 from collections import Counter
 
 import nama
-from nama import root_dir
+from nama.config import data_dir
 
 import opensecrets
 

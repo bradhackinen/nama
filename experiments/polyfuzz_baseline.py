@@ -11,7 +11,7 @@ from jellyfish import jaro_winkler_similarity
 import nama
 from nama.scoring import score_predicted, split_on_groups
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_train.csv')
+gold = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
 
 
 models = {
@@ -49,7 +49,7 @@ for model_name,model in models.items():
 
 results_df = pd.DataFrame(results)
 
-# results_df.to_csv(nama.root_dir/'experiments'/'polyfuzz_canlobby_results.csv',index=False)
+# results_df.to_csv(data_dir/'experiments'/'polyfuzz_canlobby_results.csv',index=False)
 
 # mean_results_df = results_df#.groupby(run_cols+['threshold']).mean().reset_index()
 

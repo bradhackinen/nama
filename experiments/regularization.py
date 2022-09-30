@@ -7,7 +7,7 @@ import nama
 from nama.scoring import score_predicted, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_train.csv')
+gold = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
 
 results = []
 
@@ -65,7 +65,7 @@ for regularization in [0.0,1e-8,1e-7,1e-6,1e-5,1e-4,1e-3,1e-2]:
 
 results_df = pd.DataFrame(results)
 
-results_df.to_csv(nama.root_dir/'experiments'/'regularization_results.csv')
+results_df.to_csv(data_dir/'experiments'/'regularization_results.csv')
 
 run_cols = ['regularization']
 

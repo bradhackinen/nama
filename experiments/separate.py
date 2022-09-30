@@ -4,19 +4,19 @@ import nama
 from nama.scoring import score_predicted, split_on_groups
 from nama.embedding_similarity import load_similarity_model,load_embeddings
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_train.csv')
+gold = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
 
 
-sim = load_similarity_model(Path(nama.root_dir)/'models'/'nama_base.bin')
+sim = load_similarity_model(Path(data_dir)/'models'/'nama_base.bin')
 sim.to('cuda:0')
 
 test,_ = split_on_groups(gold,0.1,seed=1)
 
 test_embeddings = sim.embed(test)
 
-test_embeddings.save(nama.root_dir/'_review'/'temp_embeddings.bin')
+test_embeddings.save(data_dir/'_review'/'temp_embeddings.bin')
 
-test_embeddings = load_embeddings(nama.root_dir/'_review'/'temp_embeddings.bin')
+test_embeddings = load_embeddings(data_dir/'_review'/'temp_embeddings.bin')
 
 test_embeddings.predict(threshold=0.5)
 

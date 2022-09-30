@@ -15,7 +15,7 @@ for training_set in ['canlobby_client_names','opensecrets_client_names']:
     for seed in range(1,11):
         print(f'\n Testing {training_set}, seed={seed}')
 
-        gold = nama.read_csv(nama.root_dir/'training'/'data'/f'{training_set}.csv')
+        gold = nama.read_csv(data_dir/'training_data'/f'{training_set}.csv')
 
         train,test = split_on_groups(gold,0.8,seed=seed)
 
@@ -47,7 +47,7 @@ for training_set in ['canlobby_client_names','opensecrets_client_names']:
 
 results_df = pd.DataFrame(results)
 
-results_df.to_csv(nama.root_dir/'experiments'/'gold_train_results.csv')
+results_df.to_csv(data_dir/'experiments'/'gold_train_results.csv')
 
 results_df[results_df['F1'] >0 ] \
             .groupby(['training_set','threshold']) \

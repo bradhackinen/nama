@@ -11,7 +11,7 @@ from nama.strings import simplify_corp
 
 matchers = {}
 for dataset in ['canlobby','opensecrets']:
-    matchers[dataset+'_gold'] = nama.read_csv(nama.root_dir/'training'/'data'/f'{dataset}_client_names.csv')
+    matchers[dataset+'_gold'] = nama.read_csv(data_dir/'training_data'/f'{dataset}_client_names.csv')
     matchers[dataset+'_hash'] = nama.Matcher(matchers[dataset+'_gold'].strings()).unite(simplify_corp)
 
 test_train_pairs = [
@@ -64,7 +64,7 @@ for test_set,training_set in test_train_pairs:
 
 results_df = pd.DataFrame(results)
 
-results_df.to_csv(nama.root_dir/'experiments'/'unsupervised_results.csv')
+results_df.to_csv(data_dir/'experiments'/'unsupervised_results.csv')
 
 results_df = results_df[(results_df['test_set'] != 'opensecrets_gold') | (results_df['training_set'] != 'canlobby_hash')]
 

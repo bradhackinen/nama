@@ -9,8 +9,8 @@ from nama.scoring import score_predicted    # split_on_groups, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel
 # from nama.strings import simplify_corp
 
-opensecrets = nama.read_csv(nama.root_dir/'training'/'data'/'opensecrets_train.csv')
-canlobby = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_train.csv')
+opensecrets = nama.read_csv(data_dir/'training_data'/'opensecrets_train.csv')
+canlobby = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
 
 results = []
 train_kwargs = {
@@ -53,7 +53,7 @@ for model_name in 'roberta-base','roberta-large':
 
         results_df = pd.DataFrame(results)
 
-results_df.to_csv(nama.root_dir/'experiments'/'opensecrets_to_canlobby_results.csv')
+results_df.to_csv(data_dir/'experiments'/'opensecrets_to_canlobby_results.csv')
 
 run_cols = ['model','transformer_lr','group_threshold']
 

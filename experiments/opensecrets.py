@@ -9,7 +9,7 @@ from nama.scoring import score_predicted, confusion_df, split_on_groups, kfold_o
 from nama.embedding_similarity import EmbeddingSimilarity
 from nama.strings import simplify_corp
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'opensecrets_client_names.csv')
+gold = nama.read_csv(data_dir/'training_data'/'opensecrets_client_names.csv')
 
 train = nama.Matcher(gold.strings()).unite(simplify_corp)
 

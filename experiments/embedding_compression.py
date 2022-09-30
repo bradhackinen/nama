@@ -10,7 +10,7 @@ from nama.scoring import score_predicted, split_on_groups, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarity
 from nama.strings import simplify_corp
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'opensecrets_train.csv')
+gold = nama.read_csv(data_dir/'training_data'/'opensecrets_train.csv')
 
 results = []
 
@@ -68,7 +68,7 @@ results_df.loc[results_df['d'].isnull() & (results_df['model_size'] == 'base'),'
 results_df.loc[results_df['d'].isnull() & (results_df['model_size'] == 'large'),'d'] = 1024
 
 
-results_df.to_csv(nama.root_dir / 'experiments' / 'embedding_compression_results.csv',index=False)
+results_df.to_csv(data_dir / 'experiments' / 'embedding_compression_results.csv',index=False)
 
 
 run_cols = ['model_size','d','half']

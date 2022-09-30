@@ -13,7 +13,7 @@ from nama.strings import simplify_corp
 for training_set in ['canlobby_client_names','opensecrets_client_names']:
     print(f'\n{training_set}')
 
-    gold = nama.read_csv(nama.root_dir/'training'/'data'/f'{training_set}.csv')
+    gold = nama.read_csv(data_dir/'training_data'/f'{training_set}.csv')
 
     train = nama.Matcher(gold.strings()).unite(simplify_corp)
 

@@ -129,7 +129,7 @@ print(f'Matcher as a dataframe:\n{matcher.to_df()}')
 
 # Finally, we can save the matcher in csv format for later use
 
-from nama import root_dir
+from nama.config import data_dir
 
 demo_dir = root_dir/'demo'
 

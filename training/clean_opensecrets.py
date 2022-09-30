@@ -11,18 +11,18 @@ from nama.embedding_similarity import EmbeddingSimilarity,load
 from nama.strings import simplify_corp
 
 
-if os.path.isfile(nama.root_dir/'training'/'data'/'opensecrets_train.csv'):
+if os.path.isfile(data_dir/'training_data'/'opensecrets_train.csv'):
     # Load the current combined opensecrets matcher
-    opensecrets = nama.read_csv(nama.root_dir/'training'/'data'/'opensecrets_train.csv')
+    opensecrets = nama.read_csv(data_dir/'training_data'/'opensecrets_train.csv')
 else:
     # ...or start a new one from scratch
-    opensecrets_clients = nama.read_csv(nama.root_dir/'training'/'data'/'opensecrets_clients.csv')
-    opensecrets_registrants = nama.read_csv(nama.root_dir/'training'/'data'/'opensecrets_registrants.csv')
+    opensecrets_clients = nama.read_csv(data_dir/'training_data'/'opensecrets_clients.csv')
+    opensecrets_registrants = nama.read_csv(data_dir/'training_data'/'opensecrets_registrants.csv')
 
     opensecrets = (opensecrets_clients + opensecrets_registrants).unite(simplify_corp)
 
 
-model_file = nama.root_dir/'models'/'opensecrets_base.pt'
+model_file = data_dir/'models'/'opensecrets_base.pt'
 
 if os.path.isfile(model_file):
     # Load the current trained model
@@ -51,7 +51,7 @@ else:
 matcher = (opensecrets_clients + opensecrets_registrants).unite(simplify_corp)
 
 manual_df = pd.concat([
-                    pd.read_csv(nama.root_dir/'training'/'data'/f'opensecrets_{x}.csv')
+                    pd.read_csv(data_dir/'training_data'/f'opensecrets_{x}.csv')
                     for x in ['fn','fp']]) \
                 .assign(is_match=lambda x: x['is_match'] == 'y')
 
@@ -72,7 +72,7 @@ for g,group_pairs_df in separate_df.groupby('group0'):
                 .split(group_strings) \
                 .unite(group_matcher)
 
-matcher.to_csv(nama.root_dir/'training'/'data'/'opensecrets_train.csv')
+matcher.to_csv(data_dir/'training_data'/'opensecrets_train.csv')
 
 
 # Train the similarity model on the updated matcher
@@ -95,7 +95,7 @@ fn_df = sim.top_scored_pairs(matcher,n=1000,is_match=False,min_score=0.6,sort_by
 
 fn_df[['string0','string1']] \
         .assign(is_match='') \
-        .to_csv(nama.root_dir/'_review'/'opensecrets_fn.csv',index=False)
+        .to_csv(data_dir/'_review'/'opensecrets_fn.csv',index=False)
 
 
 # Look for potential false positive pairs (caused by name changes, subsidiaries, client/registrant relationships, etc)
@@ -105,14 +105,14 @@ fp_df = sim.top_scored_pairs(matcher,n=1000,is_match=True,max_score=0.4,sort_by=
 
 fp_df[['string0','string1']] \
         .assign(is_match='') \
-        .to_csv(nama.root_dir/'_review'/'opensecrets_fp.csv',index=False)
+        .to_csv(data_dir/'_review'/'opensecrets_fp.csv',index=False)
 
 
 #
 #
 #
 # # Test trained similarity model on Canadian lobbying clients
-# test = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_train.csv')
+# test = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
 # results = []
 # for threshold in tqdm(np.linspace(0,1,21),desc='scoring'):
 #
@@ -175,7 +175,7 @@ fp_df[['string0','string1']] \
 # matcher = (opensecrets_clients + opensecrets_registrants).unite(simplify_corp)
 #
 # manual_df = pd.concat([
-#                     pd.read_csv(nama.root_dir/'training'/'data'/f'opensecrets_{x}.csv')
+#                     pd.read_csv(data_dir/'training_data'/f'opensecrets_{x}.csv')
 #                     for x in ['fn','fp']]) \
 #                 .assign(is_match=lambda x: x['is_match'] == 'y')
 #
@@ -196,7 +196,7 @@ fp_df[['string0','string1']] \
 #                 .split(group_strings) \
 #                 .unite(group_matcher)
 #
-# matcher.to_csv(nama.root_dir/'training'/'data'/'opensecrets_train.csv')
+# matcher.to_csv(data_dir/'training_data'/'opensecrets_train.csv')
 #
 #
 #
@@ -307,7 +307,7 @@ fp_df[['string0','string1']] \
 #
 # fn_df[['string0','string1']] \
 #     .assign(is_match=np.nan) \
-#     .to_csv(nama.root_dir/'_review'/'canlobby_manual_pairs.csv',index=False)
+#     .to_csv(data_dir/'_review'/'canlobby_manual_pairs.csv',index=False)
 #
 #
 #
@@ -390,8 +390,8 @@ fp_df[['string0','string1']] \
 #
 #
 #
-# f = nama.root_dir/'models'/'opensecrets.pt'
-# sim.save(nama.root_dir/'models'/'opensecrets.pt')
+# f = data_dir/'models'/'opensecrets.pt'
+# sim.save(data_dir/'models'/'opensecrets.pt')
 #
 # sim = torch.load(f)
 #
@@ -402,7 +402,7 @@ fp_df[['string0','string1']] \
 # sim2.load_state_dict(torch.load(f))
 #
 # sim2 = torch.load(f)
-# sim2 = EmbeddingSimilarity(load_from=nama.root_dir/'models'/'opensecrets_combined.pt')
+# sim2 = EmbeddingSimilarity(load_from=data_dir/'models'/'opensecrets_combined.pt')
 #
 # pred = sim2.predict(test,threshold=0.7,progress_bar=True)
 #

@@ -7,8 +7,8 @@ import nama
 from nama.scoring import score_predicted, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel
 
-canlobby = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_train.csv')
-opensecrets = nama.read_csv(nama.root_dir/'training'/'data'/'opensecrets_train.csv')
+canlobby = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
+opensecrets = nama.read_csv(data_dir/'training_data'/'opensecrets_train.csv')
 
 gold = canlobby + opensecrets
 
@@ -81,7 +81,7 @@ for seed in [1]:
 
 results_df = pd.DataFrame(results)
 
-results_df.to_csv(nama.root_dir/'experiments'/'score_decay_results.csv')
+results_df.to_csv(data_dir/'experiments'/'score_decay_results.csv')
 
 run_cols = ['score_decay','half']
 

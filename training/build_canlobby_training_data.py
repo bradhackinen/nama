@@ -3,7 +3,7 @@ import pandas as pd
 import re
 from unidecode import unidecode
 
-from nama import root_dir
+from nama.config import data_dir
 
 
 sorena_df = pd.read_csv(Path(root_dir)/'training_data'/'ClientNames_lower.csv',encoding='iso-8859-1')

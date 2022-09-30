@@ -7,7 +7,7 @@ from nama.token_similarity import TokenSimilarity
 from nama.scoring import score_predicted, confusion_df, split_on_groups, kfold_on_groups
 
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_client_names.csv')
+gold = nama.read_csv(data_dir/'training_data'/'canlobby_client_names.csv')
 
 groups = sorted(gold.groups.keys())
 

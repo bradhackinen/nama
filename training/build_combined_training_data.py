@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 import nama
 from nama.strings import simplify
 
-canlobby = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_train.csv')
-opensecrets = nama.read_csv(nama.root_dir/'training'/'data'/'opensecrets_train.csv')
+canlobby = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
+opensecrets = nama.read_csv(data_dir/'training_data'/'opensecrets_train.csv')
 
 gold = canlobby + opensecrets
 
 
-gold.to_csv(nama.root_dir/'training'/'data'/'combined_train.csv')
+gold.to_csv(data_dir/'training_data'/'combined_train.csv')
 
 
 gold_df = gold.to_df()
@@ -31,20 +31,20 @@ simple_upper_df = simple_df.copy() \
 upper_train_df = pd.concat([upper_df,simple_upper_df]) \
                 .drop_duplicates(subset=['string'])
 
-upper_train_df.to_csv(nama.root_dir/'training'/'data'/'augmented_train_upper_case.csv')
+upper_train_df.to_csv(data_dir/'training_data'/'augmented_train_upper_case.csv')
 
 
 mixed_train_df = pd.concat([gold_df,upper_df,simple_df,simple_upper_df]) \
                 .drop_duplicates(subset=['string'])
 
-mixed_train_df.to_csv(nama.root_dir/'training'/'data'/'augmented_train_mixed_case.csv')
+mixed_train_df.to_csv(data_dir/'training_data'/'augmented_train_mixed_case.csv')
 
 
-gold_mixed = nama.read_csv(nama.root_dir/'training'/'data'/'combined_train.csv')
+gold_mixed = nama.read_csv(data_dir/'training_data'/'combined_train.csv')
 
 gold_mixed.matches('Microsoft')
 
 
-gold_upper = nama.read_csv(nama.root_dir/'training'/'data'/'combined_train_upper_case.csv')
+gold_upper = nama.read_csv(data_dir/'training_data'/'combined_train_upper_case.csv')
 
 gold_upper.matches('MICROSOFT')

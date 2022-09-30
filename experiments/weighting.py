@@ -7,7 +7,7 @@ from nama.scoring import score_predicted, split_on_groups
 from nama.embedding_similarity import EmbeddingSimilarity
 
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_client_names.csv')
+gold = nama.read_csv(data_dir/'training_data'/'canlobby_client_names.csv')
 
 
 results = []
@@ -40,7 +40,7 @@ for train_counts in True,False:
 
 results_df = pd.DataFrame(results)
 
-results_df.to_csv(nama.root_dir/'experiments'/'weighting_results.csv')
+results_df.to_csv(data_dir/'experiments'/'weighting_results.csv')
 
 
 

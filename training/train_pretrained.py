@@ -9,8 +9,8 @@ from nama.scoring import score_predicted, split_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel, load_similarity_model
 
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'combined_train.csv')
-# gold_upper = nama.read_csv(nama.root_dir/'training'/'data'/'combined_train_upper_case.csv')
+gold = nama.read_csv(data_dir/'training_data'/'combined_train.csv')
+# gold_upper = nama.read_csv(data_dir/'training_data'/'combined_train_upper_case.csv')
 
 train_kwargs = {
                     'max_epochs': 1,
@@ -40,7 +40,7 @@ for model_name,hparams in model_defs.items():
 
     sim.to('cpu')
 
-    save_file = nama.root_dir/'models'/f'{model_name}.bin'
+    save_file = data_dir/'models'/f'{model_name}.bin'
     print(f'Saving model as {save_file}')
     sim.save(save_file)
 
@@ -58,7 +58,7 @@ results = []
 for model_name in model_defs.keys():
     print(f'Verifying {model_name}')
 
-    sim = load_similarity_model(nama.root_dir/'models'/f'{model_name}.bin')
+    sim = load_similarity_model(data_dir/'models'/f'{model_name}.bin')
     sim.to('cuda:0')
 
     for half in False,True:

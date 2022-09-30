@@ -8,7 +8,7 @@ from nama.scoring import score_predicted, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarity
 
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_client_names.csv')
+gold = nama.read_csv(data_dir/'training_data'/'canlobby_client_names.csv')
 
 
 results = []
@@ -50,7 +50,7 @@ for epochs in [1,2,3]:
 
 results_df = pd.DataFrame(results)
 
-results_df.to_csv(nama.root_dir/'experiments'/'scheduler_results.csv')
+results_df.to_csv(data_dir/'experiments'/'scheduler_results.csv')
 
 
 import matplotlib.pyplot as plt

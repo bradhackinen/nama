@@ -8,9 +8,9 @@ import nama
 from nama.scoring import score_predicted, split_on_groups, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarity, load
 
-canlobby = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_client_names.csv')
+canlobby = nama.read_csv(data_dir/'training_data'/'canlobby_client_names.csv')
 
-sim = load(nama.root_dir/'models'/'nama_base.bin')
+sim = load(data_dir/'models'/'nama_base.bin')
 
 embeddings = sim.embed(canlobby)
 

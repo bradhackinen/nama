@@ -7,7 +7,7 @@ import nama
 from nama.scoring import score_predicted, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'combined_train.csv')
+gold = nama.read_csv(data_dir/'training_data'/'combined_train.csv')
 
 results = []
 
@@ -97,7 +97,7 @@ mean_results_df.groupby(run_cols)['F1'].quantile(0.8)
 
 
 # from nama.embedding_similarity import load_similarity_model
-# sim2 = load_similarity_model(nama.root_dir/'models'/'nama_large.bin')
+# sim2 = load_similarity_model(data_dir/'models'/'nama_large.bin')
 # sim2.to('cuda:0')
 #
 

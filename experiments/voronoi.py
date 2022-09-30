@@ -43,7 +43,7 @@ seed_strings = [
 
 
 
-sim = load_similarity_model(nama.root_dir/'models'/'nama_base.bin')
+sim = load_similarity_model(data_dir/'models'/'nama_base.bin')
 
 sim.to('cuda:3')
 

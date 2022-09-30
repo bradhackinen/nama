@@ -37,7 +37,7 @@ test_matcher = nama.Matcher(
 test_matcher.to_df()
 
 # Embed the strings using a pre-trained similarity model
-sim = load_similarity_model(nama.root_dir/'models'/'nama_base.bin')
+sim = load_similarity_model(data_dir/'models'/'nama_base.bin')
 sim.to('cuda:1')
 
 embeddings = sim.embed(test_matcher)

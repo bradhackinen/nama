@@ -23,7 +23,7 @@ print(org_strings_df.loc[8557265,'source_string'])
 
 print(org_strings_df.loc[6059162,'source_string'])
 
-# gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_client_names.csv')
+# gold = nama.read_csv(data_dir/'training_data'/'canlobby_client_names.csv')
 #
 # groups = sorted(gold.groups.keys())
 #

@@ -9,7 +9,7 @@ from nama.scoring import score_predicted, split_on_groups, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarity
 from nama.strings import simplify_corp
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_clients_manual.csv')
+gold = nama.read_csv(data_dir/'training_data'/'canlobby_clients_manual.csv')
 
 results = []
 

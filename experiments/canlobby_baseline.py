@@ -7,7 +7,7 @@ import nama
 from nama.scoring import score_predicted, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel
 
-gold = nama.read_csv(nama.root_dir/'training'/'data'/'canlobby_train.csv')
+gold = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
 
 
 results = []
