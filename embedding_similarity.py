@@ -20,6 +20,10 @@ logging.set_verbosity_error()
 
 
 class TransformerProjector(nn.Module):
+    """
+    A basic wrapper around a Hugging Face transformer model.
+    Takes a string as input and produces an embedding vector of size d.
+    """
     def __init__(self,
                     model_class=RobertaModel,
                     model_name='roberta-base',
@@ -143,6 +147,11 @@ class TransformerProjector(nn.Module):
 
 
 class ExpCosSimilarity(nn.Module):
+    """
+    A trainable similarity scoring model that estimates the probability
+    of a match as the negative exponent of 1+cosine distance between
+    embeddings.
+    """
     def __init__(self,alpha=50,**kwargs):
 
         super().__init__()
@@ -194,6 +203,13 @@ class ExponentWeights():
 
 
 class EmbeddingSimilarityModel(nn.Module):
+    """
+    A combined projector/scorer model that produces Embeddings objects
+    as its primary output.
+
+    - train() jointly optimizes the projector_model and score_model using
+      contrastive learning to learn from a training Matcher.
+    """
     def __init__(self,
                     projector_class=TransformerProjector,
                     score_class=ExpCosSimilarity,
@@ -276,6 +292,16 @@ class EmbeddingSimilarityModel(nn.Module):
                 validation_interval=1000,early_stopping=True,early_stopping_patience=3,
                 verbose=False,progress_bar=True,
                 **kwargs):
+
+        """
+        Train the projector_model and score_model to predict match probabilities
+        using the training_matcher as a source of "correct" matches.
+        Training algorithm uses contrastive learning with hard-positive
+        and hard-negative mining to fine tune the projector model to place
+        matched strings near to each other in embedding space, while
+        simulataneously calibrating the score_model to predict the match
+        probabilities as a function of cosine distance
+        """
 
         if validation_matcher is None:
             early_stopping = False
@@ -483,6 +509,11 @@ class EmbeddingSimilarityModel(nn.Module):
 
 
 class Embeddings(nn.Module):
+    """
+    Stores embeddings for a fixed array of strings and provides methods for
+    clustering the strings to create Matcher objects according to different
+    algorithms.
+    """
     def __init__(self,strings,V,score_model,weighting_function,counts,device='cpu'):
         super().__init__()
 
@@ -653,6 +684,25 @@ class Embeddings(nn.Module):
                 batch_size=64,
                 progress_bar=True):
 
+        """
+        Unite embedding strings according to predicted pairwise similarity.
+
+        - "base_matcher" will be used to inialize the group_ids before uniting new matches
+        - "theshold" sets the minimimum match similarity required to unite two strings.
+            - Note that strings with similarity<threshold can end up matched if they are
+              linked by a chain of sufficiently similar strings (matching is transitive).
+              "group_threshold" can be used to add an additional constraing on the minimum
+              similarity within each group.
+        - "group_threshold" sets the minimum similarity required within a single group.
+          If "group_threshold" != None, string pairs with similarity>threshold are identified
+          and stored in order of similarity. Highest similarity strings are matched first,
+          and before each time a pair of strings is united, the function checks if this will
+          result in grouping any two strings with similarity<group_threshold. If so, this pair
+          is skipped. This version of the algorithm is slower than the one used when
+          "group_threshold=None.
+
+        returns: Matcher object
+        """
         # Use the faster prediction algorithm if possible
         if not (group_threshold or separate_strings):
 
@@ -785,6 +835,17 @@ class Embeddings(nn.Module):
 
     @torch.no_grad()
     def voronoi(self,seed_strings,threshold=0,base_matcher=None,progress_bar=True,batch_size=64):
+        """
+        Unite embedding strings with each string's most similar seed string.
+
+        - "base_matcher" will be used to inialize the group_ids before uniting new matches
+        - "theshold" sets the minimimum match similarity required between a string and seed string
+          for the string to be matched. (i.e., setting theshold=0 will result in every embedding
+          string to be matched its nearest seed string, while setting threshold=0.9 will leave
+          strings that have similarity<0.9 with their nearest seed string unaffected)
+
+        returns: Matcher object
+        """
 
         if base_matcher is not None:
             # self = self.embed(base_matcher)
