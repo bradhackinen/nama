@@ -7,7 +7,7 @@ import nama
 from nama.scoring import score_predicted, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel
 
-gold = nama.read_csv(data_dir/'training_data'/'combined_train.csv')
+gold = nama.read_csv(nama.root_dir/'training'/'data'/'combined_train.csv')
 
 results = []
 
@@ -29,7 +29,7 @@ for fold,(train,test) in enumerate(kfold_on_groups(gold,k=5,seed=1)):
     sim = EmbeddingSimilarityModel(prompt='Organization: ',
                                     model_name='roberta-base',
                                     amp=True,
-                                    d=256,
+                                    d=64,
                                     **train_kwargs)
     sim.to('cuda:0')
 
@@ -97,7 +97,7 @@ mean_results_df.groupby(run_cols)['F1'].quantile(0.8)
 
 
 # from nama.embedding_similarity import load_similarity_model
-# sim2 = load_similarity_model(data_dir/'models'/'nama_large.bin')
+# sim2 = load_similarity_model(nama.root_dir/'models'/'nama_large.bin')
 # sim2.to('cuda:0')
 #
 
@@ -121,17 +121,17 @@ mean_results_df.groupby(run_cols)['F1'].quantile(0.8)
 
 
 
-#
-# V = sim.embed(['Costco Wholesale Corporation','COSTCO WHOLESALE CORPORATION']).V
-# sim.score_model(V@V.T)
-#
-# V = sim.embed(['Costco Wholesale Corporation','COSTCO WHOLESALE CORP']).V
-# sim.score_model(V@V.T)
-#
-#
-#
-# V = sim.embed(['Apple, Inc.','APPLE, INC.']).V
-# sim.score_model(V@V.T)
-#
-# V = sim.embed(['MICROSOFT','Microsoft']).V
-# sim.score_model(V@V.T)
+
+V = sim.embed(['Costco Wholesale Corporation','COSTCO WHOLESALE CORPORATION']).V
+sim.score_model(V@V.T)
+
+V = sim.embed(['Costco Wholesale Corporation','COSTCO WHOLESALE CORP']).V
+sim.score_model(V@V.T)
+
+
+
+V = sim.embed(['Apple, Inc.','APPLE, INC.']).V
+sim.score_model(V@V.T)
+
+V = sim.embed(['MICROSOFT','Microsoft']).V
+sim.score_model(V@V.T)

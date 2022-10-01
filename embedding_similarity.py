@@ -700,6 +700,8 @@ class Embeddings(nn.Module):
           result in grouping any two strings with similarity<group_threshold. If so, this pair
           is skipped. This version of the algorithm is slower than the one used when
           "group_threshold=None.
+        - "separate_strings" takes a list of strings that should never be united with each
+          other (these strings will still be united with other strings)
 
         returns: Matcher object
         """
