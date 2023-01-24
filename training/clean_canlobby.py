@@ -10,6 +10,8 @@ from nama.scoring import score_predicted, split_on_groups, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarity,load
 from nama.strings import simplify_corp
 
+data_dir = '/home/bmorgens/CS4490/nama_data/nama'
+
 train_kwargs = {
                     'max_epochs': 1,
                     'warmup_frac': 0.1,
@@ -21,12 +23,12 @@ train_kwargs = {
                     }
 
 
-if os.path.isfile(data_dir/'training_data'/'canlobby_train.csv'):
+if os.path.isfile(f"{data_dir}/traning_data/canlobby_train.csv"):
     # Load the current combined canlobby matcher
-    canlobby = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
+    canlobby = nama.read_csv(f"{data_dir}/traning_data/canlobby_train.csv")
 else:
     # ...or start a new one from scratch
-    canlobby = nama.read_csv(data_dir/'training_data'/'canlobby_clients_manual.csv')
+    canlobby = nama.read_csv(f"{data_dir}/traning_data/canlobby_clients_manual.csv")
 
 
 model_file = data_dir/'models'/'canlobby.pt'
@@ -70,7 +72,7 @@ for g,group_pairs_df in separate_df.groupby('group0'):
                 .split(group_strings) \
                 .unite(group_matcher)
 
-matcher.to_csv(data_dir/'training_data'/'canlobby_train.csv')
+matcher.to_csv(f"{data_dir}/traning_data/canlobby_train.csv")
 
 
 # Train the similarity model on the updated matcher
@@ -192,7 +194,7 @@ results_df.groupby(run_cols)['F1'].max()
 #                 .split(group_strings) \
 #                 .unite(group_matcher)
 #
-# matcher.to_csv(data_dir/'training_data'/'opensecrets_train.csv')
+# matcher.to_csv(f"{data_dir}/traning_data/opensecrets_train.csv")
 #
 #
 #

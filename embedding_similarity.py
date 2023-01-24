@@ -157,6 +157,7 @@ class ExpCosSimilarity(nn.Module):
         super().__init__()
 
         self.alpha = nn.Parameter(torch.tensor(float(alpha)))
+        #print("aplha", self.alpha)
 
     def __repr__(self):
         return f'<nama.ExpCosSimilarity with {self.alpha=}>'
@@ -167,15 +168,40 @@ class ExpCosSimilarity(nn.Module):
         return torch.exp(-Z)
 
     def loss(self,X,Y,weights=None,decay=1e-6):
-        Z = self.alpha*(1 - X)
-
+        torch.autograd.set_detect_anomaly(True)
+        print("cal", self.alpha, nn.Parameter(torch.tensor(float(50)).to(device="cuda:2")))
+        Z = self.alpha*(X) #this was 1-X
+        print("in", Z,'|||||||||||||',"|||||||||||",X,"|||||||||",Y,"|||||||",weights)
         # Cross entropy loss with a simplified and (hopefully) numerically appropriate formula
         # TODO: Stick an epsilon in here to prevent nan?
-        # loss = Y*Z - torch.xlogy(1-Y,-torch.expm1(-Z))
-        loss = Y*Z - torch.xlogy(1-Y,1-torch.exp(-Z))
 
+        # loss = Y*Z - torch.xlogy(1-Y,1-torch.exp(-Z))
+        print(f"------\nY\n")
+        print(f"isnan: {Y.isnan().any()}")
+        print(f"isinf: {Y.isinf().any()}")
+        print(f"range: {Y.min()} - {Y.max()}")
+        print(f"------\nZ\n")
+        print(f"isnan: {Z.isnan().any()}")
+        print(f"isinf: {Z.isinf().any()}")
+        print(f"range: {Z.min()} - {Y.max()}")
+
+        A = 1-torch.exp(-Z)
+
+        print(f"------\nA\n")
+        print(f"isnan: {A.isnan().any()}")
+        print(f"isinf: {A.isinf().any()}")
+        print(f"range: {A.min()} - {A.max()}")
+
+        B = torch.xlogy(1-Y,A)
+
+        print(f"------\nB\n")
+        print(f"isnan: {B.isnan().any()}")
+        print(f"isinf: {B.isinf().any()}")
+        print(f"range: {B.min()} - {B.max()}")
+        loss = Y*Z - B
+        #print("l_loss", loss)
         if weights is not None:
-            loss *= weights*loss
+            loss *= weights #was; loss *= weights*loss
 
         if decay:
             loss += decay*self.alpha**2
@@ -234,7 +260,7 @@ class EmbeddingSimilarityModel(nn.Module):
         torch.save(self,savefile)
 
     @torch.no_grad()
-    def embed(self,input,to=None,batch_size=64,progress_bar=True,**kwargs):
+    def embed(self,input,to=None,batch_size=64,progress_bar=True, verbose=False,**kwargs):
         """
         Construct an Embeddings object from input strings or a Matcher
         """
@@ -251,7 +277,6 @@ class EmbeddingSimilarityModel(nn.Module):
             counts = torch.ones(len(strings),device=self.device).float().to(to)
 
         input_loader = DataLoader(strings,batch_size=batch_size,num_workers=0)
-
         self.projector_model.eval()
 
         V = None
@@ -261,13 +286,14 @@ class EmbeddingSimilarityModel(nn.Module):
 
                 v = self.projector_model(batch_strings).detach().to(to)
 
+                #if verbose:
+                    #print("v", v)
                 if V is None:
                     # Use v to determine dim and dtype of pre-allocated embedding tensor
                     # (Pre-allocating avoids duplicating tensors with a big .cat() operation)
                     V = torch.empty(len(strings),v.shape[1],device=to,dtype=v.dtype)
 
                 V[batch_start:batch_start+len(batch_strings),:] = v
-
                 pbar.update(len(batch_strings))
                 batch_start += len(batch_strings)
 
@@ -289,7 +315,7 @@ class EmbeddingSimilarityModel(nn.Module):
                 transformer_lr=1e-5,projection_lr=1e-5,score_lr=10,warmup_frac=0.1,
                 max_grad_norm=1,dropout=False,
                 validation_matcher=None,target='F1',restore_best=True,val_seed=None,
-                validation_interval=1000,early_stopping=True,early_stopping_patience=3,
+                validation_interval=1000,early_stopping=True,early_stopping_patience=10,
                 verbose=False,progress_bar=True,
                 **kwargs):
 
@@ -302,7 +328,7 @@ class EmbeddingSimilarityModel(nn.Module):
         simulataneously calibrating the score_model to predict the match
         probabilities as a function of cosine distance
         """
-
+        best_state = None
         if validation_matcher is None:
             early_stopping = False
             restore_best = False
@@ -325,7 +351,7 @@ class EmbeddingSimilarityModel(nn.Module):
 
         step = 0
         self.history = []
-        self.val_scores = []
+        self.validation_scores = []
         for epoch in range(max_epochs):
 
             global_embeddings = self.embed(training_matcher)
@@ -333,7 +359,8 @@ class EmbeddingSimilarityModel(nn.Module):
             strings = global_embeddings.strings
             V = global_embeddings.V
             w = global_embeddings.w
-
+            #print("V:", V)
+            #print(strings)
             groups = torch.tensor([global_embeddings.string_map[training_matcher[s]] for s in strings],device=self.device)
 
             # Normalize weights to make learning rates more general
@@ -360,8 +387,9 @@ class EmbeddingSimilarityModel(nn.Module):
                 to the embeddings and prevent the same pairs from being selected
                 every time.
                 """
-                V_i = self.projector_model(strings[batch_i])
 
+                V_i = self.projector_model(strings[batch_i])
+                #print("V_i", V_i, "\ni", batch_start)
                 # Update global embedding cache
                 V[batch_i,:] = V_i.detach()
 
@@ -379,9 +407,9 @@ class EmbeddingSimilarityModel(nn.Module):
                 if score_lr:
                     # Make sure gradients are enabled for score model
                     self.score_model.requires_grad_(True)
-
+                    print("global", global_X.isnan().any(),"|||||",global_Y.isnan().any(),"||",global_W.isnan().any())
                     global_loss = self.score_model.loss(global_X,global_Y,weights=global_W,decay=score_decay)
-
+                    print('g_loss', global_loss.nanmean().isnan().any())
                     score_optimizer.zero_grad()
                     global_loss.nanmean().backward()
                     torch.nn.utils.clip_grad_norm_(self.score_model.parameters(),max_norm=max_grad_norm)
@@ -404,7 +432,7 @@ class EmbeddingSimilarityModel(nn.Module):
 
                 # Train projector model
                 if (transformer_lr or projection_lr) and step <= num_warmup_steps + num_training_steps:
-
+                    #print("Train projector model")
                     # Turn off score model updating - only want to train projector here
                     self.score_model.requires_grad_(False)
 
@@ -426,7 +454,7 @@ class EmbeddingSimilarityModel(nn.Module):
                     batch_X = V_i@V_j.T
                     batch_Y = (groups[batch_i][:,None] == groups[batch_j][None,:]).float()
                     h['batch_obs'] = len(batch_i)*len(batch_j)
-
+                    #print("batch_loss",batch_X)
                     batch_loss = self.score_model.loss(batch_X,batch_Y,weights=batch_W)
 
                     # Add dispersion loss to push apart distant unmatched strings
@@ -452,9 +480,10 @@ class EmbeddingSimilarityModel(nn.Module):
 
                 self.history.append(h)
                 step += 1
+                print(f"------------------------------{step}---------------------------------")
 
                 if (validation_matcher is not None) and not (step % validation_interval):
-
+                    print(f'\nValidation results at step {step} (current epoch {epoch})')
                     validation = len(self.validation_scores)
                     val_scores = self.test(validation_matcher)
                     val_scores['step'] = step - 1
@@ -483,7 +512,7 @@ class EmbeddingSimilarityModel(nn.Module):
                         print(f'Stopping training ({early_stopping_patience} validation checks since best validation score)')
                         break
 
-        if restore_best:
+        if restore_best and best_state:
             print(f"Restoring to best state (step {best_state['val_scores']['step']}):")
             for k,v in best_state['val_scores'].items():
                 print(f'    {k}: {v:.4f}')
@@ -492,18 +521,21 @@ class EmbeddingSimilarityModel(nn.Module):
             self.load_state_dict(best_state['state_dict'])
             self.to(self.device)
 
-        return pd.DataFrame(self.history)
+        return pd.DataFrame(self.history), pd.DataFrame(self.validation_scores)
 
     def predict(self,input,**kwargs):
         embeddings = self.embed(input,**kwargs)
         return embeddings.predict(**kwargs)
 
-    def test(self,gold_matcher,batch_size=32):
+    def test(self,gold_matcher,batch_size=32, embed=None):
+        if not embed:
+            embeddings = self.embed(gold_matcher, verbose=False)
+        else:
+            embeddings = embed
 
-        embeddings = self.embed(gold_matcher)
-        predicted = embeddings.predict(gold_matcher)
+        predicted = embeddings.predict()
 
-        scores = score_predicted(predicted,gold_matcher,use_counts=True)
+        scores = score_predicted(predicted,gold_matcher)
 
         return scores
 
@@ -548,21 +580,21 @@ class Embeddings(nn.Module):
         with ZipFile(f,'w') as zip:
 
             # Write score model
-            zip.writestr('score_model.pkl',pickle.dumps(self.score_model))
+            zip.write('score_model.pkl',pickle.dumps(self.score_model))
 
             # Write score model
-            zip.writestr('weighting_function.pkl',pickle.dumps(self.weighting_function))
+            zip.write('weighting_function.pkl',pickle.dumps(self.weighting_function))
 
             # Write string info
             strings_df = pd.DataFrame().assign(
                                         string=self.strings,
                                         count=self.counts.to('cpu').numpy())
-            zip.writestr('strings.csv',strings_df.to_csv(index=False))
+            zip.write('strings.csv',strings_df.to_csv(index=False))
 
             # Write embedding vectors
             byte_io = BytesIO()
             np.save(byte_io,self.V.to('cpu').numpy(),allow_pickle=False)
-            zip.writestr('V.npy',byte_io.getvalue())
+            zip.write('V.npy',byte_io.getvalue())
 
     def __getitem__(self,arg):
         """
@@ -597,8 +629,10 @@ class Embeddings(nn.Module):
         Construct updated Embeddings with counts from the input Matcher
         """
         new = self[matcher]
+
         new.counts = torch.tensor([matcher.counts[s] for s in new.strings],device=self.device)
         new.w = new.weighting_function(new.counts)
+        print("new ", new.w)
 
         return new
 
@@ -996,7 +1030,7 @@ def load_embeddings(f):
                             score_model=score_model,
                             weighting_function=weighting_function,
                             V=torch.tensor(V)
-                            )
+                        )
 
 
 def load_similarity_model(f,map_location='cpu',**kwargs):
