@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -5,11 +6,12 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 import nama
+from nama.config import data_dir
 from nama.scoring import score_predicted, split_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel, load_similarity_model
 
 
-gold = nama.read_csv(data_dir/'training_data'/'combined_train.csv')
+gold = nama.read_csv(Path(data_dir)/'training_data'/'combined_train.csv')
 # gold_upper = nama.read_csv(data_dir/'training_data'/'combined_train_upper_case.csv')
 
 train_kwargs = {
@@ -24,7 +26,7 @@ train_kwargs = {
                     }
 
 model_defs = {
-    'nama_base':{'d':64,'model_name':'roberta-base'},
+    'nama_base':{'d':64,'nama_test':'roberta-base'},
     # 'nama_large':{'d':256,'model_name':'roberta-large'},
     }
 
@@ -40,7 +42,7 @@ for model_name,hparams in model_defs.items():
 
     sim.to('cpu')
 
-    save_file = data_dir/'models'/f'{model_name}.bin'
+    save_file = Path(data_dir)/'models'/f'{model_name}.bin'
     print(f'Saving model as {save_file}')
     sim.save(save_file)
 
@@ -58,7 +60,7 @@ results = []
 for model_name in model_defs.keys():
     print(f'Verifying {model_name}')
 
-    sim = load_similarity_model(data_dir/'models'/f'{model_name}.bin')
+    sim = load_similarity_model(Path(data_dir)/'models'/f'{model_name}.bin')
     sim.to('cuda:0')
 
     for half in False,True:

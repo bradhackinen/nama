@@ -1,13 +1,15 @@
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 import nama
+from nama.config import data_dir
 from nama.scoring import score_predicted, kfold_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel
 
-gold = nama.read_csv(data_dir/'training_data'/'canlobby_train.csv')
+gold = nama.read_csv(Path(data_dir)/'training_data'/'canlobby_train.csv')
 
 
 results = []
@@ -24,7 +26,8 @@ train_kwargs = {
                     'alpha':50,
                     'model_name':'roberta-base',
                     'd':256,
-                    'upper_case':True
+                    'upper_case':True,
+                    'gor':1
                     }
 
 
