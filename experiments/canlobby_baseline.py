@@ -23,18 +23,17 @@ train_kwargs = {
                     'batch_size':8,
                     'score_decay':0,
                     'dispersion':0,
-                    'alpha':50,
+                    'alpha':10,
                     'model_name':'roberta-base',
                     'd':256,
                     'upper_case':True,
-                    'gor':1
                     }
 
 
 for fold,(train,test) in enumerate(kfold_on_groups(gold,k=5,seed=1)):
 
     sim = EmbeddingSimilarityModel(prompt='Organization: ',**train_kwargs)
-    sim.to('cuda:1')
+    sim.to('cuda:3')
 
     history_df = sim.train(train,verbose=True,**train_kwargs)
 

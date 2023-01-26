@@ -150,7 +150,8 @@ class ExpCosSimilarity(nn.Module):
     """
     A trainable similarity scoring model that estimates the probability
     of a match as the negative exponent of 1+cosine distance between
-    embeddings.
+    embeddings:
+        p(match|v_i,v_j) = exp(-alpha*(1-v_i@v_j))
     """
     def __init__(self,alpha=50,**kwargs):
 
@@ -164,15 +165,25 @@ class ExpCosSimilarity(nn.Module):
     def forward(self,X):
         # Z is a scaled distance measure: Z=0 means that the score should be 1
         Z = self.alpha*(1 - X)
-        return torch.exp(-Z)
+        return torch.clamp(torch.exp(-Z),min=0,max=1.0)
 
-    def loss(self,X,Y,weights=None,decay=1e-6):
+    def loss(self,X,Y,weights=None,decay=1e-6,epsilon=1e-6):
+
         Z = self.alpha*(1 - X)
+
+        # Put epsilon floor to prevent overflow/undefined results
+        # Z = torch.tensor([1e-2,1e-3,1e-6,1e-7,1e-8,1e-9])
+        # torch.log(1 - torch.exp(-Z))
+        # 1/(1 - torch.exp(-Z))
+        with torch.no_grad():
+            Z_eps_adjustment = torch.clamp(epsilon-Z,min=0)
+
+        Z += Z_eps_adjustment
 
         # Cross entropy loss with a simplified and (hopefully) numerically appropriate formula
         # TODO: Stick an epsilon in here to prevent nan?
-        # loss = Y*Z - torch.xlogy(1-Y,-torch.expm1(-Z))
-        loss = Y*Z - torch.xlogy(1-Y,1-torch.exp(-Z))
+        loss = Y*Z - torch.xlogy(1-Y,-torch.expm1(-Z))
+        # loss = Y*Z - torch.xlogy(1-Y,1-torch.exp(-Z))
 
         if weights is not None:
             loss *= weights*loss
@@ -182,7 +193,7 @@ class ExpCosSimilarity(nn.Module):
 
         return loss
 
-    def score_to_cos(self,score,eps=1e-5):
+    def score_to_cos(self,score):
         if score > 0:
             return 1 + np.log(score)/self.alpha.item()
         else:
@@ -285,7 +296,7 @@ class EmbeddingSimilarityModel(nn.Module):
                             device=to)
 
     def train(self,training_matcher,max_epochs=1,batch_size=8,
-                score_decay=0,dispersion=0,
+                score_decay=0,regularization=0,
                 transformer_lr=1e-5,projection_lr=1e-5,score_lr=10,warmup_frac=0.1,
                 max_grad_norm=1,dropout=False,
                 validation_matcher=None,target='F1',restore_best=True,val_seed=None,
@@ -353,6 +364,11 @@ class EmbeddingSimilarityModel(nn.Module):
                 h = {'epoch':epoch,'step':step}
 
                 batch_i = shuffled_ids[batch_start:batch_start+batch_size]
+
+                # Recycle ids from the beginning to pad the last batch if necessary
+                if len(batch_i) < batch_size:
+                    batch_i = batch_i + shuffled_ids[:(batch_size-len(batch_i))]
+
                 """
                 Find highest loss match for each batch string (global search)
 
@@ -429,9 +445,15 @@ class EmbeddingSimilarityModel(nn.Module):
 
                     batch_loss = self.score_model.loss(batch_X,batch_Y,weights=batch_W)
 
-                    # Add dispersion loss to push apart distant unmatched strings
-                    if dispersion:
-                        batch_loss += dispersion*(1-batch_Y)*(batch_X**2)
+                    if regularization:
+                        # Apply Global Orthogonal Regularization from https://arxiv.org/abs/1708.06320
+                        gor_Y = (groups[batch_i][:,None] != groups[batch_i][None,:]).float()
+                        gor_n = gor_Y.sum()
+                        if gor_n > 1:
+                            gor_X = (V_i@V_i.T)*gor_Y
+                            gor_m1 = 0.5*gor_X.sum()/gor_n
+                            gor_m2 = 0.5*(gor_X**2).sum()/gor_n
+                            batch_loss += regularization*(gor_m1 + torch.clamp(gor_m2 - 1/self.projector_model.d,min=0))
 
                     h['batch_nan'] = torch.isnan(batch_loss.detach()).sum().item()
 
