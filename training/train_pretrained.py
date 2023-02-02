@@ -15,18 +15,18 @@ gold = nama.read_csv(Path(data_dir)/'training_data'/'combined_train.csv')
 # gold_upper = nama.read_csv(data_dir/'training_data'/'combined_train_upper_case.csv')
 
 train_kwargs = {
-                    'max_epochs': 1,
-                    'warmup_frac': 0.1,
-                    'transformer_lr':1e-5,
-                    'score_lr':10,
-                    'use_counts':True,
-                    'batch_size':8,
-                    'alpha_decay':0,
-                    'add_upper':True,
-                    }
+                'max_epochs': 1,
+                'warmup_frac': 0.1,
+                'transformer_lr':5e-6,
+                'score_lr':30,
+                'alpha':20,
+                'use_counts':True,
+                'batch_size':6,
+                'add_upper':True,
+                }
 
 model_defs = {
-    'nama_base':{'d':64,'nama_test':'roberta-base'},
+    'nama_base':{'d':64,'model_name':'roberta-base'},
     # 'nama_large':{'d':256,'model_name':'roberta-large'},
     }
 
@@ -61,7 +61,7 @@ for model_name in model_defs.keys():
     print(f'Verifying {model_name}')
 
     sim = load_similarity_model(Path(data_dir)/'models'/f'{model_name}.bin')
-    sim.to('cuda:0')
+    sim.to('cuda:2')
 
     for half in False,True:
 

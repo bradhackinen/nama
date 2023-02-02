@@ -660,13 +660,7 @@ class Embeddings(nn.Module):
         return matcher
 
     @torch.no_grad()
-    def _fast_predict(self,threshold=0.5,base_matcher=None,progress_bar=True,batch_size=64):
-
-        if base_matcher is not None:
-            # self = self.embed(base_matcher)
-            group_ids = self._matcher_to_group_ids(base_matcher)
-        else:
-            group_ids = torch.arange(len(self)).to(self.device)
+    def _fast_predict(self,group_ids,threshold=0.5,progress_bar=True,batch_size=64):
 
         V = self.V
         cos_threshold = self.score_model.score_to_cos(threshold)
@@ -701,15 +695,14 @@ class Embeddings(nn.Module):
     def predict(self,
                 threshold=0.5,
                 group_threshold=None,
-                separate_strings=[],
-                base_matcher=None,
+                always_match=None,
+                never_match=None,
                 batch_size=64,
                 progress_bar=True):
 
         """
         Unite embedding strings according to predicted pairwise similarity.
 
-        - "base_matcher" will be used to inialize the group_ids before uniting new matches
         - "theshold" sets the minimimum match similarity required to unite two strings.
             - Note that strings with similarity<threshold can end up matched if they are
               linked by a chain of sufficiently similar strings (matching is transitive).
@@ -722,26 +715,38 @@ class Embeddings(nn.Module):
           result in grouping any two strings with similarity<group_threshold. If so, this pair
           is skipped. This version of the algorithm is slower than the one used when
           "group_threshold=None.
-        - "separate_strings" takes a list of strings that should never be united with each
-          other (these strings will still be united with other strings)
+        - "always_match" will be used to unite embedding strings before predicting new matches
+        - "never_match" takes a set, or a list of sets, where each set indicates two or more strings
+            that should never be united with each other (these strings may still be united with other strings)
 
         returns: Matcher object
         """
-        # Use the faster prediction algorithm if possible
-        if not (group_threshold or separate_strings):
-
-            return self._fast_predict(
-                        threshold=threshold,
-                        base_matcher=base_matcher,
-                        batch_size=batch_size,
-                        progress_bar=progress_bar)
-
-        if base_matcher is not None:
-            # self = self.embed(base_matcher)
+        # Apply always_match argument
+        if always_match is not None:
+            base_matcher = (nama.Matcher(self.strings)
+                            .unite(always_match))
             group_ids = self._matcher_to_group_ids(base_matcher)
         else:
             group_ids = torch.arange(len(self)).to(self.device)
 
+        # Use a simpler, faster prediction algorithm if possible
+        if not (group_threshold or never_match):
+            return self._fast_predict(
+                        group_ids=group_ids,
+                        threshold=threshold,
+                        batch_size=batch_size,
+                        progress_bar=progress_bar)
+
+        # Ensure never_match is a list of sets
+        if never_match:
+            if all(isinstance(s,str) for s in never_match):
+                never_match = [set(never_match)]
+            else:
+                never_match = [set(s) for s in never_match]
+            
+            assert all([(len(sep) > 1) for sep in never_match])
+
+        # Convert thresholds from scores to raw cosine distances
         V = self.V
         cos_threshold = self.score_model.score_to_cos(threshold)
         if group_threshold is not None:
@@ -785,8 +790,8 @@ class Embeddings(nn.Module):
                     matches.append(batch_matches.to('cpu').numpy())
                     cos_scores.append(cos.to('cpu').numpy())
 
-        # Then unite the pairs in priority order, checking for violations of the
-        # separation arguments
+        # Unite potential match pairs in priority order, while respecting
+        # the group_threshold and never_match arguments
         if matches:
             matches = np.vstack(matches)
             cos_scores = np.hstack(cos_scores).T
@@ -797,8 +802,14 @@ class Embeddings(nn.Module):
 
             # Set up tensors
             matches = torch.tensor(matches).to(self.device)
-            separate_strings = set(separate_strings)
-            separated = torch.tensor([s in separate_strings for s in self.strings]).to(self.device)
+            
+            if never_match:
+                # print(f'{separate=}')
+                never_match_map = {s:sep for sep in never_match for s in sep}
+                # print(f'{never_match_map=}')
+                never_match_array = np.array([never_match_map.get(s,set()) for s in self.strings])
+                # print(f'{never_match_array=}')
+            
 
             n_matches = matches.shape[0]
             with tqdm(total=n_matches,desc='Uniting matches',
@@ -816,8 +827,17 @@ class Embeddings(nn.Module):
                     # Identify which strings should be united
                     to_unite = (group_ids == g[0]) | (group_ids == g[1])
 
-                    # Flag whether uniting this pair will unite any separated strings
-                    any_separated = separated[to_unite].sum() > 1
+                    # Check whether uniting this pair will unite any separated strings
+                    any_separated = False
+                    if never_match:
+                        sep_0 = never_match_array[match_pair[0]]
+                        sep_1 = never_match_array[match_pair[1]]
+                        # print(f'{sep_0=}')
+                        # print(f'{sep_1=}')
+                        if sep_0 and sep_1 and (sep_1 & sep_0):
+                            # Here we make use of the fact that any pair of separated strings
+                            # will appear in both sep_0 and sep_1 if one string is in each group
+                            any_separated = True
 
                     # Flag whether the new group will have three or more strings
                     singletons = to_unite.sum() < 3
@@ -841,6 +861,11 @@ class Embeddings(nn.Module):
                         # Unite groups
                         group_ids[to_unite] = g[0]
 
+                        if never_match and (sep_0 or sep_1):
+                            # Propagate separated strings to the whole group
+                            never_match_array[to_unite.detach().cpu().numpy()] = sep_0 | sep_1
+                            # print(f'{never_match_array=}')
+                            
                         # If we are uniting more than two strings, we can eliminate
                         # some redundant matches in the queue
                         if not singletons:
