@@ -698,7 +698,8 @@ class Embeddings(nn.Module):
                 always_match=None,
                 never_match=None,
                 batch_size=64,
-                progress_bar=True):
+                progress_bar=True,
+                always_never_conflicts='warn'):
 
         """
         Unite embedding strings according to predicted pairwise similarity.
@@ -709,42 +710,93 @@ class Embeddings(nn.Module):
               "group_threshold" can be used to add an additional constraing on the minimum
               similarity within each group.
         - "group_threshold" sets the minimum similarity required within a single group.
-          If "group_threshold" != None, string pairs with similarity>threshold are identified
-          and stored in order of similarity. Highest similarity strings are matched first,
-          and before each time a pair of strings is united, the function checks if this will
-          result in grouping any two strings with similarity<group_threshold. If so, this pair
-          is skipped. This version of the algorithm is slower than the one used when
-          "group_threshold=None.
-        - "always_match" will be used to unite embedding strings before predicting new matches
-        - "never_match" takes a set, or a list of sets, where each set indicates two or more strings
-            that should never be united with each other (these strings may still be united with other strings)
+        - "always_match" takes any argument that can be used to unite strings. These 
+            strings will always be matched.
+        - "never_match" takes a set, or a list of sets, where each set indicates two or
+            more strings that should never be united with each other (these strings may 
+            still be united with other strings).
+        - "always_never_conflicts" determines how to handle conflicts between 
+            "always_match" and "never_match":
+            - always_never_conflicts="warn": Check for conflicts and print a warning
+                if any are found (default)
+            - always_never_conflicts="raise": Check for conflicts and raise an error
+                if any are found
+            - always_never_conflicts="ignore": Do not check for conflicts ("always_match"
+              will take precedence)
 
+        If "group_threshold" or "never_match" arguments are supplied, strings pairs are
+        united in order of similarity. Highest similarity strings are matched first, and 
+        before each time a new pair of strings is united, the function checks if this will
+        result in grouping any two strings with similarity<group_threshold. If so, this
+        pair is skipped. This version of the algorithm requires more memory and processing
+        time, but guaruntees deterministic output that is consistent with the constraints.
+            
         returns: Matcher object
         """
-        # Apply always_match argument
-        if always_match is not None:
-            base_matcher = (nama.Matcher(self.strings)
+        if group_threshold and group_threshold < threshold:
+            raise ValueError('group_threshold must be greater than or equal to threshold')
+
+        group_ids = torch.arange(len(self)).to(self.device)
+        
+        if always_match:
+            always_matcher = (nama.Matcher(self.strings)
                             .unite(always_match))
-            group_ids = self._matcher_to_group_ids(base_matcher)
-        else:
-            group_ids = torch.arange(len(self)).to(self.device)
+            always_match_labels = always_matcher.labels
+
 
         # Use a simpler, faster prediction algorithm if possible
         if not (group_threshold or never_match):
+            if always_match:
+                group_ids = self._matcher_to_group_ids(always_matcher)
+
             return self._fast_predict(
                         group_ids=group_ids,
                         threshold=threshold,
                         batch_size=batch_size,
                         progress_bar=progress_bar)
 
-        # Ensure never_match is a list of sets
         if never_match:
+            # Ensure never_match is a nested list
             if all(isinstance(s,str) for s in never_match):
-                never_match = [set(never_match)]
-            else:
-                never_match = [set(s) for s in never_match]
+                never_match = [never_match]
+
+            if always_match:
+                
+                assert always_never_conflicts in ['raise','warn','ignore']
+                
+                if always_never_conflicts != 'ignore':
+
+                    # Find conflicts between never_match and always_match groups
+                    conflicts = []
+                    for i,g in enumerate(never_match):
+                        g = sorted(list(g))
+                        g_labels = always_matcher[g]
+                        if len(set(g_labels)) < len(g):
+                            df = (pd.DataFrame()
+                                  .assign(
+                                    string=g,
+                                    never_match_group=i,
+                                    always_match_group=g_labels
+                                    ))
+                            conflicts.append(df)
+
+                    if conflicts:
+                        conflicts_df = pd.concat(conflicts)
+
+                        if always_never_conflicts == 'warn':
+                            print(f'Warning: The following never_match groups are in conflict with always_match groups\n{conflicts_df}')
+                            print('Conflicted never_match relationships will be ignored')
+                        else:
+                            raise ValueError(f'The following never_match groups are in conflict with always_match groups\n{conflicts_df}')
+                                
+
+                # If always_match, collapse to group labels that should not match
+                # Note: Implicitly letting always_match over-ride never_match here
+                never_match = [{always_match_labels[s] for s in g} for g in never_match]
             
-            assert all([(len(sep) > 1) for sep in never_match])
+            else:
+                # Otherwise just use the strings themselves as labels
+                never_match = [set(s) for s in never_match]
 
         # Convert thresholds from scores to raw cosine distances
         V = self.V
@@ -803,12 +855,15 @@ class Embeddings(nn.Module):
             # Set up tensors
             matches = torch.tensor(matches).to(self.device)
             
+            # Set-up per-string tracking of never-match relationships
             if never_match:
-                # print(f'{separate=}')
                 never_match_map = {s:sep for sep in never_match for s in sep}
-                # print(f'{never_match_map=}')
-                never_match_array = np.array([never_match_map.get(s,set()) for s in self.strings])
-                # print(f'{never_match_array=}')
+                
+                if always_match:
+                    # If always_match, we use group labels instead of the strings themselves
+                    never_match_array = np.array([never_match_map.get(always_match_labels[s],set()) for s in self.strings])
+                else:
+                    never_match_array = np.array([never_match_map.get(s,set()) for s in self.strings])                   
             
 
             n_matches = matches.shape[0]
@@ -827,44 +882,39 @@ class Embeddings(nn.Module):
                     # Identify which strings should be united
                     to_unite = (group_ids == g[0]) | (group_ids == g[1])
 
-                    # Check whether uniting this pair will unite any separated strings
-                    any_separated = False
-                    if never_match:
-                        sep_0 = never_match_array[match_pair[0]]
-                        sep_1 = never_match_array[match_pair[1]]
-                        # print(f'{sep_0=}')
-                        # print(f'{sep_1=}')
-                        if sep_0 and sep_1 and (sep_1 & sep_0):
-                            # Here we make use of the fact that any pair of separated strings
-                            # will appear in both sep_0 and sep_1 if one string is in each group
-                            any_separated = True
-
                     # Flag whether the new group will have three or more strings
                     singletons = to_unite.sum() < 3
 
-                    if any_separated:
-                        unite_ok = False
-                    else:
-                        if singletons:
-                            unite_ok = True
-                        else:
-                            if group_threshold is None:
-                                unite_ok = True
-                            else:
-                                V0 = V[group_ids == g[0],:]
-                                V1 = V[group_ids == g[1],:]
+                    # Start by asuming that we can match this pair
+                    unite_ok = True
 
-                                unite_ok = (V0@V1.T).min() >= separate_cos
+                    # Check whether uniting this pair will unite any never_match strings/labels
+                    if never_match:
+                        never_0 = never_match_array[match_pair[0]]
+                        never_1 = never_match_array[match_pair[1]]
+
+                        if never_0 and never_1 and (never_0 & never_1):
+                            # Here we make use of the fact that any pair of never_match strings/labels
+                            # will appear in both never_0 and never_1 if one string/label is in each group
+                            unite_ok = False
+
+                    # Check whether the uniting the pair will violate the group_threshold
+                    # (impossible if the strings are singletons)
+                    if unite_ok and group_threshold and not singletons:
+                        V0 = V[group_ids == g[0],:]
+                        V1 = V[group_ids == g[1],:]
+
+                        unite_ok = (V0@V1.T).min() >= separate_cos
+
 
                     if unite_ok:
 
                         # Unite groups
                         group_ids[to_unite] = g[0]
 
-                        if never_match and (sep_0 or sep_1):
-                            # Propagate separated strings to the whole group
-                            never_match_array[to_unite.detach().cpu().numpy()] = sep_0 | sep_1
-                            # print(f'{never_match_array=}')
+                        if never_match and (never_0 or never_1):
+                            # Propagate never_match information to the whole group
+                            never_match_array[to_unite.detach().cpu().numpy()] = never_0 | never_1
                             
                         # If we are uniting more than two strings, we can eliminate
                         # some redundant matches in the queue
@@ -880,14 +930,19 @@ class Embeddings(nn.Module):
                     p_bar.update(n_matches - matches.shape[0])
                     n_matches = matches.shape[0]
 
-        return self._group_ids_to_matcher(group_ids)
+        predicted_matcher = self._group_ids_to_matcher(group_ids)
+
+        if always_match:
+            predicted_matcher = predicted_matcher.unite(always_matcher)
+
+        return predicted_matcher
 
     @torch.no_grad()
-    def voronoi(self,seed_strings,threshold=0,base_matcher=None,progress_bar=True,batch_size=64):
+    def voronoi(self,seed_strings,threshold=0,always_matcher=None,progress_bar=True,batch_size=64):
         """
         Unite embedding strings with each string's most similar seed string.
 
-        - "base_matcher" will be used to inialize the group_ids before uniting new matches
+        - "always_matcher" will be used to inialize the group_ids before uniting new matches
         - "theshold" sets the minimimum match similarity required between a string and seed string
           for the string to be matched. (i.e., setting theshold=0 will result in every embedding
           string to be matched its nearest seed string, while setting threshold=0.9 will leave
@@ -896,9 +951,9 @@ class Embeddings(nn.Module):
         returns: Matcher object
         """
 
-        if base_matcher is not None:
-            # self = self.embed(base_matcher)
-            group_ids = self._matcher_to_group_ids(base_matcher)
+        if always_matcher is not None:
+            # self = self.embed(always_matcher)
+            group_ids = self._matcher_to_group_ids(always_matcher)
         else:
             group_ids = torch.arange(len(self)).to(self.device)
 
