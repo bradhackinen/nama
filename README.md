@@ -4,14 +4,24 @@
 
 ## Installation
 
-Recommend install is to install from source with `conda`
+Recommend install is to install from source with ```conda```
 1. Install [`Anaconda`](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) 
-2. Clone `nama` `git clone https://github.com/bradhackinen/nama.git`
-3. Enter the `conda` directory where the conda environment file is with  `cd conda`
-4. Create new conda environment with `conda create --name <env-name> --file conda_env.txt`
-5. Activate the new environment with `conda activate <env-name>`
-6. Exit the `conda` directory
-7. Install the package with `pip install .`
+2. Clone `nama` 
+```git clone https://github.com/bradhackinen/nama.git```
+3. Enter the `conda` directory where the conda environment file is with  
+```cd conda```
+4. Create new conda environment with 
+```conda create --name <env-name>```
+5. Install [`pytorch-mutex`](https://anaconda.org/pytorch/pytorch-mutex/1.0/download/noarch/pytorch-mutex-1.0-cuda.tar.bz2)
+6. Install [`pytorch`](https://anaconda.org/pytorch/pytorch/1.10.2/download/linux-64/pytorch-1.10.2-py3.9_cuda11.3_cudnn8.2.0_0.tar.bz2)
+7. Install the rest of the dependencies with 
+```conda install --file conda_env.txt```
+5. Activate the new environment with 
+```conda activate <env-name>```
+6. Exit the `conda` directory with 
+```cd ..```
+7. Install the package with 
+```pip install .```
 
 Installing from source with `pip`
 1. Clone `nama` `git clone https://github.com/bradhackinen/nama.git`
