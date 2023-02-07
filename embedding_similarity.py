@@ -699,7 +699,8 @@ class Embeddings(nn.Module):
                 never_match=None,
                 batch_size=64,
                 progress_bar=True,
-                always_never_conflicts='warn'):
+                always_never_conflicts='warn',
+                return_united=False):
 
         """
         Unite embedding strings according to predicted pairwise similarity.
@@ -738,15 +739,15 @@ class Embeddings(nn.Module):
 
         group_ids = torch.arange(len(self)).to(self.device)
         
-        if always_match:
+        if always_match is not None:
             always_matcher = (nama.Matcher(self.strings)
                             .unite(always_match))
             always_match_labels = always_matcher.labels
 
 
         # Use a simpler, faster prediction algorithm if possible
-        if not (group_threshold or never_match):
-            if always_match:
+        if not (return_united or group_threshold or (never_match is not None)):
+            if always_match is not None:
                 group_ids = self._matcher_to_group_ids(always_matcher)
 
             return self._fast_predict(
@@ -755,13 +756,13 @@ class Embeddings(nn.Module):
                         batch_size=batch_size,
                         progress_bar=progress_bar)
 
-        if never_match:
+        if never_match is not None:
             # Ensure never_match is a nested list
             if all(isinstance(s,str) for s in never_match):
                 never_match = [never_match]
 
-            if always_match:
-                
+            if always_match is not None:
+
                 assert always_never_conflicts in ['raise','warn','ignore']
                 
                 if always_never_conflicts != 'ignore':
@@ -770,7 +771,7 @@ class Embeddings(nn.Module):
                     conflicts = []
                     for i,g in enumerate(never_match):
                         g = sorted(list(g))
-                        g_labels = always_matcher[g]
+                        g_labels = [always_match_labels[s] for s in g]
                         if len(set(g_labels)) < len(g):
                             df = (pd.DataFrame()
                                   .assign(
@@ -784,7 +785,7 @@ class Embeddings(nn.Module):
                         conflicts_df = pd.concat(conflicts)
 
                         if always_never_conflicts == 'warn':
-                            print(f'Warning: The following never_match groups are in conflict with always_match groups\n{conflicts_df}')
+                            print(f'Warning: The following never_match groups are in conflict with always_match groups:\n{conflicts_df}')
                             print('Conflicted never_match relationships will be ignored')
                         else:
                             raise ValueError(f'The following never_match groups are in conflict with always_match groups\n{conflicts_df}')
@@ -792,7 +793,7 @@ class Embeddings(nn.Module):
 
                 # If always_match, collapse to group labels that should not match
                 # Note: Implicitly letting always_match over-ride never_match here
-                never_match = [{always_match_labels[s] for s in g} for g in never_match]
+                never_match = [{always_match_labels[s] for s in g if s in always_match_labels} for g in never_match]
             
             else:
                 # Otherwise just use the strings themselves as labels
@@ -844,6 +845,7 @@ class Embeddings(nn.Module):
 
         # Unite potential match pairs in priority order, while respecting
         # the group_threshold and never_match arguments
+        united = []
         if matches:
             matches = np.vstack(matches)
             cos_scores = np.hstack(cos_scores).T
@@ -852,14 +854,19 @@ class Embeddings(nn.Module):
             m_sort = cos_scores.argsort()[::-1]
             matches = matches[m_sort]
 
+            if return_united:
+                # Save cos scores for later return
+                cos_scores_df = pd.DataFrame(matches,columns=['i','j'])
+                cos_scores_df['cos'] = cos_scores[m_sort]
+
             # Set up tensors
             matches = torch.tensor(matches).to(self.device)
             
             # Set-up per-string tracking of never-match relationships
-            if never_match:
+            if never_match is not None:
                 never_match_map = {s:sep for sep in never_match for s in sep}
                 
-                if always_match:
+                if always_match is not None:
                     # If always_match, we use group labels instead of the strings themselves
                     never_match_array = np.array([never_match_map.get(always_match_labels[s],set()) for s in self.strings])
                 else:
@@ -878,9 +885,11 @@ class Embeddings(nn.Module):
 
                     # Get the groups of the current match pair
                     g = group_ids[match_pair]
+                    g0 = group_ids == g[0]
+                    g1 = group_ids == g[1]
 
                     # Identify which strings should be united
-                    to_unite = (group_ids == g[0]) | (group_ids == g[1])
+                    to_unite = g0 | g1
 
                     # Flag whether the new group will have three or more strings
                     singletons = to_unite.sum() < 3
@@ -889,7 +898,7 @@ class Embeddings(nn.Module):
                     unite_ok = True
 
                     # Check whether uniting this pair will unite any never_match strings/labels
-                    if never_match:
+                    if never_match is not None:
                         never_0 = never_match_array[match_pair[0]]
                         never_1 = never_match_array[match_pair[1]]
 
@@ -901,8 +910,8 @@ class Embeddings(nn.Module):
                     # Check whether the uniting the pair will violate the group_threshold
                     # (impossible if the strings are singletons)
                     if unite_ok and group_threshold and not singletons:
-                        V0 = V[group_ids == g[0],:]
-                        V1 = V[group_ids == g[1],:]
+                        V0 = V[g0,:]
+                        V1 = V[g1,:]
 
                         unite_ok = (V0@V1.T).min() >= separate_cos
 
@@ -921,6 +930,14 @@ class Embeddings(nn.Module):
                         if not singletons:
                             # Removed queued matches that are now in the same group
                             matches = matches[group_ids[matches[:,0]] != group_ids[matches[:,1]]]
+
+                        if return_united:
+                            match_record = np.empty(4,dtype=int)
+                            match_record[:2] = match_pair.cpu().numpy().ravel()
+                            match_record[2] = self.counts[g0].sum().item()
+                            match_record[3] = self.counts[g1].sum().item()
+                            
+                            united.append(match_record)
                     else:
                         # Remove queued matches connecting these groups
                         matches = matches[torch.isin(group_ids[matches[:,0]],g,invert=True) \
@@ -932,10 +949,30 @@ class Embeddings(nn.Module):
 
         predicted_matcher = self._group_ids_to_matcher(group_ids)
 
-        if always_match:
+        if always_match is not None:
             predicted_matcher = predicted_matcher.unite(always_matcher)
 
-        return predicted_matcher
+        if return_united:
+            united_df = pd.DataFrame(np.vstack(united),columns=['i','j','n_i','n_j'])
+            united_df = pd.merge(united_df,cos_scores_df,how='inner',on=['i','j'])
+            united_df['score'] = self.score_model(
+                                    torch.tensor(united_df['cos'].values).to(self.device)
+                                    ).cpu().numpy()
+            
+            united_df = united_df.drop('cos',axis=1)
+            
+            for c in ['i','j']:
+                united_df[c] = [self.strings[i] for i in united_df[c]]
+
+            if always_match is not None:
+                united_df['always_match'] = [always_matcher[i] == always_matcher[j] 
+                                            for i,j in united_df[['i','j']].values]
+
+            return predicted_matcher,united_df
+            
+        else:
+
+            return predicted_matcher
 
     @torch.no_grad()
     def voronoi(self,seed_strings,threshold=0,always_matcher=None,progress_bar=True,batch_size=64):
@@ -991,95 +1028,6 @@ class Embeddings(nn.Module):
                     group_ids[i] = g_seed[max_seed[batch_i]]
 
         return self._group_ids_to_matcher(group_ids)
-
-    @torch.no_grad()
-    def _batch_scored_pairs(self,group_ids,batch_start,batch_size,
-                            is_match=None,
-                            min_score=None,max_score=None,
-                            min_loss=None,max_loss=None):
-
-        strings = self.strings
-        V = self.V
-        w = self.w
-
-        # Create simple slice objects to avoid creating copies with advanced indexing
-        i_slice = slice(batch_start,batch_start+batch_size)
-        j_slice = slice(batch_start+1,None)
-
-        X = V[i_slice]@V[j_slice].T
-        Y = (group_ids[i_slice,None] == group_ids[None,j_slice]).float()
-        if w is not None:
-            W = w[i_slice,None]*w[None,j_slice]
-        else:
-            W = None
-
-        scores = self.score_model(X)
-        loss = self.score_model.loss(X,Y,weights=W)
-
-        # Search upper diagonal entries only
-        # (note j_slice starting index is offset by one)
-        scores = torch.triu(scores)
-
-        # Filter by match type
-        if is_match is not None:
-            if is_match:
-                scores *= Y
-            else:
-                scores *= (1 - Y)
-
-        # Filter by min score
-        if min_score is not None:
-            scores *= (scores >= min_score)
-
-        # Filter by max score
-        if max_score is not None:
-            scores *= (scores <= max_score)
-
-        # Filter by min loss
-        if min_loss is not None:
-            scores *= (loss >= min_loss)
-
-        # Filter by max loss
-        if max_loss is not None:
-            scores *= (loss <= max_loss)
-
-        # Collect scored pairs
-        i,j = torch.nonzero(scores,as_tuple=True)
-
-        pairs = np.hstack([
-                                strings[i.cpu().numpy() + batch_start][:,None],
-                                strings[j.cpu().numpy() + (batch_start + 1)][:,None]
-                                ])
-
-        pair_groups = np.hstack([
-                                strings[group_ids[i + batch_start].cpu().numpy()][:,None],
-                                strings[group_ids[j + (batch_start + 1)].cpu().numpy()][:,None]
-                                ])
-
-        pair_scores = scores[i,j].cpu().numpy()
-        pair_losses = loss[i,j].cpu().numpy()
-
-        return pairs,pair_groups,pair_scores,pair_losses
-
-    def iter_scored_pairs(self,matcher=None,batch_size=64,progress_bar=True,**kwargs):
-
-        if matcher is not None:
-            self = self.embed(matcher)
-            group_ids = self._matcher_to_group_ids(matcher)
-        else:
-            group_ids = torch.arange(len(self)).to(self.device)
-
-        for batch_start in tqdm(range(0,len(self),batch_size),desc='Scoring pairs',disable=not progress_bar):
-            pairs,pair_groups,scores,losses = self._batch_scored_pairs(self,group_ids,batch_start,batch_size,**kwargs)
-            for (s0,s1),(g0,g1),score,loss in zip(pairs,pair_groups,scores,losses):
-                yield {
-                        'string0':s0,
-                        'string1':s1,
-                        'group0':g0,
-                        'group1':g1,
-                        'score':score,
-                        'loss':loss,
-                        }
 
 
 def load_embeddings(f):
