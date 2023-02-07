@@ -12,8 +12,14 @@ Recommend install is to install from source with ```conda```
 ```cd conda```
 4. Create new conda environment with 
 ```conda create --name <env-name>```
-5. Install [`pytorch-mutex`](https://anaconda.org/pytorch/pytorch-mutex/1.0/download/noarch/pytorch-mutex-1.0-cuda.tar.bz2)
-6. Install [`pytorch`](https://anaconda.org/pytorch/pytorch/1.10.2/download/linux-64/pytorch-1.10.2-py3.9_cuda11.3_cudnn8.2.0_0.tar.bz2)
+5. Download & Install [`pytorch-mutex`](https://anaconda.org/pytorch/pytorch-mutex/1.0/download/noarch/pytorch-mutex-1.0-cuda.tar.bz2)
+```
+conda install pytorch-mutex-1.0-cuda.tar.bz2
+```
+6. Download & Install [`pytorch`](https://anaconda.org/pytorch/pytorch/1.10.2/download/linux-64/pytorch-1.10.2-py3.9_cuda11.3_cudnn8.2.0_0.tar.bz2)
+```
+conda install pytorch-1.10.2-py3.9_cuda11.3_cudnn8.2.0_0.tar.bz2
+```
 7. Install the rest of the dependencies with 
 ```conda install --file conda_env.txt```
 5. Activate the new environment with 
