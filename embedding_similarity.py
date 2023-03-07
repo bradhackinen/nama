@@ -771,7 +771,7 @@ class Embeddings(nn.Module):
                     conflicts = []
                     for i,g in enumerate(never_match):
                         g = sorted(list(g))
-                        g_labels = [always_match_labels[s] for s in g]
+                        g_labels = [always_match_labels.get(s,s) for s in g]
                         if len(set(g_labels)) < len(g):
                             df = (pd.DataFrame()
                                   .assign(
