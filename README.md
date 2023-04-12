@@ -1,10 +1,14 @@
 # NAMA The NAme MAtching tool
 
-
+*Fast, flexible name matching for large datasets*
 
 ## Installation
+Recommended install via pip
+1. Create virtual env ``. Optional
+2. Install nama `pip install git+https://github.com/bradhackinen/nama.git@make-package2`
 
-Recommend install is to install from source with ```conda```
+
+Install from source with ```conda```
 1. Install [Anaconda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) 
 
 2. Clone `nama` 
@@ -62,8 +66,7 @@ Installing from source with `pip`
 - Install from the project root directory `pip install .`
 - Install from another directory `pip install /path-to-project-root`
 
-Installing via PyPi environment
-COMING SOON
+## Demo
 
 ## Usage
 
