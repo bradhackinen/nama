@@ -1,0 +1,2436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>nama.matcher API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>nama.matcher</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import os
+from pathlib import Path
+from collections import Counter, defaultdict
+from itertools import islice
+import pandas as pd
+import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+import matplotlib as mplt
+
+MAX_STR = 50
+
+
+class Matcher():
+    &#34;&#34;&#34;A class for grouping strings based on set membership.  Supports splitting and uniting of groups.&#34;&#34;&#34;
+
+    def __init__(self, strings=None):
+        &#34;&#34;&#34;
+        Initialize Matcher object.
+
+        Parameters
+        ----------
+        strings : list, optional
+            List of strings to add to the matcher, by default None
+        &#34;&#34;&#34;
+        self.counts = Counter()
+        self.labels = {}
+        self.groups = {}
+
+        if strings is not None:
+            self.add_strings(strings, inplace=True)
+
+    def __len__(self):
+        &#34;&#34;&#34;Return the number of strings in the matcher.&#34;&#34;&#34;
+        return len(self.labels)
+
+    def __repr__(self):
+        &#34;&#34;&#34;Return a string representation of the Matcher object.&#34;&#34;&#34;
+        return f&#39;&lt;nama.Matcher containing {len(self)} strings in {len(self.groups)} groups&gt;&#39;
+
+    def __str__(self):
+        &#34;&#34;&#34;Return a string representation of the groups of a Matcher object.&#34;&#34;&#34;
+        output = self.__repr__()
+        remaining = MAX_STR
+        for group in self.groups.values():
+            for s in group:
+                if remaining:
+                    output += &#39;\n&#39; + s
+                    remaining -= 1
+                else:
+                    output += f&#39;...\n(Output truncated at {MAX_STR} strings)&#39;
+                    return output
+
+            output += &#39;\n&#39;
+
+        return output
+
+    def __contains__(self, s):
+        &#34;&#34;&#34;Return True if string is in the matcher, False otherwise.&#34;&#34;&#34;
+        return s in self.labels
+
+    def __getitem__(self, strings):
+        &#34;&#34;&#34;Return the group label for a single string or a list of strings.&#34;&#34;&#34;
+        if isinstance(strings, str):
+            return self.labels[strings]
+        else:
+            return [self.labels[s] for s in strings]
+
+    def __add__(self, matcher):
+        &#34;&#34;&#34;Add two matchers together and return the result.&#34;&#34;&#34;
+        result = self.add_strings(matcher)
+        result.unite(matcher, inplace=True)
+
+        return result
+
+    def items(self):
+        &#34;&#34;&#34;Return an iterator of strings and their group labels.&#34;&#34;&#34;
+        for i, g in self.labels.items():
+            yield i, g
+
+    def copy(self):
+        &#34;&#34;&#34;Return a copy of the Matcher object.&#34;&#34;&#34;
+        new_matcher = Matcher()
+        new_matcher.counts = self.counts.copy()
+        new_matcher.labels = self.labels.copy()
+        new_matcher.groups = self.groups.copy()
+
+        return new_matcher
+
+    def strings(self):
+        &#34;&#34;&#34;Return a list of strings in the matcher. Order is not guaranteed.&#34;&#34;&#34;
+        return list(self.labels.keys())
+
+    def matches(self, string):
+        &#34;&#34;&#34;Return the group of strings that match the given string.&#34;&#34;&#34;
+        return self.groups[self.labels[string]]
+
+    def add_strings(self, arg, inplace=False):
+        &#34;&#34;&#34;Add new strings to the matcher.
+
+        Parameters
+        ----------
+        arg : str, Counter, Matcher, Iterable
+            String or group of strings to add to the matcher
+        inplace : bool, optional
+            If True, add strings to the existing Matcher object, by default False
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object
+        &#34;&#34;&#34;
+        if isinstance(arg, str):
+            counts = {arg: 1}
+
+        elif isinstance(arg, Counter):
+            counts = arg
+
+        elif isinstance(arg, Matcher):
+            counts = arg.counts
+
+        elif hasattr(arg, &#39;__next__&#39;) or hasattr(arg, &#39;__iter__&#39;):
+            counts = Counter(arg)
+
+        if not inplace:
+            self = self.copy()
+
+        for s in counts.keys():
+            if s not in self.labels:
+                self.labels[s] = s
+                self.groups[s] = [s]
+
+        self.counts += counts
+
+        return self
+
+    def drop(self, strings, inplace=False):
+        &#34;&#34;&#34;Remove strings from the matcher.
+
+        Parameters
+        ----------
+        strings : list or str
+            String or list of strings to remove from the matcher
+        inplace : bool, optional
+            If True, remove strings from the existing Matcher object, by default False
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object
+        &#34;&#34;&#34;
+        if isinstance(strings, str):
+            strings = [strings]
+
+        strings = set(strings)
+
+        if not inplace:
+            self = self.copy()
+
+        # Remove strings from their groups
+        affected_group_labels = {self[s] for s in strings}
+        for old_label in affected_group_labels:
+            old_group = self.groups[old_label]
+            new_group = [s for s in old_group if s not in strings]
+
+            if new_group:
+                counts = self.counts
+                new_label = min((-counts[s], s) for s in new_group)[1]
+
+                if new_label != old_label:
+                    del self.groups[old_label]
+
+                self.groups[new_label] = new_group
+
+                for s in new_group:
+                    self.labels[s] = new_label
+            else:
+                del self.groups[old_label]
+
+        # Remove strings from counts and labels
+        for s in strings:
+            del self.counts[s]
+            del self.labels[s]
+
+        return self
+
+    def keep(self, strings, inplace=False):
+        &#34;&#34;&#34;Drop all strings from the matcher except the passed strings.
+
+        Parameters
+        ----------
+        strings : list
+            List of strings to keep in the matcher
+        inplace : bool, optional
+            If True, drop strings from the existing Matcher object, by default False
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object
+        &#34;&#34;&#34;
+        strings = set(strings)
+
+        to_drop = [s for s in self.strings() if s not in strings]
+
+        return self.drop(to_drop, inplace=inplace)
+
+    def _unite_strings(self, strings):
+        &#34;&#34;&#34;
+        Unite strings in the matcher without checking argument type.
+        Intended as a low-level function called by self.unite()
+
+        Parameters
+        ----------
+        strings : list
+            List of strings to unite in the matcher
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        strings = {s for s in strings if s in self.labels}
+
+        if len(strings) &gt; 1:
+
+            # Identify groups that will be united
+            old_labels = set(self[strings])
+
+            # Only need to do the merge if the strings span multiple groups
+            if len(old_labels) &gt; 1:
+
+                # Identify the new group label
+                counts = self.counts
+                new_label = min((-counts[s], s) for s in old_labels)[1]
+
+                # Identify the groups which need to be modified
+                old_labels.remove(new_label)
+
+                for old_label in old_labels:
+                    # Update the string group labels
+                    for s in self.groups[old_label]:
+                        self.labels[s] = new_label
+
+                    # Update group dict
+                    self.groups[new_label] = self.groups[new_label] + \
+                        self.groups[old_label]
+                    del self.groups[old_label]
+
+    def unite(self, arg, inplace=False, **kwargs):
+        &#34;&#34;&#34;
+        Merge groups containing the passed strings. Groups can be passed as:
+        - A list of strings to unite
+        - A nested list to unite each set of strings
+        - A dictionary mapping strings to labels to unite by label
+        - A function mapping strings to labels to unite by label
+        - A Matcher instance to unite by Matcher groups
+
+        Parameters
+        ----------
+        arg : list, dict, function or Matcher instance
+            Argument representing the strings or labels to merge.
+        inplace : bool, optional
+            Whether to perform the operation in place or return a new Matcher.
+        kwargs : dict, optional
+            Additional arguments to be passed to predict_matcher method if arg
+            is a similarity model with a predict_matcher method.
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object. If `inplace` is True, the updated object
+            is returned, else a new Matcher object with the updates is returned.
+        &#34;&#34;&#34;
+
+        if not inplace:
+            self = self.copy()
+
+        if isinstance(arg, str):
+            raise ValueError(&#39;Cannot unite a single string&#39;)
+
+        elif isinstance(arg, Matcher):
+            self.unite(arg.groups.values(), inplace=True)
+
+        elif hasattr(arg, &#39;predict_matcher&#39;):
+            # Unite can accept a similarity model if it has a predict_matcher
+            # method
+            self.unite(arg.predict_matcher(self, **kwargs))
+
+        elif callable(arg):
+            # Assume arg is a mapping from strings to labels and unite by label
+            groups = {s: arg(s) for s in self.strings()}
+            self.unite(groups, inplace=True)
+
+        elif isinstance(arg, dict):
+            # Assume arg is a mapping from strings to labels and unite by label
+            # groups = {label:[] for label in arg.values()}
+            groups = defaultdict(list)
+            for string, label in arg.items():
+                groups[label].append(string)
+
+            for group in groups.values():
+                self._unite_strings(group)
+
+        elif hasattr(arg, &#39;__next__&#39;):
+            # Assume arg is an iterator of groups to unite
+            # (This needs to be checked early to avoid consuming the first group)
+            for group in arg:
+                self._unite_strings(group)
+
+        elif all(isinstance(s, str) for s in arg):
+            # Main case: Unite group of strings
+            self._unite_strings(arg)
+
+        elif hasattr(arg, &#39;__iter__&#39;):
+            # Assume arg is an iterable of groups to unite
+            for group in arg:
+                self._unite_strings(group)
+
+        else:
+            raise ValueError(&#39;Unknown input type&#39;)
+
+        if not inplace:
+            return self
+
+    def split(self, strings, inplace=False):
+        &#34;&#34;&#34;
+        Split strings into singleton groups. Strings can be passed as:
+        - A single string to isolate into a singleton group
+        - A list or iterator of strings to split
+
+        Parameters
+        ----------
+        strings : str or list of str
+            The string(s) to split into singleton groups.
+        inplace : bool, optional
+            Whether to perform the operation in place or return a new Matcher.
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object. If `inplace` is True, the updated object
+            is returned, else a new Matcher object with the updates is returned.
+        &#34;&#34;&#34;
+        if not inplace:
+            self = self.copy()
+
+        if isinstance(strings, str):
+            strings = [strings]
+
+        strings = set(strings)
+
+        # Remove strings from their groups
+        affected_group_labels = {self[s] for s in strings}
+        for old_label in affected_group_labels:
+            old_group = self.groups[old_label]
+            if len(old_group) &gt; 1:
+                new_group = [s for s in old_group if s not in strings]
+                if new_group:
+                    counts = self.counts
+                    new_label = min((-counts[s], s) for s in new_group)[1]
+
+                    if new_label != old_label:
+                        del self.groups[old_label]
+
+                    self.groups[new_label] = new_group
+
+                    for s in new_group:
+                        self.labels[s] = new_label
+
+        # Update labels and add singleton groups
+        for s in strings:
+            self.labels[s] = s
+            self.groups[s] = [s]
+
+        return self
+
+    def split_all(self, inplace=False):
+        &#34;&#34;&#34;
+        Split all strings into singleton groups.
+
+        Parameters
+        ----------
+        inplace : bool, optional
+            Whether to perform the operation in place or return a new Matcher.
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object. If `inplace` is True, the updated object
+            is returned, else a new Matcher object with the updates is returned.
+        &#34;&#34;&#34;
+        if not inplace:
+            self = self.copy()
+
+        self.labels = {s: s for s in self.strings()}
+        self.groups = {s: [s] for s in self.strings()}
+
+        return self
+
+    def separate(
+    self,
+    strings,
+    similarity_model,
+    inplace=False,
+    threshold=0,
+     **kwargs):
+        &#34;&#34;&#34;
+        Separate the strings in according to the prediction of the similarity_model.
+
+        Parameters
+        ----------
+        strings: list
+            List of strings to be separated.
+        similarity_model: Model
+            Model used to predict similarity between strings.
+        inplace: bool, optional
+            If True, the separation operation is performed in-place. Otherwise, a copy is created.
+        threshold: float, optional
+            Threshold value for prediction.
+        kwargs: dict, optional
+            Additional keyword arguments passed to the prediction function.
+
+        Returns
+        -------
+        self: Matcher
+            Returns the Matcher object after the separation operation.
+
+        &#34;&#34;&#34;
+        if not inplace:
+            self = self.copy()
+
+        # Identify which groups contain the strings to separate
+        group_map = defaultdict(list)
+        for s in set(strings):
+            group_map[self[s]].append(s)
+
+        for g, g_sep in group_map.items():
+
+            # If group contains strings to separate...
+            if len(g_sep) &gt; 1:
+                group_strings = self.groups[g]
+
+                # Split the group strings
+                self.split(group_strings, inplace=True)
+
+                # Re-unite with new prediction that enforces separation
+                try:
+                    embeddings = similarity_model[group_strings]
+                except Exception as e:
+                    print(f&#39;{g=} {g_sep} {group_strings}&#39;)
+                    raise e
+                predicted = embeddings.predict(
+                                threshold=threshold,
+                                separate_strings=strings,
+                                **kwargs)
+
+                self.unite(predicted, inplace=True)
+
+        return self
+
+    # def refine(self,similarity_model)
+
+    def top_scored_pairs_df(self, similarity_model,
+                                n=10000, buffer_n=100000,
+                                by_group=True,
+                                sort_by=[&#39;impact&#39;, &#39;score&#39;], ascending=False,
+                                skip_pairs=None, **kwargs):
+        &#34;&#34;&#34;
+        Return the DataFrame containing the n most important pairs of strings, according to the score generated by the `similarity_model`.
+
+        Parameters
+        ----------
+        similarity_model: Model
+            Model used to predict similarity between strings.
+        n: int, optional
+            Number of most important pairs to return. Default is 10000.
+        buffer_n: int, optional
+            Size of buffer to iterate through the scored pairs. Default is 100000.
+        by_group: bool, optional
+            If True, only the most important pair will be returned for each unique group combination.
+        sort_by: list, optional
+            A list of column names by which to sort the dataframe. Default is [&#39;impact&#39;,&#39;score&#39;].
+        ascending: bool, optional
+            Whether the sort order should be ascending or descending. Default is False.
+        skip_pairs: list, optional
+            List of string pairs to ignore when constructing the ranking.
+            If by_group=True, any group combination represented in the skip_pairs list will be ignored
+        kwargs: dict, optional
+            Additional keyword arguments passed to the `iter_scored_pairs` function.
+
+        Returns
+        -------
+        top_df: pandas.DataFrame
+            The DataFrame containing the n most important pairs of strings.
+
+        &#34;&#34;&#34;
+
+        top_df = pd.DataFrame(
+    columns=[
+        &#39;string0&#39;,
+        &#39;string1&#39;,
+        &#39;group0&#39;,
+        &#39;group1&#39;,
+        &#39;impact&#39;,
+        &#39;score&#39;,
+         &#39;loss&#39;])
+        pair_iterator = similarity_model.iter_scored_pairs(self, **kwargs)
+
+        def group_size(g):
+            return len(self.groups[g])
+
+        if skip_pairs is not None:
+            if by_group:
+                skip_pairs = {tuple(sorted([self[s0], self[s1]]))
+                                    for s0, s1 in skip_pairs}
+            else:
+                skip_pairs = {tuple(sorted([s0, s1])) for s0, s1 in skip_pairs}
+
+        while True:
+            df = pd.DataFrame(islice(pair_iterator, buffer_n))
+
+            if len(df):
+                for i in 0, 1:
+                    df[f&#39;group{i}&#39;] = [self[s] for s in df[f&#39;string{i}&#39;]]
+                df[&#39;impact&#39;] = df[&#39;group0&#39;].apply(
+                    group_size) * df[&#39;group1&#39;].apply(group_size)
+
+                if by_group:
+                    df[&#39;group_pair&#39;] = [tuple(sorted([g0, g1])) for g0, g1 in df[[
+                                              &#39;group0&#39;, &#39;group1&#39;]].values]
+
+                if skip_pairs:
+                    if by_group:
+                        df = df[~df[&#39;group_pair&#39;].isin(skip_pairs)]
+                    else:
+                        string_pairs = [tuple(sorted([s0, s1])) for s0, s1 in df[[
+                                              &#39;string0&#39;, &#39;string1&#39;]].values]
+                        df = df[~string_pairs.isin(skip_pairs)]
+
+                if len(df):
+                    top_df = pd.concat([top_df, df]) \
+                                        .sort_values(sort_by, ascending=ascending)
+
+                    if by_group:
+                        top_df = top_df \
+                                        .groupby(&#39;group_pair&#39;) \
+                                        .first() \
+                                        .reset_index()
+
+                    top_df = top_df \
+                                        .sort_values(sort_by, ascending=ascending) \
+                                        .head(n)
+            else:
+                break
+
+        if len(top_df) and by_group:
+            top_df = top_df \
+                        .drop(&#39;group_pair&#39;, axis=1) \
+                        .reset_index()
+
+        return top_df
+
+    def reset_counts(self, inplace=False):
+        &#34;&#34;&#34;
+        Reset the counts of strings in the Matcher object.
+
+        Parameters
+        ----------
+        inplace: bool, optional
+            If True, the operation is performed in-place. Otherwise, a copy is created.
+
+        Returns
+        -------
+        self: Matcher
+            Returns the Matcher object after the reset operation.
+
+        &#34;&#34;&#34;
+        if not inplace:
+            self = self.copy()
+
+        self.counts = Counter(self.strings())
+
+        return self
+
+    def to_df(self, singletons=True, sort_groups=True):
+        &#34;&#34;&#34;
+        Convert the matcher to a dataframe with string, count and group columns.
+
+        Parameters
+        ----------
+        singletons: bool, optional
+            If True, the resulting DataFrame will include singleton groups. Default is True.
+        ...
+
+        Returns
+        -------
+        df: pandas.DataFrame
+            The resulting DataFrame.
+            &#34;&#34;&#34;
+        strings = self.strings()
+
+        if singletons:
+            df = pd.DataFrame([(s, self.counts[s], self.labels[s]) for s in strings],
+                                columns=[&#39;string&#39;, &#39;count&#39;, &#39;group&#39;])
+        else:
+            df = pd.DataFrame([(s, self.counts[s], self.labels[s]) for s in strings
+                                if len(self.groups[self[s]]) &gt; 1],
+                                columns=[&#39;string&#39;, &#39;count&#39;, &#39;group&#39;])
+        if sort_groups:
+            df[&#39;group_count&#39;] = df.groupby(&#39;group&#39;)[&#39;count&#39;].transform(&#39;sum&#39;)
+            df = df.sort_values([&#39;group_count&#39;, &#39;group&#39;, &#39;count&#39;, &#39;string&#39;], ascending=[
+                                False, True, False, True])
+            df = df.drop(&#39;group_count&#39;, axis=1)
+            df = df.reset_index(drop=True)
+
+        return df
+
+    def to_csv(self, filename, singletons=True, **pandas_args):
+        &#34;&#34;&#34;
+        Save the matcher as a csv file with string, count and group columns.
+
+        Parameters
+        ----------
+        filename : str
+            Path to file to save the data.
+        singletons : bool, optional
+            If True, include singleton groups in the saved file, by default True.
+        pandas_args : dict
+            Additional keyword arguments to pass to the pandas.DataFrame.to_csv method.
+        &#34;&#34;&#34;
+        df = self.to_df(singletons=singletons)
+        df.to_csv(filename, index=False, **pandas_args)
+
+    def merge_dfs(self, left_df, right_df, how=&#39;inner&#39;,
+                    on=None, left_on=None, right_on=None,
+                    group_column_name=&#39;match_group&#39;, suffixes=(&#39;_x&#39;, &#39;_y&#39;),
+                    **merge_args):
+        &#34;&#34;&#34;
+        Replicated pandas.merge() functionality, except that dataframes are merged by match group instead of directly on the strings in the &#34;on&#34; columns.
+
+        Parameters
+        ----------
+        left_df : pandas.DataFrame
+            The left dataframe to merge.
+        right_df : pandas.DataFrame
+            The right dataframe to merge.
+        how : str, optional
+            How to merge the dataframes. Possible values are &#39;left&#39;, &#39;right&#39;, &#39;outer&#39;, &#39;inner&#39;, by default &#39;inner&#39;.
+        on : str, optional
+            Columns in both left and right dataframes to merge on.
+        left_on : str, optional
+            Columns in the left dataframe to merge on.
+        right_on : str, optional
+            Columns in the right dataframe to merge on.
+        group_column_name : str, optional
+            Column name for the merged match group, by default &#39;match_group&#39;.
+        suffixes : tuple of str, optional
+            Suffix to apply to overlapping column names in the left and right dataframes, by default (&#39;_x&#39;,&#39;_y&#39;).
+        **merge_args : dict
+            Additional keyword arguments to pass to the pandas.DataFrame.merge method.
+
+        Returns
+        -------
+        pandas.DataFrame
+            The merged dataframe.
+
+        Raises
+        ------
+        ValueError
+            If &#39;on&#39;, &#39;left_on&#39;, and &#39;right_on&#39; are all None.
+        ValueError
+            If `group_column_name` already exists in one of the dataframes.
+        &#34;&#34;&#34;
+
+        if ((left_on is None) or (right_on is None)) and (on is None):
+            raise ValueError(&#39;Must provide column(s) to merge on&#39;)
+
+        left_df = left_df.copy()
+        right_df = right_df.copy()
+
+        if on is not None:
+            left_on = on + suffixes[0]
+            right_on = on + suffixes[1]
+
+            left_df = left_df.rename(columns={on:left_on})
+            right_df = right_df.rename(columns={on:right_on})
+
+        group_map = lambda s: self[s] if s in self.labels else np.nan
+
+        left_group = left_df[left_on].apply(group_map)
+        right_group = right_df[right_on].apply(group_map)
+
+        if group_column_name:
+            if group_column_name in list(left_df.columns) + list(right_df.columns):
+                raise ValueError(&#39;f{group_column_name=} already exists in one of the dataframes.&#39;)
+            else:
+                left_df[group_column_name] = left_group
+
+        merged_df = pd.merge(left_df,right_df,left_on=left_group,right_on=right_group,how=how,suffixes=suffixes,**merge_args)
+
+        merged_df = merged_df[[c for c in merged_df.columns if c in list(left_df.columns) + list(right_df.columns)]]
+
+        return merged_df</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="nama.matcher.Matcher"><code class="flex name class">
+<span>class <span class="ident">Matcher</span></span>
+<span>(</span><span>strings=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class for grouping strings based on set membership.
+Supports splitting and uniting of groups.</p>
+<p>Initialize Matcher object.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>strings</code></strong> :&ensp;<code>list</code>, optional</dt>
+<dd>List of strings to add to the matcher, by default None</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Matcher():
+    &#34;&#34;&#34;A class for grouping strings based on set membership.  Supports splitting and uniting of groups.&#34;&#34;&#34;
+
+    def __init__(self, strings=None):
+        &#34;&#34;&#34;
+        Initialize Matcher object.
+
+        Parameters
+        ----------
+        strings : list, optional
+            List of strings to add to the matcher, by default None
+        &#34;&#34;&#34;
+        self.counts = Counter()
+        self.labels = {}
+        self.groups = {}
+
+        if strings is not None:
+            self.add_strings(strings, inplace=True)
+
+    def __len__(self):
+        &#34;&#34;&#34;Return the number of strings in the matcher.&#34;&#34;&#34;
+        return len(self.labels)
+
+    def __repr__(self):
+        &#34;&#34;&#34;Return a string representation of the Matcher object.&#34;&#34;&#34;
+        return f&#39;&lt;nama.Matcher containing {len(self)} strings in {len(self.groups)} groups&gt;&#39;
+
+    def __str__(self):
+        &#34;&#34;&#34;Return a string representation of the groups of a Matcher object.&#34;&#34;&#34;
+        output = self.__repr__()
+        remaining = MAX_STR
+        for group in self.groups.values():
+            for s in group:
+                if remaining:
+                    output += &#39;\n&#39; + s
+                    remaining -= 1
+                else:
+                    output += f&#39;...\n(Output truncated at {MAX_STR} strings)&#39;
+                    return output
+
+            output += &#39;\n&#39;
+
+        return output
+
+    def __contains__(self, s):
+        &#34;&#34;&#34;Return True if string is in the matcher, False otherwise.&#34;&#34;&#34;
+        return s in self.labels
+
+    def __getitem__(self, strings):
+        &#34;&#34;&#34;Return the group label for a single string or a list of strings.&#34;&#34;&#34;
+        if isinstance(strings, str):
+            return self.labels[strings]
+        else:
+            return [self.labels[s] for s in strings]
+
+    def __add__(self, matcher):
+        &#34;&#34;&#34;Add two matchers together and return the result.&#34;&#34;&#34;
+        result = self.add_strings(matcher)
+        result.unite(matcher, inplace=True)
+
+        return result
+
+    def items(self):
+        &#34;&#34;&#34;Return an iterator of strings and their group labels.&#34;&#34;&#34;
+        for i, g in self.labels.items():
+            yield i, g
+
+    def copy(self):
+        &#34;&#34;&#34;Return a copy of the Matcher object.&#34;&#34;&#34;
+        new_matcher = Matcher()
+        new_matcher.counts = self.counts.copy()
+        new_matcher.labels = self.labels.copy()
+        new_matcher.groups = self.groups.copy()
+
+        return new_matcher
+
+    def strings(self):
+        &#34;&#34;&#34;Return a list of strings in the matcher. Order is not guaranteed.&#34;&#34;&#34;
+        return list(self.labels.keys())
+
+    def matches(self, string):
+        &#34;&#34;&#34;Return the group of strings that match the given string.&#34;&#34;&#34;
+        return self.groups[self.labels[string]]
+
+    def add_strings(self, arg, inplace=False):
+        &#34;&#34;&#34;Add new strings to the matcher.
+
+        Parameters
+        ----------
+        arg : str, Counter, Matcher, Iterable
+            String or group of strings to add to the matcher
+        inplace : bool, optional
+            If True, add strings to the existing Matcher object, by default False
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object
+        &#34;&#34;&#34;
+        if isinstance(arg, str):
+            counts = {arg: 1}
+
+        elif isinstance(arg, Counter):
+            counts = arg
+
+        elif isinstance(arg, Matcher):
+            counts = arg.counts
+
+        elif hasattr(arg, &#39;__next__&#39;) or hasattr(arg, &#39;__iter__&#39;):
+            counts = Counter(arg)
+
+        if not inplace:
+            self = self.copy()
+
+        for s in counts.keys():
+            if s not in self.labels:
+                self.labels[s] = s
+                self.groups[s] = [s]
+
+        self.counts += counts
+
+        return self
+
+    def drop(self, strings, inplace=False):
+        &#34;&#34;&#34;Remove strings from the matcher.
+
+        Parameters
+        ----------
+        strings : list or str
+            String or list of strings to remove from the matcher
+        inplace : bool, optional
+            If True, remove strings from the existing Matcher object, by default False
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object
+        &#34;&#34;&#34;
+        if isinstance(strings, str):
+            strings = [strings]
+
+        strings = set(strings)
+
+        if not inplace:
+            self = self.copy()
+
+        # Remove strings from their groups
+        affected_group_labels = {self[s] for s in strings}
+        for old_label in affected_group_labels:
+            old_group = self.groups[old_label]
+            new_group = [s for s in old_group if s not in strings]
+
+            if new_group:
+                counts = self.counts
+                new_label = min((-counts[s], s) for s in new_group)[1]
+
+                if new_label != old_label:
+                    del self.groups[old_label]
+
+                self.groups[new_label] = new_group
+
+                for s in new_group:
+                    self.labels[s] = new_label
+            else:
+                del self.groups[old_label]
+
+        # Remove strings from counts and labels
+        for s in strings:
+            del self.counts[s]
+            del self.labels[s]
+
+        return self
+
+    def keep(self, strings, inplace=False):
+        &#34;&#34;&#34;Drop all strings from the matcher except the passed strings.
+
+        Parameters
+        ----------
+        strings : list
+            List of strings to keep in the matcher
+        inplace : bool, optional
+            If True, drop strings from the existing Matcher object, by default False
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object
+        &#34;&#34;&#34;
+        strings = set(strings)
+
+        to_drop = [s for s in self.strings() if s not in strings]
+
+        return self.drop(to_drop, inplace=inplace)
+
+    def _unite_strings(self, strings):
+        &#34;&#34;&#34;
+        Unite strings in the matcher without checking argument type.
+        Intended as a low-level function called by self.unite()
+
+        Parameters
+        ----------
+        strings : list
+            List of strings to unite in the matcher
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        strings = {s for s in strings if s in self.labels}
+
+        if len(strings) &gt; 1:
+
+            # Identify groups that will be united
+            old_labels = set(self[strings])
+
+            # Only need to do the merge if the strings span multiple groups
+            if len(old_labels) &gt; 1:
+
+                # Identify the new group label
+                counts = self.counts
+                new_label = min((-counts[s], s) for s in old_labels)[1]
+
+                # Identify the groups which need to be modified
+                old_labels.remove(new_label)
+
+                for old_label in old_labels:
+                    # Update the string group labels
+                    for s in self.groups[old_label]:
+                        self.labels[s] = new_label
+
+                    # Update group dict
+                    self.groups[new_label] = self.groups[new_label] + \
+                        self.groups[old_label]
+                    del self.groups[old_label]
+
+    def unite(self, arg, inplace=False, **kwargs):
+        &#34;&#34;&#34;
+        Merge groups containing the passed strings. Groups can be passed as:
+        - A list of strings to unite
+        - A nested list to unite each set of strings
+        - A dictionary mapping strings to labels to unite by label
+        - A function mapping strings to labels to unite by label
+        - A Matcher instance to unite by Matcher groups
+
+        Parameters
+        ----------
+        arg : list, dict, function or Matcher instance
+            Argument representing the strings or labels to merge.
+        inplace : bool, optional
+            Whether to perform the operation in place or return a new Matcher.
+        kwargs : dict, optional
+            Additional arguments to be passed to predict_matcher method if arg
+            is a similarity model with a predict_matcher method.
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object. If `inplace` is True, the updated object
+            is returned, else a new Matcher object with the updates is returned.
+        &#34;&#34;&#34;
+
+        if not inplace:
+            self = self.copy()
+
+        if isinstance(arg, str):
+            raise ValueError(&#39;Cannot unite a single string&#39;)
+
+        elif isinstance(arg, Matcher):
+            self.unite(arg.groups.values(), inplace=True)
+
+        elif hasattr(arg, &#39;predict_matcher&#39;):
+            # Unite can accept a similarity model if it has a predict_matcher
+            # method
+            self.unite(arg.predict_matcher(self, **kwargs))
+
+        elif callable(arg):
+            # Assume arg is a mapping from strings to labels and unite by label
+            groups = {s: arg(s) for s in self.strings()}
+            self.unite(groups, inplace=True)
+
+        elif isinstance(arg, dict):
+            # Assume arg is a mapping from strings to labels and unite by label
+            # groups = {label:[] for label in arg.values()}
+            groups = defaultdict(list)
+            for string, label in arg.items():
+                groups[label].append(string)
+
+            for group in groups.values():
+                self._unite_strings(group)
+
+        elif hasattr(arg, &#39;__next__&#39;):
+            # Assume arg is an iterator of groups to unite
+            # (This needs to be checked early to avoid consuming the first group)
+            for group in arg:
+                self._unite_strings(group)
+
+        elif all(isinstance(s, str) for s in arg):
+            # Main case: Unite group of strings
+            self._unite_strings(arg)
+
+        elif hasattr(arg, &#39;__iter__&#39;):
+            # Assume arg is an iterable of groups to unite
+            for group in arg:
+                self._unite_strings(group)
+
+        else:
+            raise ValueError(&#39;Unknown input type&#39;)
+
+        if not inplace:
+            return self
+
+    def split(self, strings, inplace=False):
+        &#34;&#34;&#34;
+        Split strings into singleton groups. Strings can be passed as:
+        - A single string to isolate into a singleton group
+        - A list or iterator of strings to split
+
+        Parameters
+        ----------
+        strings : str or list of str
+            The string(s) to split into singleton groups.
+        inplace : bool, optional
+            Whether to perform the operation in place or return a new Matcher.
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object. If `inplace` is True, the updated object
+            is returned, else a new Matcher object with the updates is returned.
+        &#34;&#34;&#34;
+        if not inplace:
+            self = self.copy()
+
+        if isinstance(strings, str):
+            strings = [strings]
+
+        strings = set(strings)
+
+        # Remove strings from their groups
+        affected_group_labels = {self[s] for s in strings}
+        for old_label in affected_group_labels:
+            old_group = self.groups[old_label]
+            if len(old_group) &gt; 1:
+                new_group = [s for s in old_group if s not in strings]
+                if new_group:
+                    counts = self.counts
+                    new_label = min((-counts[s], s) for s in new_group)[1]
+
+                    if new_label != old_label:
+                        del self.groups[old_label]
+
+                    self.groups[new_label] = new_group
+
+                    for s in new_group:
+                        self.labels[s] = new_label
+
+        # Update labels and add singleton groups
+        for s in strings:
+            self.labels[s] = s
+            self.groups[s] = [s]
+
+        return self
+
+    def split_all(self, inplace=False):
+        &#34;&#34;&#34;
+        Split all strings into singleton groups.
+
+        Parameters
+        ----------
+        inplace : bool, optional
+            Whether to perform the operation in place or return a new Matcher.
+
+        Returns
+        -------
+        Matcher
+            The updated Matcher object. If `inplace` is True, the updated object
+            is returned, else a new Matcher object with the updates is returned.
+        &#34;&#34;&#34;
+        if not inplace:
+            self = self.copy()
+
+        self.labels = {s: s for s in self.strings()}
+        self.groups = {s: [s] for s in self.strings()}
+
+        return self
+
+    def separate(
+    self,
+    strings,
+    similarity_model,
+    inplace=False,
+    threshold=0,
+     **kwargs):
+        &#34;&#34;&#34;
+        Separate the strings in according to the prediction of the similarity_model.
+
+        Parameters
+        ----------
+        strings: list
+            List of strings to be separated.
+        similarity_model: Model
+            Model used to predict similarity between strings.
+        inplace: bool, optional
+            If True, the separation operation is performed in-place. Otherwise, a copy is created.
+        threshold: float, optional
+            Threshold value for prediction.
+        kwargs: dict, optional
+            Additional keyword arguments passed to the prediction function.
+
+        Returns
+        -------
+        self: Matcher
+            Returns the Matcher object after the separation operation.
+
+        &#34;&#34;&#34;
+        if not inplace:
+            self = self.copy()
+
+        # Identify which groups contain the strings to separate
+        group_map = defaultdict(list)
+        for s in set(strings):
+            group_map[self[s]].append(s)
+
+        for g, g_sep in group_map.items():
+
+            # If group contains strings to separate...
+            if len(g_sep) &gt; 1:
+                group_strings = self.groups[g]
+
+                # Split the group strings
+                self.split(group_strings, inplace=True)
+
+                # Re-unite with new prediction that enforces separation
+                try:
+                    embeddings = similarity_model[group_strings]
+                except Exception as e:
+                    print(f&#39;{g=} {g_sep} {group_strings}&#39;)
+                    raise e
+                predicted = embeddings.predict(
+                                threshold=threshold,
+                                separate_strings=strings,
+                                **kwargs)
+
+                self.unite(predicted, inplace=True)
+
+        return self
+
+    # def refine(self,similarity_model)
+
+    def top_scored_pairs_df(self, similarity_model,
+                                n=10000, buffer_n=100000,
+                                by_group=True,
+                                sort_by=[&#39;impact&#39;, &#39;score&#39;], ascending=False,
+                                skip_pairs=None, **kwargs):
+        &#34;&#34;&#34;
+        Return the DataFrame containing the n most important pairs of strings, according to the score generated by the `similarity_model`.
+
+        Parameters
+        ----------
+        similarity_model: Model
+            Model used to predict similarity between strings.
+        n: int, optional
+            Number of most important pairs to return. Default is 10000.
+        buffer_n: int, optional
+            Size of buffer to iterate through the scored pairs. Default is 100000.
+        by_group: bool, optional
+            If True, only the most important pair will be returned for each unique group combination.
+        sort_by: list, optional
+            A list of column names by which to sort the dataframe. Default is [&#39;impact&#39;,&#39;score&#39;].
+        ascending: bool, optional
+            Whether the sort order should be ascending or descending. Default is False.
+        skip_pairs: list, optional
+            List of string pairs to ignore when constructing the ranking.
+            If by_group=True, any group combination represented in the skip_pairs list will be ignored
+        kwargs: dict, optional
+            Additional keyword arguments passed to the `iter_scored_pairs` function.
+
+        Returns
+        -------
+        top_df: pandas.DataFrame
+            The DataFrame containing the n most important pairs of strings.
+
+        &#34;&#34;&#34;
+
+        top_df = pd.DataFrame(
+    columns=[
+        &#39;string0&#39;,
+        &#39;string1&#39;,
+        &#39;group0&#39;,
+        &#39;group1&#39;,
+        &#39;impact&#39;,
+        &#39;score&#39;,
+         &#39;loss&#39;])
+        pair_iterator = similarity_model.iter_scored_pairs(self, **kwargs)
+
+        def group_size(g):
+            return len(self.groups[g])
+
+        if skip_pairs is not None:
+            if by_group:
+                skip_pairs = {tuple(sorted([self[s0], self[s1]]))
+                                    for s0, s1 in skip_pairs}
+            else:
+                skip_pairs = {tuple(sorted([s0, s1])) for s0, s1 in skip_pairs}
+
+        while True:
+            df = pd.DataFrame(islice(pair_iterator, buffer_n))
+
+            if len(df):
+                for i in 0, 1:
+                    df[f&#39;group{i}&#39;] = [self[s] for s in df[f&#39;string{i}&#39;]]
+                df[&#39;impact&#39;] = df[&#39;group0&#39;].apply(
+                    group_size) * df[&#39;group1&#39;].apply(group_size)
+
+                if by_group:
+                    df[&#39;group_pair&#39;] = [tuple(sorted([g0, g1])) for g0, g1 in df[[
+                                              &#39;group0&#39;, &#39;group1&#39;]].values]
+
+                if skip_pairs:
+                    if by_group:
+                        df = df[~df[&#39;group_pair&#39;].isin(skip_pairs)]
+                    else:
+                        string_pairs = [tuple(sorted([s0, s1])) for s0, s1 in df[[
+                                              &#39;string0&#39;, &#39;string1&#39;]].values]
+                        df = df[~string_pairs.isin(skip_pairs)]
+
+                if len(df):
+                    top_df = pd.concat([top_df, df]) \
+                                        .sort_values(sort_by, ascending=ascending)
+
+                    if by_group:
+                        top_df = top_df \
+                                        .groupby(&#39;group_pair&#39;) \
+                                        .first() \
+                                        .reset_index()
+
+                    top_df = top_df \
+                                        .sort_values(sort_by, ascending=ascending) \
+                                        .head(n)
+            else:
+                break
+
+        if len(top_df) and by_group:
+            top_df = top_df \
+                        .drop(&#39;group_pair&#39;, axis=1) \
+                        .reset_index()
+
+        return top_df
+
+    def reset_counts(self, inplace=False):
+        &#34;&#34;&#34;
+        Reset the counts of strings in the Matcher object.
+
+        Parameters
+        ----------
+        inplace: bool, optional
+            If True, the operation is performed in-place. Otherwise, a copy is created.
+
+        Returns
+        -------
+        self: Matcher
+            Returns the Matcher object after the reset operation.
+
+        &#34;&#34;&#34;
+        if not inplace:
+            self = self.copy()
+
+        self.counts = Counter(self.strings())
+
+        return self
+
+    def to_df(self, singletons=True, sort_groups=True):
+        &#34;&#34;&#34;
+        Convert the matcher to a dataframe with string, count and group columns.
+
+        Parameters
+        ----------
+        singletons: bool, optional
+            If True, the resulting DataFrame will include singleton groups. Default is True.
+        ...
+
+        Returns
+        -------
+        df: pandas.DataFrame
+            The resulting DataFrame.
+            &#34;&#34;&#34;
+        strings = self.strings()
+
+        if singletons:
+            df = pd.DataFrame([(s, self.counts[s], self.labels[s]) for s in strings],
+                                columns=[&#39;string&#39;, &#39;count&#39;, &#39;group&#39;])
+        else:
+            df = pd.DataFrame([(s, self.counts[s], self.labels[s]) for s in strings
+                                if len(self.groups[self[s]]) &gt; 1],
+                                columns=[&#39;string&#39;, &#39;count&#39;, &#39;group&#39;])
+        if sort_groups:
+            df[&#39;group_count&#39;] = df.groupby(&#39;group&#39;)[&#39;count&#39;].transform(&#39;sum&#39;)
+            df = df.sort_values([&#39;group_count&#39;, &#39;group&#39;, &#39;count&#39;, &#39;string&#39;], ascending=[
+                                False, True, False, True])
+            df = df.drop(&#39;group_count&#39;, axis=1)
+            df = df.reset_index(drop=True)
+
+        return df
+
+    def to_csv(self, filename, singletons=True, **pandas_args):
+        &#34;&#34;&#34;
+        Save the matcher as a csv file with string, count and group columns.
+
+        Parameters
+        ----------
+        filename : str
+            Path to file to save the data.
+        singletons : bool, optional
+            If True, include singleton groups in the saved file, by default True.
+        pandas_args : dict
+            Additional keyword arguments to pass to the pandas.DataFrame.to_csv method.
+        &#34;&#34;&#34;
+        df = self.to_df(singletons=singletons)
+        df.to_csv(filename, index=False, **pandas_args)
+
+    def merge_dfs(self, left_df, right_df, how=&#39;inner&#39;,
+                    on=None, left_on=None, right_on=None,
+                    group_column_name=&#39;match_group&#39;, suffixes=(&#39;_x&#39;, &#39;_y&#39;),
+                    **merge_args):
+        &#34;&#34;&#34;
+        Replicated pandas.merge() functionality, except that dataframes are merged by match group instead of directly on the strings in the &#34;on&#34; columns.
+
+        Parameters
+        ----------
+        left_df : pandas.DataFrame
+            The left dataframe to merge.
+        right_df : pandas.DataFrame
+            The right dataframe to merge.
+        how : str, optional
+            How to merge the dataframes. Possible values are &#39;left&#39;, &#39;right&#39;, &#39;outer&#39;, &#39;inner&#39;, by default &#39;inner&#39;.
+        on : str, optional
+            Columns in both left and right dataframes to merge on.
+        left_on : str, optional
+            Columns in the left dataframe to merge on.
+        right_on : str, optional
+            Columns in the right dataframe to merge on.
+        group_column_name : str, optional
+            Column name for the merged match group, by default &#39;match_group&#39;.
+        suffixes : tuple of str, optional
+            Suffix to apply to overlapping column names in the left and right dataframes, by default (&#39;_x&#39;,&#39;_y&#39;).
+        **merge_args : dict
+            Additional keyword arguments to pass to the pandas.DataFrame.merge method.
+
+        Returns
+        -------
+        pandas.DataFrame
+            The merged dataframe.
+
+        Raises
+        ------
+        ValueError
+            If &#39;on&#39;, &#39;left_on&#39;, and &#39;right_on&#39; are all None.
+        ValueError
+            If `group_column_name` already exists in one of the dataframes.
+        &#34;&#34;&#34;
+
+        if ((left_on is None) or (right_on is None)) and (on is None):
+            raise ValueError(&#39;Must provide column(s) to merge on&#39;)
+
+        left_df = left_df.copy()
+        right_df = right_df.copy()
+
+        if on is not None:
+            left_on = on + suffixes[0]
+            right_on = on + suffixes[1]
+
+            left_df = left_df.rename(columns={on:left_on})
+            right_df = right_df.rename(columns={on:right_on})
+
+        group_map = lambda s: self[s] if s in self.labels else np.nan
+
+        left_group = left_df[left_on].apply(group_map)
+        right_group = right_df[right_on].apply(group_map)
+
+        if group_column_name:
+            if group_column_name in list(left_df.columns) + list(right_df.columns):
+                raise ValueError(&#39;f{group_column_name=} already exists in one of the dataframes.&#39;)
+            else:
+                left_df[group_column_name] = left_group
+
+        merged_df = pd.merge(left_df,right_df,left_on=left_group,right_on=right_group,how=how,suffixes=suffixes,**merge_args)
+
+        merged_df = merged_df[[c for c in merged_df.columns if c in list(left_df.columns) + list(right_df.columns)]]
+
+        return merged_df</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="nama.matcher.Matcher.add_strings"><code class="name flex">
+<span>def <span class="ident">add_strings</span></span>(<span>self, arg, inplace=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add new strings to the matcher.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>arg</code></strong> :&ensp;<code>str, Counter, <a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a>, Iterable</code></dt>
+<dd>String or group of strings to add to the matcher</dd>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, add strings to the existing Matcher object, by default False</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></dt>
+<dd>The updated Matcher object</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_strings(self, arg, inplace=False):
+    &#34;&#34;&#34;Add new strings to the matcher.
+
+    Parameters
+    ----------
+    arg : str, Counter, Matcher, Iterable
+        String or group of strings to add to the matcher
+    inplace : bool, optional
+        If True, add strings to the existing Matcher object, by default False
+
+    Returns
+    -------
+    Matcher
+        The updated Matcher object
+    &#34;&#34;&#34;
+    if isinstance(arg, str):
+        counts = {arg: 1}
+
+    elif isinstance(arg, Counter):
+        counts = arg
+
+    elif isinstance(arg, Matcher):
+        counts = arg.counts
+
+    elif hasattr(arg, &#39;__next__&#39;) or hasattr(arg, &#39;__iter__&#39;):
+        counts = Counter(arg)
+
+    if not inplace:
+        self = self.copy()
+
+    for s in counts.keys():
+        if s not in self.labels:
+            self.labels[s] = s
+            self.groups[s] = [s]
+
+    self.counts += counts
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.copy"><code class="name flex">
+<span>def <span class="ident">copy</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return a copy of the Matcher object.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def copy(self):
+    &#34;&#34;&#34;Return a copy of the Matcher object.&#34;&#34;&#34;
+    new_matcher = Matcher()
+    new_matcher.counts = self.counts.copy()
+    new_matcher.labels = self.labels.copy()
+    new_matcher.groups = self.groups.copy()
+
+    return new_matcher</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.drop"><code class="name flex">
+<span>def <span class="ident">drop</span></span>(<span>self, strings, inplace=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove strings from the matcher.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>strings</code></strong> :&ensp;<code>list</code> or <code>str</code></dt>
+<dd>String or list of strings to remove from the matcher</dd>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, remove strings from the existing Matcher object, by default False</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></dt>
+<dd>The updated Matcher object</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def drop(self, strings, inplace=False):
+    &#34;&#34;&#34;Remove strings from the matcher.
+
+    Parameters
+    ----------
+    strings : list or str
+        String or list of strings to remove from the matcher
+    inplace : bool, optional
+        If True, remove strings from the existing Matcher object, by default False
+
+    Returns
+    -------
+    Matcher
+        The updated Matcher object
+    &#34;&#34;&#34;
+    if isinstance(strings, str):
+        strings = [strings]
+
+    strings = set(strings)
+
+    if not inplace:
+        self = self.copy()
+
+    # Remove strings from their groups
+    affected_group_labels = {self[s] for s in strings}
+    for old_label in affected_group_labels:
+        old_group = self.groups[old_label]
+        new_group = [s for s in old_group if s not in strings]
+
+        if new_group:
+            counts = self.counts
+            new_label = min((-counts[s], s) for s in new_group)[1]
+
+            if new_label != old_label:
+                del self.groups[old_label]
+
+            self.groups[new_label] = new_group
+
+            for s in new_group:
+                self.labels[s] = new_label
+        else:
+            del self.groups[old_label]
+
+    # Remove strings from counts and labels
+    for s in strings:
+        del self.counts[s]
+        del self.labels[s]
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.items"><code class="name flex">
+<span>def <span class="ident">items</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return an iterator of strings and their group labels.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def items(self):
+    &#34;&#34;&#34;Return an iterator of strings and their group labels.&#34;&#34;&#34;
+    for i, g in self.labels.items():
+        yield i, g</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.keep"><code class="name flex">
+<span>def <span class="ident">keep</span></span>(<span>self, strings, inplace=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Drop all strings from the matcher except the passed strings.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>strings</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of strings to keep in the matcher</dd>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, drop strings from the existing Matcher object, by default False</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></dt>
+<dd>The updated Matcher object</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def keep(self, strings, inplace=False):
+    &#34;&#34;&#34;Drop all strings from the matcher except the passed strings.
+
+    Parameters
+    ----------
+    strings : list
+        List of strings to keep in the matcher
+    inplace : bool, optional
+        If True, drop strings from the existing Matcher object, by default False
+
+    Returns
+    -------
+    Matcher
+        The updated Matcher object
+    &#34;&#34;&#34;
+    strings = set(strings)
+
+    to_drop = [s for s in self.strings() if s not in strings]
+
+    return self.drop(to_drop, inplace=inplace)</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.matches"><code class="name flex">
+<span>def <span class="ident">matches</span></span>(<span>self, string)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the group of strings that match the given string.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def matches(self, string):
+    &#34;&#34;&#34;Return the group of strings that match the given string.&#34;&#34;&#34;
+    return self.groups[self.labels[string]]</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.merge_dfs"><code class="name flex">
+<span>def <span class="ident">merge_dfs</span></span>(<span>self, left_df, right_df, how='inner', on=None, left_on=None, right_on=None, group_column_name='match_group', suffixes=('_x', '_y'), **merge_args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Replicated pandas.merge() functionality, except that dataframes are merged by match group instead of directly on the strings in the "on" columns.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>left_df</code></strong> :&ensp;<code>pandas.DataFrame</code></dt>
+<dd>The left dataframe to merge.</dd>
+<dt><strong><code>right_df</code></strong> :&ensp;<code>pandas.DataFrame</code></dt>
+<dd>The right dataframe to merge.</dd>
+<dt><strong><code>how</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>How to merge the dataframes. Possible values are 'left', 'right', 'outer', 'inner', by default 'inner'.</dd>
+<dt><strong><code>on</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Columns in both left and right dataframes to merge on.</dd>
+<dt><strong><code>left_on</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Columns in the left dataframe to merge on.</dd>
+<dt><strong><code>right_on</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Columns in the right dataframe to merge on.</dd>
+<dt><strong><code>group_column_name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Column name for the merged match group, by default 'match_group'.</dd>
+<dt><strong><code>suffixes</code></strong> :&ensp;<code>tuple</code> of <code>str</code>, optional</dt>
+<dd>Suffix to apply to overlapping column names in the left and right dataframes, by default ('_x','_y').</dd>
+<dt><strong><code>**merge_args</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Additional keyword arguments to pass to the pandas.DataFrame.merge method.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pandas.DataFrame</code></dt>
+<dd>The merged dataframe.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If 'on', 'left_on', and 'right_on' are all None.</dd>
+<dt><code>ValueError</code></dt>
+<dd>If <code>group_column_name</code> already exists in one of the dataframes.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def merge_dfs(self, left_df, right_df, how=&#39;inner&#39;,
+                on=None, left_on=None, right_on=None,
+                group_column_name=&#39;match_group&#39;, suffixes=(&#39;_x&#39;, &#39;_y&#39;),
+                **merge_args):
+    &#34;&#34;&#34;
+    Replicated pandas.merge() functionality, except that dataframes are merged by match group instead of directly on the strings in the &#34;on&#34; columns.
+
+    Parameters
+    ----------
+    left_df : pandas.DataFrame
+        The left dataframe to merge.
+    right_df : pandas.DataFrame
+        The right dataframe to merge.
+    how : str, optional
+        How to merge the dataframes. Possible values are &#39;left&#39;, &#39;right&#39;, &#39;outer&#39;, &#39;inner&#39;, by default &#39;inner&#39;.
+    on : str, optional
+        Columns in both left and right dataframes to merge on.
+    left_on : str, optional
+        Columns in the left dataframe to merge on.
+    right_on : str, optional
+        Columns in the right dataframe to merge on.
+    group_column_name : str, optional
+        Column name for the merged match group, by default &#39;match_group&#39;.
+    suffixes : tuple of str, optional
+        Suffix to apply to overlapping column names in the left and right dataframes, by default (&#39;_x&#39;,&#39;_y&#39;).
+    **merge_args : dict
+        Additional keyword arguments to pass to the pandas.DataFrame.merge method.
+
+    Returns
+    -------
+    pandas.DataFrame
+        The merged dataframe.
+
+    Raises
+    ------
+    ValueError
+        If &#39;on&#39;, &#39;left_on&#39;, and &#39;right_on&#39; are all None.
+    ValueError
+        If `group_column_name` already exists in one of the dataframes.
+    &#34;&#34;&#34;
+
+    if ((left_on is None) or (right_on is None)) and (on is None):
+        raise ValueError(&#39;Must provide column(s) to merge on&#39;)
+
+    left_df = left_df.copy()
+    right_df = right_df.copy()
+
+    if on is not None:
+        left_on = on + suffixes[0]
+        right_on = on + suffixes[1]
+
+        left_df = left_df.rename(columns={on:left_on})
+        right_df = right_df.rename(columns={on:right_on})
+
+    group_map = lambda s: self[s] if s in self.labels else np.nan
+
+    left_group = left_df[left_on].apply(group_map)
+    right_group = right_df[right_on].apply(group_map)
+
+    if group_column_name:
+        if group_column_name in list(left_df.columns) + list(right_df.columns):
+            raise ValueError(&#39;f{group_column_name=} already exists in one of the dataframes.&#39;)
+        else:
+            left_df[group_column_name] = left_group
+
+    merged_df = pd.merge(left_df,right_df,left_on=left_group,right_on=right_group,how=how,suffixes=suffixes,**merge_args)
+
+    merged_df = merged_df[[c for c in merged_df.columns if c in list(left_df.columns) + list(right_df.columns)]]
+
+    return merged_df</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.reset_counts"><code class="name flex">
+<span>def <span class="ident">reset_counts</span></span>(<span>self, inplace=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reset the counts of strings in the Matcher object.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, the operation is performed in-place. Otherwise, a copy is created.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>self</code></strong> :&ensp;<code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></dt>
+<dd>Returns the Matcher object after the reset operation.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset_counts(self, inplace=False):
+    &#34;&#34;&#34;
+    Reset the counts of strings in the Matcher object.
+
+    Parameters
+    ----------
+    inplace: bool, optional
+        If True, the operation is performed in-place. Otherwise, a copy is created.
+
+    Returns
+    -------
+    self: Matcher
+        Returns the Matcher object after the reset operation.
+
+    &#34;&#34;&#34;
+    if not inplace:
+        self = self.copy()
+
+    self.counts = Counter(self.strings())
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.separate"><code class="name flex">
+<span>def <span class="ident">separate</span></span>(<span>self, strings, similarity_model, inplace=False, threshold=0, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Separate the strings in according to the prediction of the similarity_model.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>strings</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of strings to be separated.</dd>
+<dt><strong><code>similarity_model</code></strong> :&ensp;<code>Model</code></dt>
+<dd>Model used to predict similarity between strings.</dd>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, the separation operation is performed in-place. Otherwise, a copy is created.</dd>
+<dt><strong><code>threshold</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Threshold value for prediction.</dd>
+<dt><strong><code>kwargs</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Additional keyword arguments passed to the prediction function.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>self</code></strong> :&ensp;<code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></dt>
+<dd>Returns the Matcher object after the separation operation.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def separate(
+self,
+strings,
+similarity_model,
+inplace=False,
+threshold=0,
+ **kwargs):
+    &#34;&#34;&#34;
+    Separate the strings in according to the prediction of the similarity_model.
+
+    Parameters
+    ----------
+    strings: list
+        List of strings to be separated.
+    similarity_model: Model
+        Model used to predict similarity between strings.
+    inplace: bool, optional
+        If True, the separation operation is performed in-place. Otherwise, a copy is created.
+    threshold: float, optional
+        Threshold value for prediction.
+    kwargs: dict, optional
+        Additional keyword arguments passed to the prediction function.
+
+    Returns
+    -------
+    self: Matcher
+        Returns the Matcher object after the separation operation.
+
+    &#34;&#34;&#34;
+    if not inplace:
+        self = self.copy()
+
+    # Identify which groups contain the strings to separate
+    group_map = defaultdict(list)
+    for s in set(strings):
+        group_map[self[s]].append(s)
+
+    for g, g_sep in group_map.items():
+
+        # If group contains strings to separate...
+        if len(g_sep) &gt; 1:
+            group_strings = self.groups[g]
+
+            # Split the group strings
+            self.split(group_strings, inplace=True)
+
+            # Re-unite with new prediction that enforces separation
+            try:
+                embeddings = similarity_model[group_strings]
+            except Exception as e:
+                print(f&#39;{g=} {g_sep} {group_strings}&#39;)
+                raise e
+            predicted = embeddings.predict(
+                            threshold=threshold,
+                            separate_strings=strings,
+                            **kwargs)
+
+            self.unite(predicted, inplace=True)
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.split"><code class="name flex">
+<span>def <span class="ident">split</span></span>(<span>self, strings, inplace=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Split strings into singleton groups. Strings can be passed as:
+- A single string to isolate into a singleton group
+- A list or iterator of strings to split</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>strings</code></strong> :&ensp;<code>str</code> or <code>list</code> of <code>str</code></dt>
+<dd>The string(s) to split into singleton groups.</dd>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to perform the operation in place or return a new Matcher.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></dt>
+<dd>The updated Matcher object. If <code>inplace</code> is True, the updated object
+is returned, else a new Matcher object with the updates is returned.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def split(self, strings, inplace=False):
+    &#34;&#34;&#34;
+    Split strings into singleton groups. Strings can be passed as:
+    - A single string to isolate into a singleton group
+    - A list or iterator of strings to split
+
+    Parameters
+    ----------
+    strings : str or list of str
+        The string(s) to split into singleton groups.
+    inplace : bool, optional
+        Whether to perform the operation in place or return a new Matcher.
+
+    Returns
+    -------
+    Matcher
+        The updated Matcher object. If `inplace` is True, the updated object
+        is returned, else a new Matcher object with the updates is returned.
+    &#34;&#34;&#34;
+    if not inplace:
+        self = self.copy()
+
+    if isinstance(strings, str):
+        strings = [strings]
+
+    strings = set(strings)
+
+    # Remove strings from their groups
+    affected_group_labels = {self[s] for s in strings}
+    for old_label in affected_group_labels:
+        old_group = self.groups[old_label]
+        if len(old_group) &gt; 1:
+            new_group = [s for s in old_group if s not in strings]
+            if new_group:
+                counts = self.counts
+                new_label = min((-counts[s], s) for s in new_group)[1]
+
+                if new_label != old_label:
+                    del self.groups[old_label]
+
+                self.groups[new_label] = new_group
+
+                for s in new_group:
+                    self.labels[s] = new_label
+
+    # Update labels and add singleton groups
+    for s in strings:
+        self.labels[s] = s
+        self.groups[s] = [s]
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.split_all"><code class="name flex">
+<span>def <span class="ident">split_all</span></span>(<span>self, inplace=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Split all strings into singleton groups.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to perform the operation in place or return a new Matcher.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></dt>
+<dd>The updated Matcher object. If <code>inplace</code> is True, the updated object
+is returned, else a new Matcher object with the updates is returned.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def split_all(self, inplace=False):
+    &#34;&#34;&#34;
+    Split all strings into singleton groups.
+
+    Parameters
+    ----------
+    inplace : bool, optional
+        Whether to perform the operation in place or return a new Matcher.
+
+    Returns
+    -------
+    Matcher
+        The updated Matcher object. If `inplace` is True, the updated object
+        is returned, else a new Matcher object with the updates is returned.
+    &#34;&#34;&#34;
+    if not inplace:
+        self = self.copy()
+
+    self.labels = {s: s for s in self.strings()}
+    self.groups = {s: [s] for s in self.strings()}
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.strings"><code class="name flex">
+<span>def <span class="ident">strings</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return a list of strings in the matcher. Order is not guaranteed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def strings(self):
+    &#34;&#34;&#34;Return a list of strings in the matcher. Order is not guaranteed.&#34;&#34;&#34;
+    return list(self.labels.keys())</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.to_csv"><code class="name flex">
+<span>def <span class="ident">to_csv</span></span>(<span>self, filename, singletons=True, **pandas_args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Save the matcher as a csv file with string, count and group columns.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to file to save the data.</dd>
+<dt><strong><code>singletons</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, include singleton groups in the saved file, by default True.</dd>
+<dt><strong><code>pandas_args</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Additional keyword arguments to pass to the pandas.DataFrame.to_csv method.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_csv(self, filename, singletons=True, **pandas_args):
+    &#34;&#34;&#34;
+    Save the matcher as a csv file with string, count and group columns.
+
+    Parameters
+    ----------
+    filename : str
+        Path to file to save the data.
+    singletons : bool, optional
+        If True, include singleton groups in the saved file, by default True.
+    pandas_args : dict
+        Additional keyword arguments to pass to the pandas.DataFrame.to_csv method.
+    &#34;&#34;&#34;
+    df = self.to_df(singletons=singletons)
+    df.to_csv(filename, index=False, **pandas_args)</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.to_df"><code class="name flex">
+<span>def <span class="ident">to_df</span></span>(<span>self, singletons=True, sort_groups=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert the matcher to a dataframe with string, count and group columns.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>singletons</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, the resulting DataFrame will include singleton groups. Default is True.</dd>
+</dl>
+<p>&hellip;</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas.DataFrame</code></dt>
+<dd>The resulting DataFrame.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_df(self, singletons=True, sort_groups=True):
+    &#34;&#34;&#34;
+    Convert the matcher to a dataframe with string, count and group columns.
+
+    Parameters
+    ----------
+    singletons: bool, optional
+        If True, the resulting DataFrame will include singleton groups. Default is True.
+    ...
+
+    Returns
+    -------
+    df: pandas.DataFrame
+        The resulting DataFrame.
+        &#34;&#34;&#34;
+    strings = self.strings()
+
+    if singletons:
+        df = pd.DataFrame([(s, self.counts[s], self.labels[s]) for s in strings],
+                            columns=[&#39;string&#39;, &#39;count&#39;, &#39;group&#39;])
+    else:
+        df = pd.DataFrame([(s, self.counts[s], self.labels[s]) for s in strings
+                            if len(self.groups[self[s]]) &gt; 1],
+                            columns=[&#39;string&#39;, &#39;count&#39;, &#39;group&#39;])
+    if sort_groups:
+        df[&#39;group_count&#39;] = df.groupby(&#39;group&#39;)[&#39;count&#39;].transform(&#39;sum&#39;)
+        df = df.sort_values([&#39;group_count&#39;, &#39;group&#39;, &#39;count&#39;, &#39;string&#39;], ascending=[
+                            False, True, False, True])
+        df = df.drop(&#39;group_count&#39;, axis=1)
+        df = df.reset_index(drop=True)
+
+    return df</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.top_scored_pairs_df"><code class="name flex">
+<span>def <span class="ident">top_scored_pairs_df</span></span>(<span>self, similarity_model, n=10000, buffer_n=100000, by_group=True, sort_by=['impact', 'score'], ascending=False, skip_pairs=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the DataFrame containing the n most important pairs of strings, according to the score generated by the <code>similarity_model</code>.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>similarity_model</code></strong> :&ensp;<code>Model</code></dt>
+<dd>Model used to predict similarity between strings.</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of most important pairs to return. Default is 10000.</dd>
+<dt><strong><code>buffer_n</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Size of buffer to iterate through the scored pairs. Default is 100000.</dd>
+<dt><strong><code>by_group</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, only the most important pair will be returned for each unique group combination.</dd>
+<dt><strong><code>sort_by</code></strong> :&ensp;<code>list</code>, optional</dt>
+<dd>A list of column names by which to sort the dataframe. Default is ['impact','score'].</dd>
+<dt><strong><code>ascending</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether the sort order should be ascending or descending. Default is False.</dd>
+<dt><strong><code>skip_pairs</code></strong> :&ensp;<code>list</code>, optional</dt>
+<dd>List of string pairs to ignore when constructing the ranking.
+If by_group=True, any group combination represented in the skip_pairs list will be ignored</dd>
+<dt><strong><code>kwargs</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Additional keyword arguments passed to the <code>iter_scored_pairs</code> function.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>top_df</code></strong> :&ensp;<code>pandas.DataFrame</code></dt>
+<dd>The DataFrame containing the n most important pairs of strings.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def top_scored_pairs_df(self, similarity_model,
+                            n=10000, buffer_n=100000,
+                            by_group=True,
+                            sort_by=[&#39;impact&#39;, &#39;score&#39;], ascending=False,
+                            skip_pairs=None, **kwargs):
+    &#34;&#34;&#34;
+    Return the DataFrame containing the n most important pairs of strings, according to the score generated by the `similarity_model`.
+
+    Parameters
+    ----------
+    similarity_model: Model
+        Model used to predict similarity between strings.
+    n: int, optional
+        Number of most important pairs to return. Default is 10000.
+    buffer_n: int, optional
+        Size of buffer to iterate through the scored pairs. Default is 100000.
+    by_group: bool, optional
+        If True, only the most important pair will be returned for each unique group combination.
+    sort_by: list, optional
+        A list of column names by which to sort the dataframe. Default is [&#39;impact&#39;,&#39;score&#39;].
+    ascending: bool, optional
+        Whether the sort order should be ascending or descending. Default is False.
+    skip_pairs: list, optional
+        List of string pairs to ignore when constructing the ranking.
+        If by_group=True, any group combination represented in the skip_pairs list will be ignored
+    kwargs: dict, optional
+        Additional keyword arguments passed to the `iter_scored_pairs` function.
+
+    Returns
+    -------
+    top_df: pandas.DataFrame
+        The DataFrame containing the n most important pairs of strings.
+
+    &#34;&#34;&#34;
+
+    top_df = pd.DataFrame(
+columns=[
+    &#39;string0&#39;,
+    &#39;string1&#39;,
+    &#39;group0&#39;,
+    &#39;group1&#39;,
+    &#39;impact&#39;,
+    &#39;score&#39;,
+     &#39;loss&#39;])
+    pair_iterator = similarity_model.iter_scored_pairs(self, **kwargs)
+
+    def group_size(g):
+        return len(self.groups[g])
+
+    if skip_pairs is not None:
+        if by_group:
+            skip_pairs = {tuple(sorted([self[s0], self[s1]]))
+                                for s0, s1 in skip_pairs}
+        else:
+            skip_pairs = {tuple(sorted([s0, s1])) for s0, s1 in skip_pairs}
+
+    while True:
+        df = pd.DataFrame(islice(pair_iterator, buffer_n))
+
+        if len(df):
+            for i in 0, 1:
+                df[f&#39;group{i}&#39;] = [self[s] for s in df[f&#39;string{i}&#39;]]
+            df[&#39;impact&#39;] = df[&#39;group0&#39;].apply(
+                group_size) * df[&#39;group1&#39;].apply(group_size)
+
+            if by_group:
+                df[&#39;group_pair&#39;] = [tuple(sorted([g0, g1])) for g0, g1 in df[[
+                                          &#39;group0&#39;, &#39;group1&#39;]].values]
+
+            if skip_pairs:
+                if by_group:
+                    df = df[~df[&#39;group_pair&#39;].isin(skip_pairs)]
+                else:
+                    string_pairs = [tuple(sorted([s0, s1])) for s0, s1 in df[[
+                                          &#39;string0&#39;, &#39;string1&#39;]].values]
+                    df = df[~string_pairs.isin(skip_pairs)]
+
+            if len(df):
+                top_df = pd.concat([top_df, df]) \
+                                    .sort_values(sort_by, ascending=ascending)
+
+                if by_group:
+                    top_df = top_df \
+                                    .groupby(&#39;group_pair&#39;) \
+                                    .first() \
+                                    .reset_index()
+
+                top_df = top_df \
+                                    .sort_values(sort_by, ascending=ascending) \
+                                    .head(n)
+        else:
+            break
+
+    if len(top_df) and by_group:
+        top_df = top_df \
+                    .drop(&#39;group_pair&#39;, axis=1) \
+                    .reset_index()
+
+    return top_df</code></pre>
+</details>
+</dd>
+<dt id="nama.matcher.Matcher.unite"><code class="name flex">
+<span>def <span class="ident">unite</span></span>(<span>self, arg, inplace=False, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Merge groups containing the passed strings. Groups can be passed as:
+- A list of strings to unite
+- A nested list to unite each set of strings
+- A dictionary mapping strings to labels to unite by label
+- A function mapping strings to labels to unite by label
+- A Matcher instance to unite by Matcher groups</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>arg</code></strong> :&ensp;<code>list, dict, function</code> or <code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a> instance</code></dt>
+<dd>Argument representing the strings or labels to merge.</dd>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to perform the operation in place or return a new Matcher.</dd>
+<dt><strong><code>kwargs</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>Additional arguments to be passed to predict_matcher method if arg
+is a similarity model with a predict_matcher method.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></dt>
+<dd>The updated Matcher object. If <code>inplace</code> is True, the updated object
+is returned, else a new Matcher object with the updates is returned.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unite(self, arg, inplace=False, **kwargs):
+    &#34;&#34;&#34;
+    Merge groups containing the passed strings. Groups can be passed as:
+    - A list of strings to unite
+    - A nested list to unite each set of strings
+    - A dictionary mapping strings to labels to unite by label
+    - A function mapping strings to labels to unite by label
+    - A Matcher instance to unite by Matcher groups
+
+    Parameters
+    ----------
+    arg : list, dict, function or Matcher instance
+        Argument representing the strings or labels to merge.
+    inplace : bool, optional
+        Whether to perform the operation in place or return a new Matcher.
+    kwargs : dict, optional
+        Additional arguments to be passed to predict_matcher method if arg
+        is a similarity model with a predict_matcher method.
+
+    Returns
+    -------
+    Matcher
+        The updated Matcher object. If `inplace` is True, the updated object
+        is returned, else a new Matcher object with the updates is returned.
+    &#34;&#34;&#34;
+
+    if not inplace:
+        self = self.copy()
+
+    if isinstance(arg, str):
+        raise ValueError(&#39;Cannot unite a single string&#39;)
+
+    elif isinstance(arg, Matcher):
+        self.unite(arg.groups.values(), inplace=True)
+
+    elif hasattr(arg, &#39;predict_matcher&#39;):
+        # Unite can accept a similarity model if it has a predict_matcher
+        # method
+        self.unite(arg.predict_matcher(self, **kwargs))
+
+    elif callable(arg):
+        # Assume arg is a mapping from strings to labels and unite by label
+        groups = {s: arg(s) for s in self.strings()}
+        self.unite(groups, inplace=True)
+
+    elif isinstance(arg, dict):
+        # Assume arg is a mapping from strings to labels and unite by label
+        # groups = {label:[] for label in arg.values()}
+        groups = defaultdict(list)
+        for string, label in arg.items():
+            groups[label].append(string)
+
+        for group in groups.values():
+            self._unite_strings(group)
+
+    elif hasattr(arg, &#39;__next__&#39;):
+        # Assume arg is an iterator of groups to unite
+        # (This needs to be checked early to avoid consuming the first group)
+        for group in arg:
+            self._unite_strings(group)
+
+    elif all(isinstance(s, str) for s in arg):
+        # Main case: Unite group of strings
+        self._unite_strings(arg)
+
+    elif hasattr(arg, &#39;__iter__&#39;):
+        # Assume arg is an iterable of groups to unite
+        for group in arg:
+            self._unite_strings(group)
+
+    else:
+        raise ValueError(&#39;Unknown input type&#39;)
+
+    if not inplace:
+        return self</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="nama" href="index.html">nama</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="nama.matcher.Matcher" href="#nama.matcher.Matcher">Matcher</a></code></h4>
+<ul class="two-column">
+<li><code><a title="nama.matcher.Matcher.add_strings" href="#nama.matcher.Matcher.add_strings">add_strings</a></code></li>
+<li><code><a title="nama.matcher.Matcher.copy" href="#nama.matcher.Matcher.copy">copy</a></code></li>
+<li><code><a title="nama.matcher.Matcher.drop" href="#nama.matcher.Matcher.drop">drop</a></code></li>
+<li><code><a title="nama.matcher.Matcher.items" href="#nama.matcher.Matcher.items">items</a></code></li>
+<li><code><a title="nama.matcher.Matcher.keep" href="#nama.matcher.Matcher.keep">keep</a></code></li>
+<li><code><a title="nama.matcher.Matcher.matches" href="#nama.matcher.Matcher.matches">matches</a></code></li>
+<li><code><a title="nama.matcher.Matcher.merge_dfs" href="#nama.matcher.Matcher.merge_dfs">merge_dfs</a></code></li>
+<li><code><a title="nama.matcher.Matcher.reset_counts" href="#nama.matcher.Matcher.reset_counts">reset_counts</a></code></li>
+<li><code><a title="nama.matcher.Matcher.separate" href="#nama.matcher.Matcher.separate">separate</a></code></li>
+<li><code><a title="nama.matcher.Matcher.split" href="#nama.matcher.Matcher.split">split</a></code></li>
+<li><code><a title="nama.matcher.Matcher.split_all" href="#nama.matcher.Matcher.split_all">split_all</a></code></li>
+<li><code><a title="nama.matcher.Matcher.strings" href="#nama.matcher.Matcher.strings">strings</a></code></li>
+<li><code><a title="nama.matcher.Matcher.to_csv" href="#nama.matcher.Matcher.to_csv">to_csv</a></code></li>
+<li><code><a title="nama.matcher.Matcher.to_df" href="#nama.matcher.Matcher.to_df">to_df</a></code></li>
+<li><code><a title="nama.matcher.Matcher.top_scored_pairs_df" href="#nama.matcher.Matcher.top_scored_pairs_df">top_scored_pairs_df</a></code></li>
+<li><code><a title="nama.matcher.Matcher.unite" href="#nama.matcher.Matcher.unite">unite</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
