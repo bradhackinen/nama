@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>nama.utils API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>nama.utils</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import nltk
+from nltk.corpus import stopwords
+from pathlib import Path
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+import sys
+import torch
+import argparse
+from datetime import datetime
+import re
+import os
+from pathlib import Path
+from collections import Counter, defaultdict
+from itertools import islice
+import pandas as pd
+import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+import matplotlib as mplt
+
+from .scoring import score_predicted, split_on_groups
+from .matcher import Matcher
+
+
+# Preprocessors
+
+def simplify(s):
+    &#34;&#34;&#34;
+    A basic case string simplication function. Strips case and punctuation.
+
+    Parameters
+    ----------
+    s : str
+        The string to be simplified.
+
+    Returns
+    -------
+    str
+        The simplified string.
+    &#34;&#34;&#34;
+    s = s.lower()
+    s = re.sub(&#39; &amp; &#39;, &#39; and &#39;, s)
+    s = re.sub(r&#39;(?&lt;=\S)[\&#39;’´\.](?=\S)&#39;, &#39;&#39;, s)
+    s = re.sub(r&#39;[\s\.,:;/\&#39;&#34;`´‘’“”\(\)_—\-]+&#39;, &#39; &#39;, s)
+    s = s.strip()
+
+    return s
+
+
+def simplify_corp(s):
+    &#34;&#34;&#34;
+    A simplification function for corporations and law firms.
+    Strips:
+        - case &amp; puctation
+        - &#39;the&#39; prefix
+        - common corporate suffixes, including &#39;holding co&#39;
+
+    Parameters
+    ----------
+    s : str
+        The string to be simplified.
+
+    Returns
+    -------
+    str
+        The simplified string.
+    &#34;&#34;&#34;
+    s = simplify(s)
+    if s.startswith(&#39;the &#39;):
+        s = s[4:]
+
+    s = re.sub(
+        &#39;( (group|holding(s)?( co)?|inc(orporated)?|ltd|l ?l? ?[cp]|co(rp(oration)?|mpany)?|s[ae]|plc))+$&#39;,
+        &#39;&#39;,
+        s,
+        count=1)
+
+    return s
+
+
+def remove_stopwords(text):
+    &#34;&#34;&#34;
+    Remove stopwords from a string.
+
+    Parameters
+    ----------
+    text : str
+        The string to have stopwords removed.
+
+    Returns
+    -------
+    str
+        The string with stopwords removed.
+    &#34;&#34;&#34;
+    try:
+        stop_words = set(stopwords.words(&#39;english&#39;))
+    except Exception:
+        nltk.download(&#39;stopwords&#39;)
+        stop_words = set(stopwords.words(&#39;english&#39;))
+
+    return &#39; &#39;.join([word for word in text.split()
+                    if word.lower() not in stop_words])
+
+
+# Matcher Tools
+
+def plot(matchers, strings, matcher_names=None, ax=None):
+    &#34;&#34;&#34;
+    Plots strings and their parent groups for multiple matchers as a graph, with
+    groups represented as nodes that connect strings.
+
+    Parameters
+    ----------
+    matchers : Matcher or list of Matcher
+        a matcher or list of matchers to plot
+    strings : str or list of str
+        a string or list of strings to plot (all connected strings will also be plotted)
+    matcher_names : list of str, optional
+        a list of strings to label matchers in the plot legend
+    ax : matplotlib.axes._subplots.AxesSubplot, optional
+        a matplotlib axis object to draw the plot on.
+
+    Returns
+    -------
+    matplotlib.axes._subplots.AxesSubplot
+        The matplotlib axis object with the plot.
+    &#34;&#34;&#34;
+
+    if isinstance(matchers, Matcher):
+        matchers = [matchers]
+
+    if isinstance(strings, str):
+        strings = [strings]
+
+    if not matcher_names:
+        matcher_names = [f&#39;matcher{i}&#39; for i in range(len(matchers))]
+    elif not (len(matcher_names) == len(matchers)):
+        raise ValueError(&#39;matcher_names must be the same length as matchers&#39;)
+
+    def varname(x): return f&#39;{x=}&#39;.split(&#39;=&#39;)[0]
+
+    # First build graph representation of the parent groups
+    G = nx.Graph()
+    for i, matcher in enumerate(matchers):
+        m_groups = set(matcher[strings])
+        for g in m_groups:
+            group_node = f&#39;{matcher_names[i]}: {g}&#39;
+            string_nodes = matcher.groups[g]
+            G.add_nodes_from(string_nodes, type=&#39;string&#39;, color=&#39;w&#39;)
+            if len(string_nodes) &gt; 1:
+                G.add_nodes_from(
+                    [group_node],
+                    type=&#39;group&#39;,
+                    color=f&#39;C{i}&#39;,
+                    label=group_node)
+                nx.add_star(G, [group_node] + string_nodes, color=f&#39;C{i}&#39;)
+
+    # Now plot graph components in a grid
+    components = sorted(nx.connected_components(G), key=len, reverse=True)
+
+    n_grid = int(np.ceil(np.sqrt(len(components))))
+    grid_xy = [(x, -y) for y in range(n_grid) for x in range(n_grid)]
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    for i, component in enumerate(components):
+        G_sub = G.subgraph(component)
+
+        x0, y0 = grid_xy[i]
+
+        # Position nodes
+        if len(component) &gt; 1:
+            pos = nx.random_layout(G_sub)
+            pos = nx.kamada_kawai_layout(G_sub, pos=pos, scale=0.25)
+            pos = {n: (x0 + x, y0 + y) for n, (x, y) in pos.items()}
+        else:
+            pos = {list(component)[0]: (x0, y0)}
+
+        edges = list(G_sub.edges(data=True))
+
+        edge_coord = [[pos[n0], pos[n1]] for n0, n1, d in edges]
+        edge_colors = [mplt.colors.to_rgba(d[&#39;color&#39;]) for n0, n1, d in edges]
+
+        lc = mplt.collections.LineCollection(
+            edge_coord, color=edge_colors, zorder=0)
+
+        ax.add_collection(lc)
+
+        for node, d in G_sub.nodes(data=True):
+            x, y = pos[node]
+            if d[&#39;type&#39;] == &#39;group&#39;:
+                ax.scatter(
+                    x,
+                    y,
+                    color=mplt.colors.to_rgb(
+                        d[&#39;color&#39;]),
+                    label=d[&#39;label&#39;],
+                    s=50,
+                    zorder=2)
+            else:
+                ax.scatter(x, y, color=&#39;w&#39;, s=200, zorder=1)
+                ax.text(x, y, node, ha=&#39;center&#39;, va=&#39;center&#39;, zorder=3)
+
+    ax.axis(&#39;off&#39;)
+
+    legend_handles = [
+        mplt.lines.Line2D(
+            [],
+            [],
+            color=mplt.colors.to_rgb(f&#39;C{i}&#39;),
+            markersize=15,
+            marker=&#39;.&#39;,
+            label=f&#39;{name}&#39;) for i,
+        name in enumerate(matcher_names)]
+    plt.legend(handles=legend_handles,
+               bbox_to_anchor=(0.5, -0.2), loc=&#39;lower center&#39;,
+               ncol=3, borderaxespad=0)
+
+    return ax
+
+
+def from_df(
+        df,
+        match_format=&#39;detect&#39;,
+        pair_columns=[
+            &#39;string0&#39;,
+            &#39;string1&#39;],
+    string_column=&#39;string&#39;,
+    group_column=&#39;group&#39;,
+        count_column=&#39;count&#39;):
+    &#34;&#34;&#34;
+    Construct a new matcher from a pandas DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The input dataframe.
+    match_format : str, optional
+        The format of the dataframe, by default &#34;detect&#34;.
+        It can be one of [&#39;unmatched&#39;, &#39;groups&#39;, &#39;pairs&#39;, &#39;detect&#39;].
+    pair_columns : list of str, optional
+        The columns names containing the string pairs, by default [&#39;string0&#39;,&#39;string1&#39;].
+    string_column : str, optional
+        The column name containing the strings, by default &#39;string&#39;.
+    group_column : str, optional
+        The column name containing the groups, by default &#39;group&#39;.
+    count_column : str, optional
+        The column name containing the counts, by default &#39;count&#39;.
+
+    Returns
+    -------
+    Matcher
+        The constructed Matcher object.
+
+    Raises
+    ------
+    ValueError
+        If the input `match_format` is not one of [&#39;unmatched&#39;, &#39;groups&#39;, &#39;pairs&#39;, &#39;detect&#39;].
+    ValueError
+        If the `match_format` is &#39;detect&#39; and the input dataframe format could not be inferred.
+
+    Notes
+    -----
+    The function accepts two formats of the input dataframe:
+
+        - &#34;groups&#34;: The standard format for a matcher dataframe. It includes a
+          string column, and a &#34;group&#34; column that contains group labels, and an
+          optional &#34;count&#34; column. These three columns completely describe a
+          matcher object, allowing lossless matcher -&gt; dataframe -&gt; matcher
+          conversion (though the specific group labels in the dataframe will be
+          ignored and rebuilt in the new matcher).
+
+        - &#34;pairs&#34;: The dataframe includes two string columns, and each row indicates
+          a link between a pair of strings. A new matcher will be constructed by
+          uniting each pair of strings.
+    &#34;&#34;&#34;
+
+    if match_format not in [&#39;unmatched&#39;, &#39;groups&#39;, &#39;pairs&#39;, &#39;detect&#39;]:
+        raise ValueError(
+            &#39;match_format must be one of &#34;unmatched&#34;, &#34;groups&#34;, &#34;pairs&#34;, or &#34;detect&#34;&#39;)
+
+    # Create an empty matcher
+    matcher = Matcher()
+
+    if match_format == &#39;detect&#39;:
+        if (string_column in df.columns):
+            if group_column is None:
+                match_format = &#39;unmatched&#39;
+            elif (group_column in df.columns):
+                match_format = &#39;groups&#39;
+        elif set(df.columns) == set(pair_columns):
+            match_format = &#39;pairs&#39;
+
+    if match_format == &#39;detect&#39;:
+        raise ValueError(&#39;Could not infer valid dataframe format from input&#39;)
+
+    if count_column in df.columns:
+        counts = df[count_column].values
+    else:
+        counts = np.ones(len(df))
+
+    if match_format == &#39;unmatched&#39;:
+        strings = df[string_column].values
+
+        # Build the matcher
+        matcher.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        matcher.labels = {s: s for s in strings}
+        matcher.groups = {s: [s] for s in strings}
+
+    elif match_format == &#39;groups&#39;:
+
+        strings = df[string_column].values
+        group_ids = df[group_column].values
+
+        # Sort by group and string count
+        g_sort = np.lexsort((counts, group_ids))
+        group_ids = group_ids[g_sort]
+        strings = strings[g_sort]
+        counts = counts[g_sort]
+
+        # Identify group boundaries and split locations
+        split_locs = np.nonzero(group_ids[1:] != group_ids[:-1])[0] + 1
+
+        # Get grouped strings as separate arrays
+        groups = np.split(strings, split_locs)
+
+        # Build the matcher
+        matcher.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        matcher.labels = {s: g[-1] for g in groups for s in g}
+        matcher.groups = {g[-1]: list(g) for g in groups}
+
+    elif match_format == &#39;pairs&#39;:
+        # TODO: Allow pairs data to use counts
+        for pair_column in pair_columns:
+            matcher.add_strings(df[pair_column].values, inplace=True)
+
+        # There are several ways to unite pairs
+        # Guessing it is most efficient to &#34;group by&#34; one of the string columns
+        groups = {s: pair[1] for pair in df[pair_columns].values for s in pair}
+
+        matcher.unite(groups, inplace=True)
+
+    return matcher
+
+
+def read_csv(
+        filename,
+        match_format=&#39;detect&#39;,
+        pair_columns=[
+            &#39;string0&#39;,
+            &#39;string1&#39;],
+    string_column=&#39;string&#39;,
+    group_column=&#39;group&#39;,
+    count_column=&#39;count&#39;,
+        **pandas_args):
+    &#34;&#34;&#34;
+    Read a csv file and construct a new matcher.
+
+    Parameters
+    ----------
+    filename : str
+        The path to the csv file.
+    match_format : str, optional (default=&#39;detect&#39;)
+        One of &#34;unmatched&#34;, &#34;groups&#34;, &#34;pairs&#34;, or &#34;detect&#34;.
+    pair_columns : list of str, optional (default=[&#39;string0&#39;, &#39;string1&#39;])
+        Two string columns to use if match_format=&#39;pairs&#39;.
+    string_column : str, optional (default=&#39;string&#39;)
+        Column name for string values in match_format=&#39;unmatched&#39; or &#39;groups&#39;.
+    group_column : str, optional (default=&#39;group&#39;)
+        Column name for group values in match_format=&#39;groups&#39;.
+    count_column : str, optional (default=&#39;count&#39;)
+        Column name for count values in match_format=&#39;unmatched&#39; or &#39;groups&#39;.
+    **pandas_args : optional
+        Optional arguments to pass to `pandas.read_csv`.
+
+    Returns
+    -------
+    Matcher
+        A new matcher built from the csv file.
+    &#34;&#34;&#34;
+    df = pd.read_csv(filename, **pandas_args, na_filter=False)
+    df = df.astype(str)
+
+    return from_df(df, match_format=match_format, pair_columns=pair_columns,
+                   string_column=string_column, group_column=group_column,
+                   count_column=count_column)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="nama.utils.from_df"><code class="name flex">
+<span>def <span class="ident">from_df</span></span>(<span>df, match_format='detect', pair_columns=['string0', 'string1'], string_column='string', group_column='group', count_column='count')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Construct a new matcher from a pandas DataFrame.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas.DataFrame</code></dt>
+<dd>The input dataframe.</dd>
+<dt><strong><code>match_format</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The format of the dataframe, by default "detect".
+It can be one of ['unmatched', 'groups', 'pairs', 'detect'].</dd>
+<dt><strong><code>pair_columns</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
+<dd>The columns names containing the string pairs, by default ['string0','string1'].</dd>
+<dt><strong><code>string_column</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The column name containing the strings, by default 'string'.</dd>
+<dt><strong><code>group_column</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The column name containing the groups, by default 'group'.</dd>
+<dt><strong><code>count_column</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The column name containing the counts, by default 'count'.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Matcher</code></dt>
+<dd>The constructed Matcher object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the input <code>match_format</code> is not one of ['unmatched', 'groups', 'pairs', 'detect'].</dd>
+<dt><code>ValueError</code></dt>
+<dd>If the <code>match_format</code> is 'detect' and the input dataframe format could not be inferred.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<p>The function accepts two formats of the input dataframe:</p>
+<pre><code>- "groups": The standard format for a matcher dataframe. It includes a
+  string column, and a "group" column that contains group labels, and an
+  optional "count" column. These three columns completely describe a
+  matcher object, allowing lossless matcher -&gt; dataframe -&gt; matcher
+  conversion (though the specific group labels in the dataframe will be
+  ignored and rebuilt in the new matcher).
+
+- "pairs": The dataframe includes two string columns, and each row indicates
+  a link between a pair of strings. A new matcher will be constructed by
+  uniting each pair of strings.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def from_df(
+        df,
+        match_format=&#39;detect&#39;,
+        pair_columns=[
+            &#39;string0&#39;,
+            &#39;string1&#39;],
+    string_column=&#39;string&#39;,
+    group_column=&#39;group&#39;,
+        count_column=&#39;count&#39;):
+    &#34;&#34;&#34;
+    Construct a new matcher from a pandas DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The input dataframe.
+    match_format : str, optional
+        The format of the dataframe, by default &#34;detect&#34;.
+        It can be one of [&#39;unmatched&#39;, &#39;groups&#39;, &#39;pairs&#39;, &#39;detect&#39;].
+    pair_columns : list of str, optional
+        The columns names containing the string pairs, by default [&#39;string0&#39;,&#39;string1&#39;].
+    string_column : str, optional
+        The column name containing the strings, by default &#39;string&#39;.
+    group_column : str, optional
+        The column name containing the groups, by default &#39;group&#39;.
+    count_column : str, optional
+        The column name containing the counts, by default &#39;count&#39;.
+
+    Returns
+    -------
+    Matcher
+        The constructed Matcher object.
+
+    Raises
+    ------
+    ValueError
+        If the input `match_format` is not one of [&#39;unmatched&#39;, &#39;groups&#39;, &#39;pairs&#39;, &#39;detect&#39;].
+    ValueError
+        If the `match_format` is &#39;detect&#39; and the input dataframe format could not be inferred.
+
+    Notes
+    -----
+    The function accepts two formats of the input dataframe:
+
+        - &#34;groups&#34;: The standard format for a matcher dataframe. It includes a
+          string column, and a &#34;group&#34; column that contains group labels, and an
+          optional &#34;count&#34; column. These three columns completely describe a
+          matcher object, allowing lossless matcher -&gt; dataframe -&gt; matcher
+          conversion (though the specific group labels in the dataframe will be
+          ignored and rebuilt in the new matcher).
+
+        - &#34;pairs&#34;: The dataframe includes two string columns, and each row indicates
+          a link between a pair of strings. A new matcher will be constructed by
+          uniting each pair of strings.
+    &#34;&#34;&#34;
+
+    if match_format not in [&#39;unmatched&#39;, &#39;groups&#39;, &#39;pairs&#39;, &#39;detect&#39;]:
+        raise ValueError(
+            &#39;match_format must be one of &#34;unmatched&#34;, &#34;groups&#34;, &#34;pairs&#34;, or &#34;detect&#34;&#39;)
+
+    # Create an empty matcher
+    matcher = Matcher()
+
+    if match_format == &#39;detect&#39;:
+        if (string_column in df.columns):
+            if group_column is None:
+                match_format = &#39;unmatched&#39;
+            elif (group_column in df.columns):
+                match_format = &#39;groups&#39;
+        elif set(df.columns) == set(pair_columns):
+            match_format = &#39;pairs&#39;
+
+    if match_format == &#39;detect&#39;:
+        raise ValueError(&#39;Could not infer valid dataframe format from input&#39;)
+
+    if count_column in df.columns:
+        counts = df[count_column].values
+    else:
+        counts = np.ones(len(df))
+
+    if match_format == &#39;unmatched&#39;:
+        strings = df[string_column].values
+
+        # Build the matcher
+        matcher.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        matcher.labels = {s: s for s in strings}
+        matcher.groups = {s: [s] for s in strings}
+
+    elif match_format == &#39;groups&#39;:
+
+        strings = df[string_column].values
+        group_ids = df[group_column].values
+
+        # Sort by group and string count
+        g_sort = np.lexsort((counts, group_ids))
+        group_ids = group_ids[g_sort]
+        strings = strings[g_sort]
+        counts = counts[g_sort]
+
+        # Identify group boundaries and split locations
+        split_locs = np.nonzero(group_ids[1:] != group_ids[:-1])[0] + 1
+
+        # Get grouped strings as separate arrays
+        groups = np.split(strings, split_locs)
+
+        # Build the matcher
+        matcher.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        matcher.labels = {s: g[-1] for g in groups for s in g}
+        matcher.groups = {g[-1]: list(g) for g in groups}
+
+    elif match_format == &#39;pairs&#39;:
+        # TODO: Allow pairs data to use counts
+        for pair_column in pair_columns:
+            matcher.add_strings(df[pair_column].values, inplace=True)
+
+        # There are several ways to unite pairs
+        # Guessing it is most efficient to &#34;group by&#34; one of the string columns
+        groups = {s: pair[1] for pair in df[pair_columns].values for s in pair}
+
+        matcher.unite(groups, inplace=True)
+
+    return matcher</code></pre>
+</details>
+</dd>
+<dt id="nama.utils.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>matchers, strings, matcher_names=None, ax=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plots strings and their parent groups for multiple matchers as a graph, with
+groups represented as nodes that connect strings.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>matchers</code></strong> :&ensp;<code>Matcher</code> or <code>list</code> of <code>Matcher</code></dt>
+<dd>a matcher or list of matchers to plot</dd>
+<dt><strong><code>strings</code></strong> :&ensp;<code>str</code> or <code>list</code> of <code>str</code></dt>
+<dd>a string or list of strings to plot (all connected strings will also be plotted)</dd>
+<dt><strong><code>matcher_names</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
+<dd>a list of strings to label matchers in the plot legend</dd>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib.axes._subplots.AxesSubplot</code>, optional</dt>
+<dd>a matplotlib axis object to draw the plot on.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>matplotlib.axes._subplots.AxesSubplot</code></dt>
+<dd>The matplotlib axis object with the plot.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(matchers, strings, matcher_names=None, ax=None):
+    &#34;&#34;&#34;
+    Plots strings and their parent groups for multiple matchers as a graph, with
+    groups represented as nodes that connect strings.
+
+    Parameters
+    ----------
+    matchers : Matcher or list of Matcher
+        a matcher or list of matchers to plot
+    strings : str or list of str
+        a string or list of strings to plot (all connected strings will also be plotted)
+    matcher_names : list of str, optional
+        a list of strings to label matchers in the plot legend
+    ax : matplotlib.axes._subplots.AxesSubplot, optional
+        a matplotlib axis object to draw the plot on.
+
+    Returns
+    -------
+    matplotlib.axes._subplots.AxesSubplot
+        The matplotlib axis object with the plot.
+    &#34;&#34;&#34;
+
+    if isinstance(matchers, Matcher):
+        matchers = [matchers]
+
+    if isinstance(strings, str):
+        strings = [strings]
+
+    if not matcher_names:
+        matcher_names = [f&#39;matcher{i}&#39; for i in range(len(matchers))]
+    elif not (len(matcher_names) == len(matchers)):
+        raise ValueError(&#39;matcher_names must be the same length as matchers&#39;)
+
+    def varname(x): return f&#39;{x=}&#39;.split(&#39;=&#39;)[0]
+
+    # First build graph representation of the parent groups
+    G = nx.Graph()
+    for i, matcher in enumerate(matchers):
+        m_groups = set(matcher[strings])
+        for g in m_groups:
+            group_node = f&#39;{matcher_names[i]}: {g}&#39;
+            string_nodes = matcher.groups[g]
+            G.add_nodes_from(string_nodes, type=&#39;string&#39;, color=&#39;w&#39;)
+            if len(string_nodes) &gt; 1:
+                G.add_nodes_from(
+                    [group_node],
+                    type=&#39;group&#39;,
+                    color=f&#39;C{i}&#39;,
+                    label=group_node)
+                nx.add_star(G, [group_node] + string_nodes, color=f&#39;C{i}&#39;)
+
+    # Now plot graph components in a grid
+    components = sorted(nx.connected_components(G), key=len, reverse=True)
+
+    n_grid = int(np.ceil(np.sqrt(len(components))))
+    grid_xy = [(x, -y) for y in range(n_grid) for x in range(n_grid)]
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    for i, component in enumerate(components):
+        G_sub = G.subgraph(component)
+
+        x0, y0 = grid_xy[i]
+
+        # Position nodes
+        if len(component) &gt; 1:
+            pos = nx.random_layout(G_sub)
+            pos = nx.kamada_kawai_layout(G_sub, pos=pos, scale=0.25)
+            pos = {n: (x0 + x, y0 + y) for n, (x, y) in pos.items()}
+        else:
+            pos = {list(component)[0]: (x0, y0)}
+
+        edges = list(G_sub.edges(data=True))
+
+        edge_coord = [[pos[n0], pos[n1]] for n0, n1, d in edges]
+        edge_colors = [mplt.colors.to_rgba(d[&#39;color&#39;]) for n0, n1, d in edges]
+
+        lc = mplt.collections.LineCollection(
+            edge_coord, color=edge_colors, zorder=0)
+
+        ax.add_collection(lc)
+
+        for node, d in G_sub.nodes(data=True):
+            x, y = pos[node]
+            if d[&#39;type&#39;] == &#39;group&#39;:
+                ax.scatter(
+                    x,
+                    y,
+                    color=mplt.colors.to_rgb(
+                        d[&#39;color&#39;]),
+                    label=d[&#39;label&#39;],
+                    s=50,
+                    zorder=2)
+            else:
+                ax.scatter(x, y, color=&#39;w&#39;, s=200, zorder=1)
+                ax.text(x, y, node, ha=&#39;center&#39;, va=&#39;center&#39;, zorder=3)
+
+    ax.axis(&#39;off&#39;)
+
+    legend_handles = [
+        mplt.lines.Line2D(
+            [],
+            [],
+            color=mplt.colors.to_rgb(f&#39;C{i}&#39;),
+            markersize=15,
+            marker=&#39;.&#39;,
+            label=f&#39;{name}&#39;) for i,
+        name in enumerate(matcher_names)]
+    plt.legend(handles=legend_handles,
+               bbox_to_anchor=(0.5, -0.2), loc=&#39;lower center&#39;,
+               ncol=3, borderaxespad=0)
+
+    return ax</code></pre>
+</details>
+</dd>
+<dt id="nama.utils.read_csv"><code class="name flex">
+<span>def <span class="ident">read_csv</span></span>(<span>filename, match_format='detect', pair_columns=['string0', 'string1'], string_column='string', group_column='group', count_column='count', **pandas_args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read a csv file and construct a new matcher.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>The path to the csv file.</dd>
+<dt><strong><code>match_format</code></strong> :&ensp;<code>str</code>, optional <code>(default='detect')</code></dt>
+<dd>One of "unmatched", "groups", "pairs", or "detect".</dd>
+<dt><strong><code>pair_columns</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional <code>(default=['string0', 'string1'])</code></dt>
+<dd>Two string columns to use if match_format='pairs'.</dd>
+<dt><strong><code>string_column</code></strong> :&ensp;<code>str</code>, optional <code>(default='string')</code></dt>
+<dd>Column name for string values in match_format='unmatched' or 'groups'.</dd>
+<dt><strong><code>group_column</code></strong> :&ensp;<code>str</code>, optional <code>(default='group')</code></dt>
+<dd>Column name for group values in match_format='groups'.</dd>
+<dt><strong><code>count_column</code></strong> :&ensp;<code>str</code>, optional <code>(default='count')</code></dt>
+<dd>Column name for count values in match_format='unmatched' or 'groups'.</dd>
+<dt><strong><code>**pandas_args</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Optional arguments to pass to <code>pandas.read_csv</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Matcher</code></dt>
+<dd>A new matcher built from the csv file.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_csv(
+        filename,
+        match_format=&#39;detect&#39;,
+        pair_columns=[
+            &#39;string0&#39;,
+            &#39;string1&#39;],
+    string_column=&#39;string&#39;,
+    group_column=&#39;group&#39;,
+    count_column=&#39;count&#39;,
+        **pandas_args):
+    &#34;&#34;&#34;
+    Read a csv file and construct a new matcher.
+
+    Parameters
+    ----------
+    filename : str
+        The path to the csv file.
+    match_format : str, optional (default=&#39;detect&#39;)
+        One of &#34;unmatched&#34;, &#34;groups&#34;, &#34;pairs&#34;, or &#34;detect&#34;.
+    pair_columns : list of str, optional (default=[&#39;string0&#39;, &#39;string1&#39;])
+        Two string columns to use if match_format=&#39;pairs&#39;.
+    string_column : str, optional (default=&#39;string&#39;)
+        Column name for string values in match_format=&#39;unmatched&#39; or &#39;groups&#39;.
+    group_column : str, optional (default=&#39;group&#39;)
+        Column name for group values in match_format=&#39;groups&#39;.
+    count_column : str, optional (default=&#39;count&#39;)
+        Column name for count values in match_format=&#39;unmatched&#39; or &#39;groups&#39;.
+    **pandas_args : optional
+        Optional arguments to pass to `pandas.read_csv`.
+
+    Returns
+    -------
+    Matcher
+        A new matcher built from the csv file.
+    &#34;&#34;&#34;
+    df = pd.read_csv(filename, **pandas_args, na_filter=False)
+    df = df.astype(str)
+
+    return from_df(df, match_format=match_format, pair_columns=pair_columns,
+                   string_column=string_column, group_column=group_column,
+                   count_column=count_column)</code></pre>
+</details>
+</dd>
+<dt id="nama.utils.remove_stopwords"><code class="name flex">
+<span>def <span class="ident">remove_stopwords</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove stopwords from a string.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>text</code></strong> :&ensp;<code>str</code></dt>
+<dd>The string to have stopwords removed.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The string with stopwords removed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_stopwords(text):
+    &#34;&#34;&#34;
+    Remove stopwords from a string.
+
+    Parameters
+    ----------
+    text : str
+        The string to have stopwords removed.
+
+    Returns
+    -------
+    str
+        The string with stopwords removed.
+    &#34;&#34;&#34;
+    try:
+        stop_words = set(stopwords.words(&#39;english&#39;))
+    except Exception:
+        nltk.download(&#39;stopwords&#39;)
+        stop_words = set(stopwords.words(&#39;english&#39;))
+
+    return &#39; &#39;.join([word for word in text.split()
+                    if word.lower() not in stop_words])</code></pre>
+</details>
+</dd>
+<dt id="nama.utils.simplify"><code class="name flex">
+<span>def <span class="ident">simplify</span></span>(<span>s)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A basic case string simplication function. Strips case and punctuation.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>str</code></dt>
+<dd>The string to be simplified.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The simplified string.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def simplify(s):
+    &#34;&#34;&#34;
+    A basic case string simplication function. Strips case and punctuation.
+
+    Parameters
+    ----------
+    s : str
+        The string to be simplified.
+
+    Returns
+    -------
+    str
+        The simplified string.
+    &#34;&#34;&#34;
+    s = s.lower()
+    s = re.sub(&#39; &amp; &#39;, &#39; and &#39;, s)
+    s = re.sub(r&#39;(?&lt;=\S)[\&#39;’´\.](?=\S)&#39;, &#39;&#39;, s)
+    s = re.sub(r&#39;[\s\.,:;/\&#39;&#34;`´‘’“”\(\)_—\-]+&#39;, &#39; &#39;, s)
+    s = s.strip()
+
+    return s</code></pre>
+</details>
+</dd>
+<dt id="nama.utils.simplify_corp"><code class="name flex">
+<span>def <span class="ident">simplify_corp</span></span>(<span>s)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A simplification function for corporations and law firms.</p>
+<h2 id="strips">Strips</h2>
+<ul>
+<li>case &amp; puctation</li>
+<li>'the' prefix</li>
+<li>common corporate suffixes, including 'holding co'</li>
+</ul>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>str</code></dt>
+<dd>The string to be simplified.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The simplified string.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def simplify_corp(s):
+    &#34;&#34;&#34;
+    A simplification function for corporations and law firms.
+    Strips:
+        - case &amp; puctation
+        - &#39;the&#39; prefix
+        - common corporate suffixes, including &#39;holding co&#39;
+
+    Parameters
+    ----------
+    s : str
+        The string to be simplified.
+
+    Returns
+    -------
+    str
+        The simplified string.
+    &#34;&#34;&#34;
+    s = simplify(s)
+    if s.startswith(&#39;the &#39;):
+        s = s[4:]
+
+    s = re.sub(
+        &#39;( (group|holding(s)?( co)?|inc(orporated)?|ltd|l ?l? ?[cp]|co(rp(oration)?|mpany)?|s[ae]|plc))+$&#39;,
+        &#39;&#39;,
+        s,
+        count=1)
+
+    return s</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="nama" href="index.html">nama</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="nama.utils.from_df" href="#nama.utils.from_df">from_df</a></code></li>
+<li><code><a title="nama.utils.plot" href="#nama.utils.plot">plot</a></code></li>
+<li><code><a title="nama.utils.read_csv" href="#nama.utils.read_csv">read_csv</a></code></li>
+<li><code><a title="nama.utils.remove_stopwords" href="#nama.utils.remove_stopwords">remove_stopwords</a></code></li>
+<li><code><a title="nama.utils.simplify" href="#nama.utils.simplify">simplify</a></code></li>
+<li><code><a title="nama.utils.simplify_corp" href="#nama.utils.simplify_corp">simplify_corp</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

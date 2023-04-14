@@ -1,149 +1,156 @@
-# nama
+# NAMA The NAme MAtching tool
 
 *Fast, flexible name matching for large datasets*
 
-***Warning:*** **nama is being refactored and revised. Current code is not final.**
+## Installation
+Recommended install via pip
+1. Create virtual env ``. Optional
+2. Install nama `pip install git+https://github.com/bradhackinen/nama.git@make-package2`
+
+
+Install from source with ```conda```
+1. Install [Anaconda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) 
+
+2. Clone `nama` 
+```
+git clone https://github.com/bradhackinen/nama.git
+```
+
+3. Enter the `conda` directory where the conda environment file is with  
+```
+cd conda
+```
+4. Create new conda environment with 
+```
+conda create --name <env-name>
+```
+
+5. Activate the new environment with 
+```
+conda activate <env-name>
+```
+
+6. Download & Install [`pytorch-mutex`](https://anaconda.org/pytorch/pytorch-mutex/1.0/download/noarch/pytorch-mutex-1.0-cuda.tar.bz2)
+```
+conda install pytorch-mutex-1.0-cuda.tar.bz2
+```
+
+7. Download & Install [`pytorch`](https://anaconda.org/pytorch/pytorch/1.10.2/download/linux-64/pytorch-1.10.2-py3.9_cuda11.3_cudnn8.2.0_0.tar.bz2)
+```
+conda install pytorch-1.10.2-py3.9_cuda11.3_cudnn8.2.0_0.tar.bz2
+```
+
+8. Install the rest of the dependencies with 
+```
+conda install --file conda_env.txt
+```
 
 
 
+9. Exit the `conda` directory with 
+```
+cd ..
+```
 
-# Demo Code
+10. Install the package with 
+```
+pip install .
+```
 
-The following code (from `nama/demo/demo.py`) illustrates how to match strings using string simplification and token similarity measures .
 
+Installing from source with `pip`
+1. Clone `nama` `git clone https://github.com/bradhackinen/nama.git`
+2. Create & activate virtual environment `python -m venv nama_env && source nama_env/bin/activate`
+3. Install dependencies `pip install -r requirements.txt`
+4. Install the package with `pip install ./nama`
+- Install from the project root directory `pip install .`
+- Install from another directory `pip install /path-to-project-root`
+
+## Demo
+
+## Usage
+
+### Using the `Matcher()`
+
+#### Importing data
+
+To import data into the matcher we can either pass `nama` a pandas DataFrame with
 ```python
-
-import os
-import pandas as pd
-
 import nama
 
-# Create some simple dataframes to match
-df1 = pd.DataFrame(['ABC Inc.','abc inc','A.B.C. INCORPORATED','The XYZ Company','X Y Z CO'],columns=['name'])
-df2 = pd.DataFrame(['ABC Inc.','XYZ Co.'],columns=['name'])
-
-print(f'Toy data:\ndf1=\n{df1}\ndf2=\n{df2}')
-
-# Nama is built around an object called a "matcher", which holds matching
-# information about a set of strings and partitions the strings into
-# non-overlapping groups.
-#   - Strings in the same group are considered "matched"
-#   - Strings in different groups are not matched.
-# Nama provides tools for creating, modifying, saving, and loading matchers.
-# Then matchers can be used to generate unique group ids for a set of
-# strings, or perform two-way merges between pandas dataframes according to
-# the match groups.
-
-# We start matching by creating an empty matcher
-matcher = nama.Matcher()
-
-# First we need to add all the strings we want to match to the matcher
-# (in this case the strings the name column of each dataframe)
-matcher = matcher.add_strings(df1['name'])
-matcher = matcher.add_strings(df2['name'])
-
-# Initially, strings are automatically assigned to singleton groups
-# (Groups are automatically labelled according to the most common string,
-# with ties broken alphabetically)
-print(f'Initial string groups:\n{matcher.groups}')
-
-# At this point we can merge on exact matches, but there isn't much point
-# (equivalent to pandas merge function)
-print(f"Exact matching with singleton groups:\n{matcher.merge_dfs(df1,df2,on='name')}")
-
-# To get better results, we need to modify the matcher.
-# Unite merges all groups that contain the passed strings.
-matcher = matcher.unite(['X Y Z CO','XYZ Co.'])
-print(f'Updated string groups:\n{matcher.groups}')
-
-# Unite is very flexible. We can pass a single set of strings, a nested list
-# of strings, or mapping from strings to group labels. The mapping can even
-# be a function that evaluates strings and generates a label.
-# This makes it very simple to do hash collision matching.
-
-# Hash collision matching works by matching any strings that have the same hash.
-# A hash could be almost anything, but one useful way to do collision matching
-# is to match strings that are identical after simplifying both strings.
-
-# Nama provides some useful simplification functions in nama.strings.
-# simplify_corp strips punctuation and capitalization, and removes common parts
-# of names like starting with "the", or ending with "inc" or "ltd".
-
-from nama.strings import simplify_corp
-
-# Make a new matcher for comparison
-corp_matcher = nama.Matcher(matcher.strings())
-
-# Unite strings with the same simplified representation
-corp_matcher = corp_matcher.unite(simplify_corp)
-
-print(f'Groups after uniting by simplify_corp:\n{corp_matcher.groups}')
-
-# Another useful approach to matching is to construct a similarity measure
-# between strings. The standard way to do this is to break strings into "tokens"
-# (words or short substrings) and use a measure like a weighted jaccard
-# similarity index to summarize the overlap between the tokens in pairs of
-# strings. The token_similarity module provides tools for matching based on
-# token similarity.
-
-# First, create a TokenSimilarity model. This can be customized with different
-# tokenizers, similarity measures, and token weighting methods.
-
-from nama.token_similarity import TokenSimilarity
-
-token_model = TokenSimilarity()
-
-# In the future: Use a training set to automatically pick the optimal similarity
-# threshold for uniting strings.
-# For now: Just set the threshold manually.
-
-# Then we can use the similarity model to predict matches between the matcher
-# strings. The predict method returns a new matcher.
-token_matcher = token_model.predict(matcher.strings(),threshold=0.05)
-
-
-# The nama.plot() function can help visualize the how strings are grouped in
-# multiple matchers at the same time.
-
-nama.plot([corp_matcher,token_matcher],matcher.strings(),matcher_names=['corp_matcher','token_matcher'])
-
-# Notice that the combination of the two matchers correctly groups all the
-# strings. It is often useful to combine multiple matching techniques.
-
-# We can integrate the corp and token matchers into the original matcher
-# with unite.
-
-matcher = matcher.unite(corp_matcher)
-matcher = matcher.unite(token_matcher)
-
-nama.plot(matcher,matcher.strings())
-
-# Now merging the dataframes gives us the desired output
-print(f"Merging with the final matcher:\n{matcher.merge_dfs(df1,df2,on='name')}")
-
-# The matcher can also be converted to a dataframe if we want to cluster the
-# the names in one dataset or create a mapping to string groups that can be used
-# accross multiple datasets.
-
-print(f'Matcher as a dataframe:\n{matcher.to_df()}')
-
-# Finally, we can save the matcher in csv format for later use
-
-from nama.config import data_dir
-
-demo_dir = root_dir/'demo'
-
-if not os.path.isdir(demo_dir):
-    os.makedirs(demo_dir)
-
-matcher.to_csv(demo_dir/'matcher.csv')
-
-# ...and load it again at a later time
-
-loaded_matcher = nama.read_csv(demo_dir/'matcher.csv')
-
-# Visually verify that the saved and loaded matchers are the same
-nama.plot([matcher,loaded_matcher],matcher.strings(),matcher_names=['saved','loaded'])
-
-
+training_data = nama.from_df(
+    df,
+    group_column='group_column',
+    string_column='string_column')
+print(training_data)
 ```
+
+or we can pass `nama` a .csv file directly
+```python
+import nama
+
+testing_data = nama.read_csv(
+    'path-to-data',
+    match_format=match_format,
+    group_column=group_column,
+    string_column=string_column)
+print(training_data)
+```
+
+See [`from_df`](path-to-docs) & [`read_csv`](path-to-docs) for parameters and function details
+
+### Using the `EmbeddingSimilarityModel()`
+
+#### Initialation
+
+We can  initalize a model like so
+```python
+from nama.embedding_similarity import EmbeddingSimilarityModel
+
+sim = EmbeddingSimilarityModel()
+```
+
+If using a GPU then we need to send the model to a GPU device like
+```python
+sim.to(gpu_device)
+```
+#### Training
+
+To train a model we simply need to specifiy the training parmeters and training data
+```python
+train_kwargs = {
+    'max_epochs': 1,
+    'warmup_frac': 0.2,
+    'transformer_lr':1e-5,
+    'score_lr':30,
+    'use_counts':False,
+    'batch_size':8,
+    'early_stopping':False
+}
+
+history_df, val_df = sim.train(training_data, verbose=True, **train_kwargs)
+```
+
+We can also save the trained model for later 
+```python
+sim.save("path-to-save-model")
+```
+
+#### Testing
+
+We can use the model we train above directly like
+```python
+embeddings = sim.embed(testing_data)
+```
+
+Or load a previously trained model 
+```python
+from nama.embedding_similarity import load_similarity_model
+
+new_sim = load_similarity_model("path-to-saved-model")
+embeddings = sim.embed(testing_data)
+```
+
+MORE TO COME
+
+
