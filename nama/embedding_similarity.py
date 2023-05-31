@@ -11,9 +11,10 @@ from transformers import AutoTokenizer,RobertaModel,get_cosine_schedule_with_war
 from zipfile import ZipFile
 import pickle
 from io import BytesIO
+from itertools import islice
 
 import nama
-from nama.scoring import score_predicted
+from .scoring import score_predicted
 
 
 logging.set_verbosity_error()
@@ -516,14 +517,14 @@ class EmbeddingSimilarityModel(nn.Module):
 
         return pd.DataFrame(self.history)
 
-    def predict(self,input,**kwargs):
+    def unite_similar(self,input,**kwargs):
         embeddings = self.embed(input,**kwargs)
-        return embeddings.predict(**kwargs)
+        return embeddings.unite_similar(**kwargs)
 
     def test(self,gold_matcher,batch_size=32):
 
         embeddings = self.embed(gold_matcher)
-        predicted = embeddings.predict(gold_matcher)
+        predicted = embeddings.unite_similar(gold_matcher)
 
         scores = score_predicted(predicted,gold_matcher,use_counts=True)
 
@@ -660,7 +661,7 @@ class Embeddings(nn.Module):
         return matcher
 
     @torch.no_grad()
-    def _fast_predict(self,group_ids,threshold=0.5,progress_bar=True,batch_size=64):
+    def _fast_unite_similar(self,group_ids,threshold=0.5,progress_bar=True,batch_size=64):
 
         V = self.V
         cos_threshold = self.score_model.score_to_cos(threshold)
@@ -692,7 +693,7 @@ class Embeddings(nn.Module):
         return self._group_ids_to_matcher(group_ids)
 
     @torch.no_grad()
-    def predict(self,
+    def unite_similar(self,
                 threshold=0.5,
                 group_threshold=None,
                 always_match=None,
@@ -750,7 +751,7 @@ class Embeddings(nn.Module):
             if always_match is not None:
                 group_ids = self._matcher_to_group_ids(always_matcher)
 
-            return self._fast_predict(
+            return self._fast_unite_similar(
                         group_ids=group_ids,
                         threshold=threshold,
                         batch_size=batch_size,
@@ -975,15 +976,15 @@ class Embeddings(nn.Module):
             return predicted_matcher
 
     @torch.no_grad()
-    def voronoi(self,seed_strings,threshold=0,always_matcher=None,progress_bar=True,batch_size=64):
+    def unite_nearest(self,target_strings,threshold=0,always_matcher=None,progress_bar=True,batch_size=64):
         """
-        Unite embedding strings with each string's most similar seed string.
+        Unite embedding strings with each string's most similar target string.
 
         - "always_matcher" will be used to inialize the group_ids before uniting new matches
-        - "theshold" sets the minimimum match similarity required between a string and seed string
+        - "theshold" sets the minimimum match similarity required between a string and target string
           for the string to be matched. (i.e., setting theshold=0 will result in every embedding
-          string to be matched its nearest seed string, while setting threshold=0.9 will leave
-          strings that have similarity<0.9 with their nearest seed string unaffected)
+          string to be matched its nearest target string, while setting threshold=0.9 will leave
+          strings that have similarity<0.9 with their nearest target string unaffected)
 
         returns: Matcher object
         """
@@ -997,7 +998,7 @@ class Embeddings(nn.Module):
         V = self.V
         cos_threshold = self.score_model.score_to_cos(threshold)
 
-        seed_ids = torch.tensor([self.string_map[s] for s in seed_strings]).to(self.device)
+        seed_ids = torch.tensor([self.string_map[s] for s in target_strings]).to(self.device)
         V_seed = V[seed_ids]
         g_seed = group_ids[seed_ids]
         is_seed = torch.zeros(V.shape[0],dtype=torch.bool).to(self.device)
@@ -1016,18 +1017,127 @@ class Embeddings(nn.Module):
             batch_i = torch.nonzero(max_cos > cos_threshold)
 
             if len(batch_i):
-                # Drop seed strings from matches (otherwise numerical precision
-                # issues can allow seed strings to match to other strings)
+                # Drop target strings from matches (otherwise numerical precision
+                # issues can allow target strings to match to other strings)
                 batch_i = batch_i[~is_seed[batch_slice][batch_i]]
 
                 if len(batch_i):
                     # Get indices of matched strings
                     i = batch_i + batch_start
 
-                    # Assign matched strings to the seed string's group
+                    # Assign matched strings to the target string's group
                     group_ids[i] = g_seed[max_seed[batch_i]]
 
         return self._group_ids_to_matcher(group_ids)
+
+    @torch.no_grad()
+    def score_pairs(self,string_pairs,batch_size=64,progress_bar=True):
+        string_pairs = np.array(string_pairs)
+
+        scores = []
+        for batch_start in tqdm(range(0,string_pairs.shape[0],batch_size),desc='Scoring pairs',disable=not progress_bar):
+
+            V0 = self[string_pairs[batch_start:batch_start+batch_size,0]].V
+            V1 = self[string_pairs[batch_start:batch_start+batch_size,1]].V
+
+            batch_cos = (V0*V1).sum(dim=1).ravel()
+            batch_scores = self.score_model(batch_cos)
+            
+            scores.append(batch_scores.cpu().numpy())
+
+        return np.concatenate(scores)
+
+    @torch.no_grad()
+    def _batch_scores(self,group_ids,batch_start,batch_size,
+                            is_match=None,
+                            min_score=None,max_score=None,
+                            min_loss=None,max_loss=None):
+
+        strings = self.strings
+        V = self.V
+        w = self.w
+
+        # Create simple slice objects to avoid creating copies with advanced indexing
+        i_slice = slice(batch_start,batch_start+batch_size)
+        j_slice = slice(batch_start+1,None)
+
+        X = V[i_slice]@V[j_slice].T
+        Y = (group_ids[i_slice,None] == group_ids[None,j_slice]).float()
+        if w is not None:
+            W = w[i_slice,None]*w[None,j_slice]
+        else:
+            W = None
+
+        scores = self.score_model(X)
+        loss = self.score_model.loss(X,Y,weights=W)
+
+        # Search upper diagonal entries only
+        # (note j_slice starting index is offset by one)
+        scores = torch.triu(scores)
+
+        # Filter by match type
+        if is_match is not None:
+            if is_match:
+                scores *= Y
+            else:
+                scores *= (1 - Y)
+
+        # Filter by min score
+        if min_score is not None:
+            scores *= (scores >= min_score)
+
+        # Filter by max score
+        if max_score is not None:
+            scores *= (scores <= max_score)
+
+        # Filter by min loss
+        if min_loss is not None:
+            scores *= (loss >= min_loss)
+
+        # Filter by max loss
+        if max_loss is not None:
+            scores *= (loss <= max_loss)
+
+        # Collect scored pairs
+        i,j = torch.nonzero(scores,as_tuple=True)
+
+        pairs = np.hstack([
+                                strings[i.cpu().numpy() + batch_start][:,None],
+                                strings[j.cpu().numpy() + (batch_start + 1)][:,None]
+                                ])
+
+        pair_groups = np.hstack([
+                                strings[group_ids[i + batch_start].cpu().numpy()][:,None],
+                                strings[group_ids[j + (batch_start + 1)].cpu().numpy()][:,None]
+                                ])
+
+        pair_scores = scores[i,j].cpu().numpy()
+        pair_losses = loss[i,j].cpu().numpy()
+
+        return pairs,pair_groups,pair_scores,pair_losses
+
+
+    def iter_scores(self,matcher=None,batch_size=64,progress_bar=True,**kwargs):
+
+        if matcher is not None:
+            self = self.embed(matcher)
+            group_ids = self._matcher_to_group_ids(matcher)
+        else:
+            group_ids = torch.arange(len(self)).to(self.device)
+
+        for batch_start in tqdm(range(0,len(self),batch_size),desc='Scoring pairs',disable=not progress_bar):
+            pairs,pair_groups,scores,losses = self._batch_scored_pairs(self,group_ids,batch_start,batch_size,**kwargs)
+            for (s0,s1),(g0,g1),score,loss in zip(pairs,pair_groups,scores,losses):
+                yield {
+                        'string0':s0,
+                        'string1':s1,
+                        'group0':g0,
+                        'group1':g1,
+                        'score':score,
+                        'loss':loss,
+                        }
+
+
 
 
 def load_embeddings(f):
