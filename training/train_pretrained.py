@@ -6,10 +6,10 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 import nama
-from nama.config import data_dir
 from nama.scoring import score_predicted, split_on_groups
 from nama.embedding_similarity import EmbeddingSimilarityModel, load_similarity_model
 
+data_dir = Path('/home/brad/Dropbox/Data/nama')
 
 gold = nama.read_csv(Path(data_dir)/'training_data'/'combined_train.csv')
 # gold_upper = nama.read_csv(data_dir/'training_data'/'combined_train_upper_case.csv')

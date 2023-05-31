@@ -5,9 +5,10 @@ with open('requirements.txt') as f:
 
 setup(
     name='nama',
-    version='1.0.0',
+    version='0.1.0',
     packages=['nama'],
     install_requires=requirements,
+    data_files=[('',['requirements.txt'])],
     url='https://github.com/bradhackinen/nama',
     description='A NAme MAtching tool' 
 )

@@ -1,27 +1,27 @@
-import nltk
-from nltk.corpus import stopwords
-from pathlib import Path
+# import nltk
+# from nltk.corpus import stopwords
+# from pathlib import Path
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-import sys
-import torch
-import argparse
-from datetime import datetime
+# from matplotlib import pyplot as plt
+# from tqdm import tqdm
+# import matplotlib.pyplot as plt
+# import sys
+# import torch
+# import argparse
+# from datetime import datetime
 import re
-import os
-from pathlib import Path
-from collections import Counter, defaultdict
-from itertools import islice
+# import os
+# from pathlib import Path
+from collections import Counter
+# from itertools import islice
 import pandas as pd
 import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
-import matplotlib as mplt
+# import networkx as nx
+# import matplotlib.pyplot as plt
+# import matplotlib as mplt
 
-from .scoring import score_predicted, split_on_groups
+# from .scoring import score_predicted, split_on_groups
 from .matcher import Matcher
 
 
@@ -81,146 +81,146 @@ def simplify_corp(s):
     return s
 
 
-def remove_stopwords(text):
-    """
-    Remove stopwords from a string.
+# def remove_stopwords(text):
+#     """
+#     Remove stopwords from a string.
 
-    Parameters
-    ----------
-    text : str
-        The string to have stopwords removed.
+#     Parameters
+#     ----------
+#     text : str
+#         The string to have stopwords removed.
 
-    Returns
-    -------
-    str
-        The string with stopwords removed.
-    """
-    try:
-        stop_words = set(stopwords.words('english'))
-    except Exception:
-        nltk.download('stopwords')
-        stop_words = set(stopwords.words('english'))
+#     Returns
+#     -------
+#     str
+#         The string with stopwords removed.
+#     """
+#     try:
+#         stop_words = set(stopwords.words('english'))
+#     except Exception:
+#         nltk.download('stopwords')
+#         stop_words = set(stopwords.words('english'))
 
-    return ' '.join([word for word in text.split()
-                    if word.lower() not in stop_words])
+#     return ' '.join([word for word in text.split()
+#                     if word.lower() not in stop_words])
 
 
 # Matcher Tools
 
-def plot(matchers, strings, matcher_names=None, ax=None):
-    """
-    Plots strings and their parent groups for multiple matchers as a graph, with
-    groups represented as nodes that connect strings.
+# def plot(matchers, strings, matcher_names=None, ax=None):
+#     """
+#     Plots strings and their parent groups for multiple matchers as a graph, with
+#     groups represented as nodes that connect strings.
 
-    Parameters
-    ----------
-    matchers : Matcher or list of Matcher
-        a matcher or list of matchers to plot
-    strings : str or list of str
-        a string or list of strings to plot (all connected strings will also be plotted)
-    matcher_names : list of str, optional
-        a list of strings to label matchers in the plot legend
-    ax : matplotlib.axes._subplots.AxesSubplot, optional
-        a matplotlib axis object to draw the plot on.
+#     Parameters
+#     ----------
+#     matchers : Matcher or list of Matcher
+#         a matcher or list of matchers to plot
+#     strings : str or list of str
+#         a string or list of strings to plot (all connected strings will also be plotted)
+#     matcher_names : list of str, optional
+#         a list of strings to label matchers in the plot legend
+#     ax : matplotlib.axes._subplots.AxesSubplot, optional
+#         a matplotlib axis object to draw the plot on.
 
-    Returns
-    -------
-    matplotlib.axes._subplots.AxesSubplot
-        The matplotlib axis object with the plot.
-    """
+#     Returns
+#     -------
+#     matplotlib.axes._subplots.AxesSubplot
+#         The matplotlib axis object with the plot.
+#     """
 
-    if isinstance(matchers, Matcher):
-        matchers = [matchers]
+#     if isinstance(matchers, Matcher):
+#         matchers = [matchers]
 
-    if isinstance(strings, str):
-        strings = [strings]
+#     if isinstance(strings, str):
+#         strings = [strings]
 
-    if not matcher_names:
-        matcher_names = [f'matcher{i}' for i in range(len(matchers))]
-    elif not (len(matcher_names) == len(matchers)):
-        raise ValueError('matcher_names must be the same length as matchers')
+#     if not matcher_names:
+#         matcher_names = [f'matcher{i}' for i in range(len(matchers))]
+#     elif not (len(matcher_names) == len(matchers)):
+#         raise ValueError('matcher_names must be the same length as matchers')
 
-    def varname(x): return f'{x=}'.split('=')[0]
+#     def varname(x): return f'{x=}'.split('=')[0]
 
-    # First build graph representation of the parent groups
-    G = nx.Graph()
-    for i, matcher in enumerate(matchers):
-        m_groups = set(matcher[strings])
-        for g in m_groups:
-            group_node = f'{matcher_names[i]}: {g}'
-            string_nodes = matcher.groups[g]
-            G.add_nodes_from(string_nodes, type='string', color='w')
-            if len(string_nodes) > 1:
-                G.add_nodes_from(
-                    [group_node],
-                    type='group',
-                    color=f'C{i}',
-                    label=group_node)
-                nx.add_star(G, [group_node] + string_nodes, color=f'C{i}')
+#     # First build graph representation of the parent groups
+#     G = nx.Graph()
+#     for i, matcher in enumerate(matchers):
+#         m_groups = set(matcher[strings])
+#         for g in m_groups:
+#             group_node = f'{matcher_names[i]}: {g}'
+#             string_nodes = matcher.groups[g]
+#             G.add_nodes_from(string_nodes, type='string', color='w')
+#             if len(string_nodes) > 1:
+#                 G.add_nodes_from(
+#                     [group_node],
+#                     type='group',
+#                     color=f'C{i}',
+#                     label=group_node)
+#                 nx.add_star(G, [group_node] + string_nodes, color=f'C{i}')
 
-    # Now plot graph components in a grid
-    components = sorted(nx.connected_components(G), key=len, reverse=True)
+#     # Now plot graph components in a grid
+#     components = sorted(nx.connected_components(G), key=len, reverse=True)
 
-    n_grid = int(np.ceil(np.sqrt(len(components))))
-    grid_xy = [(x, -y) for y in range(n_grid) for x in range(n_grid)]
+#     n_grid = int(np.ceil(np.sqrt(len(components))))
+#     grid_xy = [(x, -y) for y in range(n_grid) for x in range(n_grid)]
 
-    if ax is None:
-        fig, ax = plt.subplots()
+#     if ax is None:
+#         fig, ax = plt.subplots()
 
-    for i, component in enumerate(components):
-        G_sub = G.subgraph(component)
+#     for i, component in enumerate(components):
+#         G_sub = G.subgraph(component)
 
-        x0, y0 = grid_xy[i]
+#         x0, y0 = grid_xy[i]
 
-        # Position nodes
-        if len(component) > 1:
-            pos = nx.random_layout(G_sub)
-            pos = nx.kamada_kawai_layout(G_sub, pos=pos, scale=0.25)
-            pos = {n: (x0 + x, y0 + y) for n, (x, y) in pos.items()}
-        else:
-            pos = {list(component)[0]: (x0, y0)}
+#         # Position nodes
+#         if len(component) > 1:
+#             pos = nx.random_layout(G_sub)
+#             pos = nx.kamada_kawai_layout(G_sub, pos=pos, scale=0.25)
+#             pos = {n: (x0 + x, y0 + y) for n, (x, y) in pos.items()}
+#         else:
+#             pos = {list(component)[0]: (x0, y0)}
 
-        edges = list(G_sub.edges(data=True))
+#         edges = list(G_sub.edges(data=True))
 
-        edge_coord = [[pos[n0], pos[n1]] for n0, n1, d in edges]
-        edge_colors = [mplt.colors.to_rgba(d['color']) for n0, n1, d in edges]
+#         edge_coord = [[pos[n0], pos[n1]] for n0, n1, d in edges]
+#         edge_colors = [mplt.colors.to_rgba(d['color']) for n0, n1, d in edges]
 
-        lc = mplt.collections.LineCollection(
-            edge_coord, color=edge_colors, zorder=0)
+#         lc = mplt.collections.LineCollection(
+#             edge_coord, color=edge_colors, zorder=0)
 
-        ax.add_collection(lc)
+#         ax.add_collection(lc)
 
-        for node, d in G_sub.nodes(data=True):
-            x, y = pos[node]
-            if d['type'] == 'group':
-                ax.scatter(
-                    x,
-                    y,
-                    color=mplt.colors.to_rgb(
-                        d['color']),
-                    label=d['label'],
-                    s=50,
-                    zorder=2)
-            else:
-                ax.scatter(x, y, color='w', s=200, zorder=1)
-                ax.text(x, y, node, ha='center', va='center', zorder=3)
+#         for node, d in G_sub.nodes(data=True):
+#             x, y = pos[node]
+#             if d['type'] == 'group':
+#                 ax.scatter(
+#                     x,
+#                     y,
+#                     color=mplt.colors.to_rgb(
+#                         d['color']),
+#                     label=d['label'],
+#                     s=50,
+#                     zorder=2)
+#             else:
+#                 ax.scatter(x, y, color='w', s=200, zorder=1)
+#                 ax.text(x, y, node, ha='center', va='center', zorder=3)
 
-    ax.axis('off')
+#     ax.axis('off')
 
-    legend_handles = [
-        mplt.lines.Line2D(
-            [],
-            [],
-            color=mplt.colors.to_rgb(f'C{i}'),
-            markersize=15,
-            marker='.',
-            label=f'{name}') for i,
-        name in enumerate(matcher_names)]
-    plt.legend(handles=legend_handles,
-               bbox_to_anchor=(0.5, -0.2), loc='lower center',
-               ncol=3, borderaxespad=0)
+#     legend_handles = [
+#         mplt.lines.Line2D(
+#             [],
+#             [],
+#             color=mplt.colors.to_rgb(f'C{i}'),
+#             markersize=15,
+#             marker='.',
+#             label=f'{name}') for i,
+#         name in enumerate(matcher_names)]
+#     plt.legend(handles=legend_handles,
+#                bbox_to_anchor=(0.5, -0.2), loc='lower center',
+#                ncol=3, borderaxespad=0)
 
-    return ax
+#     return ax
 
 
 def from_df(

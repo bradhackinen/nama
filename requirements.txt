@@ -18,8 +18,6 @@ lit==16.0.1
 MarkupSafe==2.1.2
 matplotlib==3.7.1
 mpmath==1.3.0
-networkx==3.1
-nltk==3.8.1
 numpy==1.24.2
 nvidia-cublas-cu11==11.10.3.66
 nvidia-cuda-cupti-cu11==11.7.101
