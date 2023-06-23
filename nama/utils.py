@@ -44,7 +44,7 @@ def simplify(s):
     s = s.lower()
     s = re.sub(' & ', ' and ', s)
     s = re.sub(r'(?<=\S)[\'’´\.](?=\S)', '', s)
-    s = re.sub(r'[\s\.,:;/\'"`´‘’“”\(\)_—\-]+', ' ', s)
+    s = re.sub(r'[\s\.,!@#$%^&*:;/\'"`´‘’“”\(\)_—\-]+', ' ', s)
     s = s.strip()
 
     return s
@@ -81,28 +81,138 @@ def simplify_corp(s):
     return s
 
 
-# def remove_stopwords(text):
-#     """
-#     Remove stopwords from a string.
+def ngrams(string, n=2):
+    """
+    Generates all n-grams of the given string.
 
-#     Parameters
-#     ----------
-#     text : str
-#         The string to have stopwords removed.
+    Parameters
+    ----------
+    string: str
+        The string from which the n-grams will be generated.
+    n: int, optional
+        The number of characters in each n-gram. Default is 2.
 
-#     Returns
-#     -------
-#     str
-#         The string with stopwords removed.
-#     """
-#     try:
-#         stop_words = set(stopwords.words('english'))
-#     except Exception:
-#         nltk.download('stopwords')
-#         stop_words = set(stopwords.words('english'))
+    Yields
+    ------
+    str
+        An n-gram of the string.
 
-#     return ' '.join([word for word in text.split()
-#                     if word.lower() not in stop_words])
+    """
+    for i in range(len(string) - n + 1):
+        yield string[i:i + n]
+
+
+def nmgrams(string, n=1, m=3):
+    """
+    Generates all n-grams of the given string where the n-grams are of length between n and m.
+
+    Parameters
+    ----------
+    string: str
+        The string from which the n-grams will be generated.
+    n: int, optional
+        The minimum length of the n-grams to be generated. Default is 1.
+    m: int, optional
+        The maximum length of the n-grams to be generated. Default is 3.
+
+    Yields
+    ------
+    str
+        An n-gram of the string where the length is between n and m.
+
+    """
+    for j in range(n, m + 1):
+        for i in range(len(string) - j + 1):
+            yield string[i:i + j]
+
+
+def words(string):
+    """
+    Generates all words in the given string.
+
+    Parameters
+    ----------
+    string: str
+        The string from which the words will be extracted.
+
+    Yields
+    ------
+    str
+        A word extracted from the string.
+
+    """
+    for m in re.finditer(r'[A-Za-z0-9]+', string):
+        yield m.group(0)
+
+
+def jaccard_similarity(set0, set1, weights):
+    """
+    Calculates the Jaccard similarity between two sets of terms.
+
+    Parameters
+    ----------
+    set0: set
+        The first set of terms.
+    set1: set
+        The second set of terms.
+    weights: dict
+        A dictionary mapping terms to weights.
+
+    Returns
+    -------
+    float
+        The Jaccard similarity between set0 and set1.
+
+    """
+    intersection = set0 & set1
+
+    if not intersection:
+        return 0
+
+    union = set0 | set1
+    denominator = sum(weights[t] for t in union)
+
+    if not denominator:
+        return 0
+
+    numerator = sum(weights[t] for t in intersection)
+    return numerator / denominator
+
+
+def cosine_similarity(set0, set1, weights):
+    """
+    Calculates the cosine similarity between two sets of terms.
+
+    Parameters
+    ----------
+    set0: set
+        The first set of terms.
+    set1: set
+        The second set of terms.
+    weights: dict
+        A dictionary mapping terms to weights.
+
+    Returns
+    -------
+    float
+        The cosine similarity between set0 and set1.
+
+    """
+    intersection = set0 & set1
+
+    if not intersection:
+        return 0
+
+    length0 = np.sqrt(sum(weights[t]**2 for t in set0))
+    length1 = np.sqrt(sum(weights[t]**2 for t in set1))
+
+    denominator = length0 * length1
+    if not denominator:
+        return 0
+
+    numerator = sum(weights[t]**2 for t in intersection)
+
+    return numerator / denominator
 
 
 # Matcher Tools
