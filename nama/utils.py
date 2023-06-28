@@ -80,6 +80,7 @@ def simplify_corp(s):
 
     return s
 
+# Tokenizers
 
 def ngrams(string, n=2):
     """
@@ -144,6 +145,7 @@ def words(string):
     for m in re.finditer(r'[A-Za-z0-9]+', string):
         yield m.group(0)
 
+# Similarity Measures
 
 def jaccard_similarity(set0, set1, weights):
     """

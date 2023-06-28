@@ -1116,7 +1116,6 @@ class Embeddings(nn.Module):
 
         return pairs,pair_groups,pair_scores,pair_losses
 
-
     def iter_scores(self,matcher=None,batch_size=64,progress_bar=True,**kwargs):
 
         if matcher is not None:
