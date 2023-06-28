@@ -7,7 +7,7 @@ import pandas as pd
 # from tqdm import tqdm
 # import matplotlib.pyplot as plt
 # import sys
-# import torch
+import torch
 # import argparse
 # from datetime import datetime
 import re
@@ -20,10 +20,11 @@ import numpy as np
 # import networkx as nx
 # import matplotlib.pyplot as plt
 # import matplotlib as mplt
-
+from zipfile import ZipFile
+import pickle
 # from .scoring import score_predicted, split_on_groups
 from .matcher import Matcher
-
+from .models.embeddings import Embeddings
 
 # Preprocessors
 
@@ -80,6 +81,7 @@ def simplify_corp(s):
 
     return s
 
+# Tokenizers
 
 def ngrams(string, n=2):
     """
@@ -144,6 +146,7 @@ def words(string):
     for m in re.finditer(r'[A-Za-z0-9]+', string):
         yield m.group(0)
 
+# Similarity Measures
 
 def jaccard_similarity(set0, set1, weights):
     """
@@ -498,3 +501,26 @@ def read_csv(
     return from_df(df, match_format=match_format, pair_columns=pair_columns,
                    string_column=string_column, group_column=group_column,
                    count_column=count_column)
+
+
+def load_embeddings(f):
+    """
+    Load embeddings from custom zipped archive format
+    """
+    with ZipFile(f,'r') as zip:
+        score_model = pickle.loads(zip.read('score_model.pkl'))
+        weighting_function = pickle.loads(zip.read('weighting_function.pkl'))
+        strings_df = pd.read_csv(zip.open('strings.csv'),na_filter=False)
+        V = np.load(zip.open('V.npy'))
+
+        return Embeddings(
+                            strings=strings_df['string'].values,
+                            counts=torch.tensor(strings_df['count'].values),
+                            score_model=score_model,
+                            weighting_function=weighting_function,
+                            V=torch.tensor(V)
+                            )
+
+
+def load_similarity_model(f,map_location='cpu',**kwargs):
+    return torch.load(f,map_location=map_location,**kwargs)
