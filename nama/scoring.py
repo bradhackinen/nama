@@ -8,9 +8,9 @@ def confusion_df(predicted_matcher, gold_matcher, use_counts=True):
 
     Parameters
     ----------
-    predicted_matcher : Matcher
+    predicted_matcher : MatchGroups
         The predicted matcher object.
-    gold_matcher : Matcher
+    gold_matcher : MatchGroups
         The gold matcher object.
     use_counts : bool, optional
         Use the count of each string. If False, the count is set to 1.
@@ -52,9 +52,9 @@ def confusion_matrix(predicted_matcher, gold_matcher, use_counts=True):
 
     Parameters
     ----------
-    predicted_matcher : Matcher
+    predicted_matcher : MatchGroups
         The predicted matcher object.
-    gold_matcher : Matcher
+    gold_matcher : MatchGroups
         The gold matcher object.
     use_counts : bool, optional
         Use the count of each string. If False, the count is set to 1.
@@ -81,9 +81,9 @@ def score_predicted(
 
     Parameters
     ----------
-    predicted_matcher : Matcher
+    predicted_matcher : MatchGroups
         The predicted matcher object.
-    gold_matcher : Matcher
+    gold_matcher : MatchGroups
         The gold matcher object.
     use_counts : bool, optional
         Use the count of each string. If False, the count is set to 1.
@@ -134,7 +134,7 @@ def split_on_groups(matcher, frac=0.5, seed=None):
 
     Parameters
     ----------
-    matcher : Matcher
+    matcher : MatchGroups
         The matcher object to be split.
     frac : float, optional
         The fraction of groups to select.
@@ -165,7 +165,7 @@ def kfold_on_groups(matcher, k=4, shuffle=True, seed=None):
     Parameters
     ----------
     matcher : object
-        Matcher object to perform K-fold cross validation on.
+        MatchGroups object to perform K-fold cross validation on.
     k : int, optional
         Number of folds to perform, by default 4.
     shuffle : bool, optional
@@ -175,7 +175,7 @@ def kfold_on_groups(matcher, k=4, shuffle=True, seed=None):
 
     Yields
     ------
-    tuple : Matcher, Matcher
+    tuple : MatchGroups, MatchGroups
         A tuple of k matcher objects, the first for the training set and the second for the testing set for each fold.
     """
     if seed is not None:

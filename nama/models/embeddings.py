@@ -8,13 +8,13 @@ from zipfile import ZipFile
 import pickle
 from io import BytesIO
 
-from ..matcher import Matcher
+from ..match_groups import MatchGroups
 
 
 class Embeddings(torch.nn.Module):
     """
     Stores embeddings for a fixed array of strings and provides methods for
-    clustering the strings to create Matcher objects according to different
+    clustering the strings to create MatchGroups objects according to different
     algorithms.
     """
     def __init__(self,strings,V,score_model,weighting_function,counts,device='cpu'):
@@ -73,7 +73,7 @@ class Embeddings(torch.nn.Module):
         """
         if isinstance(arg,slice):
             i = arg
-        elif isinstance(arg, Matcher):
+        elif isinstance(arg, MatchGroups):
             return self[arg.strings()]
         elif hasattr(arg,'__iter__'):
             # Return a subset of the embeddings and their weights
@@ -97,7 +97,7 @@ class Embeddings(torch.nn.Module):
 
     def embed(self,matcher):
         """
-        Construct updated Embeddings with counts from the input Matcher
+        Construct updated Embeddings with counts from the input MatchGroups
         """
         new = self[matcher]
         new.counts = torch.tensor([matcher.counts[s] for s in new.strings],device=self.device)
@@ -133,7 +133,7 @@ class Embeddings(torch.nn.Module):
         groups = np.split(strings,split_locs)
 
         # Build the matcher
-        matcher = Matcher()
+        matcher = MatchGroups()
         matcher.counts = Counter({s:int(c) for s,c in zip(strings,counts)})
         matcher.labels = {s:g[-1] for g in groups for s in g}
         matcher.groups = {g[-1]:list(g) for g in groups}
@@ -213,7 +213,7 @@ class Embeddings(torch.nn.Module):
         pair is skipped. This version of the algorithm requires more memory and processing
         time, but guaruntees deterministic output that is consistent with the constraints.
             
-        returns: Matcher object
+        returns: MatchGroups object
         """
         if group_threshold and group_threshold < threshold:
             raise ValueError('group_threshold must be greater than or equal to threshold')
@@ -221,7 +221,7 @@ class Embeddings(torch.nn.Module):
         group_ids = torch.arange(len(self)).to(self.device)
         
         if always_match is not None:
-            always_matcher = (Matcher(self.strings)
+            always_matcher = (MatchGroups(self.strings)
                             .unite(always_match))
             always_match_labels = always_matcher.labels
 
@@ -466,7 +466,7 @@ class Embeddings(torch.nn.Module):
           string to be matched its nearest target string, while setting threshold=0.9 will leave
           strings that have similarity<0.9 with their nearest target string unaffected)
 
-        returns: Matcher object
+        returns: MatchGroups object
         """
 
         if always_matcher is not None:
@@ -615,4 +615,23 @@ class Embeddings(torch.nn.Module):
                         'score':score,
                         'loss':loss,
                         }
+
+
+def load_embeddings(f):
+    """
+    Load embeddings from custom zipped archive format
+    """
+    with ZipFile(f,'r') as zip:
+        score_model = pickle.loads(zip.read('score_model.pkl'))
+        weighting_function = pickle.loads(zip.read('weighting_function.pkl'))
+        strings_df = pd.read_csv(zip.open('strings.csv'),na_filter=False)
+        V = np.load(zip.open('V.npy'))
+
+        return Embeddings(
+                            strings=strings_df['string'].values,
+                            counts=torch.tensor(strings_df['count'].values),
+                            score_model=score_model,
+                            weighting_function=weighting_function,
+                            V=torch.tensor(V)
+                            )
 

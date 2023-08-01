@@ -10,11 +10,11 @@ from torch.utils.data import DataLoader
 from transformers import get_cosine_schedule_with_warmup,get_linear_schedule_with_warmup, logging
 
 
-from ..matcher import Matcher
+from ..match_groups import MatchGroups
 from ..scoring import score_predicted
 from .scoring_model import SimilarityScore
 from .embeddings import Embeddings
-from .projector_model import TransformerProjector
+from .embedding_model import EmbeddingModel
 
 logging.set_verbosity_error()
 
@@ -33,10 +33,10 @@ class SimilarityModel(nn.Module):
     as its primary output.
 
     - train() jointly optimizes the projector_model and score_model using
-      contrastive learning to learn from a training Matcher.
+      contrastive learning to learn from a training MatchGroups.
     """
     def __init__(self,
-                    projector_class=TransformerProjector,
+                    projector_class=EmbeddingModel,
                     score_class=SimilarityScore,
                     weighting_class=ExponentWeights,
                     **kwargs):
@@ -46,6 +46,7 @@ class SimilarityModel(nn.Module):
         self.projector_model = projector_class(**kwargs)
         self.score_model = score_class(**kwargs)
         self.weighting_function = weighting_class(**kwargs)
+        self.config = kwargs
 
         self.to(kwargs.get('device','cpu'))
 
@@ -56,18 +57,18 @@ class SimilarityModel(nn.Module):
         self.device = device
 
     def save(self,savefile):
-        torch.save(self,savefile)
+        torch.save({'metadata': self.config, 'state_dict': self.state_dict()}, savefile)
 
     @torch.no_grad()
     def embed(self,input,to=None,batch_size=64,progress_bar=True,**kwargs):
         """
-        Construct an Embeddings object from input strings or a Matcher
+        Construct an Embeddings object from input strings or a MatchGroups
         """
 
         if to is None:
             to = self.device
 
-        if isinstance(input, Matcher):
+        if isinstance(input, MatchGroups):
             strings = input.strings()
             counts = torch.tensor([input.counts[s] for s in strings],device=self.device).float().to(to)
 
@@ -356,5 +357,17 @@ class SimilarityModel(nn.Module):
 
 
 
+def load_similarity_model(f,map_location='cpu',*args,**kwargs):
+    checkpoint = torch.load(f, map_location=map_location, **kwargs)
+    metadata = checkpoint['metadata']
+    state_dict = checkpoint['state_dict']
+
+    model = SimilarityModel(**metadata)
+    model.load_state_dict(state_dict)
+
+    return model
+    #return torch.load(f,map_location=map_location,**kwargs)
+
+    
 
 

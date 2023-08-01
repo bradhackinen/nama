@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoTokenizer,RobertaModel
 
-class TransformerProjector(torch.nn.Module):
+class EmbeddingModel(torch.nn.Module):
     """
     A basic wrapper around a Hugging Face transformer model.
     Takes a string as input and produces an embedding vector of size d.

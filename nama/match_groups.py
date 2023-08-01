@@ -11,12 +11,12 @@ import matplotlib as mplt
 MAX_STR = 50
 
 
-class Matcher():
+class MatchGroups():
     """A class for grouping strings based on set membership.  Supports splitting and uniting of groups."""
 
     def __init__(self, strings=None):
         """
-        Initialize Matcher object.
+        Initialize MatchGroups object.
 
         Parameters
         ----------
@@ -35,11 +35,11 @@ class Matcher():
         return len(self.labels)
 
     def __repr__(self):
-        """Return a string representation of the Matcher object."""
-        return f'<nama.Matcher containing {len(self)} strings in {len(self.groups)} groups>'
+        """Return a string representation of the MatchGroups object."""
+        return f'<nama.MatchGroups containing {len(self)} strings in {len(self.groups)} groups>'
 
     def __str__(self):
-        """Return a string representation of the groups of a Matcher object."""
+        """Return a string representation of the groups of a MatchGroups object."""
         output = self.__repr__()
         remaining = MAX_STR
         for group in self.groups.values():
@@ -79,8 +79,8 @@ class Matcher():
             yield i, g
 
     def copy(self):
-        """Return a copy of the Matcher object."""
-        new_matcher = Matcher()
+        """Return a copy of the MatchGroups object."""
+        new_matcher = MatchGroups()
         new_matcher.counts = self.counts.copy()
         new_matcher.labels = self.labels.copy()
         new_matcher.groups = self.groups.copy()
@@ -100,15 +100,15 @@ class Matcher():
 
         Parameters
         ----------
-        arg : str, Counter, Matcher, Iterable
+        arg : str, Counter, MatchGroups, Iterable
             String or group of strings to add to the matcher
         inplace : bool, optional
-            If True, add strings to the existing Matcher object, by default False
+            If True, add strings to the existing MatchGroups object, by default False
 
         Returns
         -------
-        Matcher
-            The updated Matcher object
+        MatchGroups
+            The updated MatchGroups object
         """
         if isinstance(arg, str):
             counts = {arg: 1}
@@ -116,7 +116,7 @@ class Matcher():
         elif isinstance(arg, Counter):
             counts = arg
 
-        elif isinstance(arg, Matcher):
+        elif isinstance(arg, MatchGroups):
             counts = arg.counts
 
         elif hasattr(arg, '__next__') or hasattr(arg, '__iter__'):
@@ -142,12 +142,12 @@ class Matcher():
         strings : list or str
             String or list of strings to remove from the matcher
         inplace : bool, optional
-            If True, remove strings from the existing Matcher object, by default False
+            If True, remove strings from the existing MatchGroups object, by default False
 
         Returns
         -------
-        Matcher
-            The updated Matcher object
+        MatchGroups
+            The updated MatchGroups object
         """
         if isinstance(strings, str):
             strings = [strings]
@@ -192,12 +192,12 @@ class Matcher():
         strings : list
             List of strings to keep in the matcher
         inplace : bool, optional
-            If True, drop strings from the existing Matcher object, by default False
+            If True, drop strings from the existing MatchGroups object, by default False
 
         Returns
         -------
-        Matcher
-            The updated Matcher object
+        MatchGroups
+            The updated MatchGroups object
         """
         strings = set(strings)
 
@@ -253,23 +253,23 @@ class Matcher():
         - A nested list to unite each set of strings
         - A dictionary mapping strings to labels to unite by label
         - A function mapping strings to labels to unite by label
-        - A Matcher instance to unite by Matcher groups
+        - A MatchGroups instance to unite by MatchGroups groups
 
         Parameters
         ----------
-        arg : list, dict, function or Matcher instance
+        arg : list, dict, function or MatchGroups instance
             Argument representing the strings or labels to merge.
         inplace : bool, optional
-            Whether to perform the operation in place or return a new Matcher.
+            Whether to perform the operation in place or return a new MatchGroups.
         kwargs : dict, optional
             Additional arguments to be passed to predict_matcher method if arg
             is a similarity model with a predict_matcher method.
 
         Returns
         -------
-        Matcher
-            The updated Matcher object. If `inplace` is True, the updated object
-            is returned, else a new Matcher object with the updates is returned.
+        MatchGroups
+            The updated MatchGroups object. If `inplace` is True, the updated object
+            is returned, else a new MatchGroups object with the updates is returned.
         """
 
         if not inplace:
@@ -278,7 +278,7 @@ class Matcher():
         if isinstance(arg, str):
             raise ValueError('Cannot unite a single string')
 
-        elif isinstance(arg, Matcher):
+        elif isinstance(arg, MatchGroups):
             self.unite(arg.groups.values(), inplace=True)
 
         elif hasattr(arg, 'predict_matcher'):
@@ -333,13 +333,13 @@ class Matcher():
         strings : str or list of str
             The string(s) to split into singleton groups.
         inplace : bool, optional
-            Whether to perform the operation in place or return a new Matcher.
+            Whether to perform the operation in place or return a new MatchGroups.
 
         Returns
         -------
-        Matcher
-            The updated Matcher object. If `inplace` is True, the updated object
-            is returned, else a new Matcher object with the updates is returned.
+        MatchGroups
+            The updated MatchGroups object. If `inplace` is True, the updated object
+            is returned, else a new MatchGroups object with the updates is returned.
         """
         if not inplace:
             self = self.copy()
@@ -381,13 +381,13 @@ class Matcher():
         Parameters
         ----------
         inplace : bool, optional
-            Whether to perform the operation in place or return a new Matcher.
+            Whether to perform the operation in place or return a new MatchGroups.
 
         Returns
         -------
-        Matcher
-            The updated Matcher object. If `inplace` is True, the updated object
-            is returned, else a new Matcher object with the updates is returned.
+        MatchGroups
+            The updated MatchGroups object. If `inplace` is True, the updated object
+            is returned, else a new MatchGroups object with the updates is returned.
         """
         if not inplace:
             self = self.copy()
@@ -422,8 +422,8 @@ class Matcher():
 
         Returns
         -------
-        self: Matcher
-            Returns the Matcher object after the separation operation.
+        self: MatchGroups
+            Returns the MatchGroups object after the separation operation.
 
         """
         if not inplace:
@@ -562,7 +562,7 @@ class Matcher():
 
     def reset_counts(self, inplace=False):
         """
-        Reset the counts of strings in the Matcher object.
+        Reset the counts of strings in the MatchGroups object.
 
         Parameters
         ----------
@@ -571,8 +571,8 @@ class Matcher():
 
         Returns
         -------
-        self: Matcher
-            Returns the Matcher object after the reset operation.
+        self: MatchGroups
+            Returns the MatchGroups object after the reset operation.
 
         """
         if not inplace:
@@ -701,3 +701,170 @@ class Matcher():
         merged_df = merged_df[[c for c in merged_df.columns if c in list(left_df.columns) + list(right_df.columns)]]
 
         return merged_df
+
+
+def from_df(
+        df,
+        match_format='detect',
+        pair_columns=[
+            'string0',
+            'string1'],
+    string_column='string',
+    group_column='group',
+        count_column='count'):
+    """
+    Construct a new matcher from a pandas DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The input dataframe.
+    match_format : str, optional
+        The format of the dataframe, by default "detect".
+        It can be one of ['unmatched', 'groups', 'pairs', 'detect'].
+    pair_columns : list of str, optional
+        The columns names containing the string pairs, by default ['string0','string1'].
+    string_column : str, optional
+        The column name containing the strings, by default 'string'.
+    group_column : str, optional
+        The column name containing the groups, by default 'group'.
+    count_column : str, optional
+        The column name containing the counts, by default 'count'.
+
+    Returns
+    -------
+    MatchGroups
+        The constructed MatchGroups object.
+
+    Raises
+    ------
+    ValueError
+        If the input `match_format` is not one of ['unmatched', 'groups', 'pairs', 'detect'].
+    ValueError
+        If the `match_format` is 'detect' and the input dataframe format could not be inferred.
+
+    Notes
+    -----
+    The function accepts two formats of the input dataframe:
+
+        - "groups": The standard format for a matcher dataframe. It includes a
+          string column, and a "group" column that contains group labels, and an
+          optional "count" column. These three columns completely describe a
+          matcher object, allowing lossless matcher -> dataframe -> matcher
+          conversion (though the specific group labels in the dataframe will be
+          ignored and rebuilt in the new matcher).
+
+        - "pairs": The dataframe includes two string columns, and each row indicates
+          a link between a pair of strings. A new matcher will be constructed by
+          uniting each pair of strings.
+    """
+
+    if match_format not in ['unmatched', 'groups', 'pairs', 'detect']:
+        raise ValueError(
+            'match_format must be one of "unmatched", "groups", "pairs", or "detect"')
+
+    # Create an empty matcher
+    matcher = MatchGroups()
+
+    if match_format == 'detect':
+        if (string_column in df.columns):
+            if group_column is None:
+                match_format = 'unmatched'
+            elif (group_column in df.columns):
+                match_format = 'groups'
+        elif set(df.columns) == set(pair_columns):
+            match_format = 'pairs'
+
+    if match_format == 'detect':
+        raise ValueError('Could not infer valid dataframe format from input')
+
+    if count_column in df.columns:
+        counts = df[count_column].values
+    else:
+        counts = np.ones(len(df))
+
+    if match_format == 'unmatched':
+        strings = df[string_column].values
+
+        # Build the matcher
+        matcher.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        matcher.labels = {s: s for s in strings}
+        matcher.groups = {s: [s] for s in strings}
+
+    elif match_format == 'groups':
+
+        strings = df[string_column].values
+        group_ids = df[group_column].values
+
+        # Sort by group and string count
+        g_sort = np.lexsort((counts, group_ids))
+        group_ids = group_ids[g_sort]
+        strings = strings[g_sort]
+        counts = counts[g_sort]
+
+        # Identify group boundaries and split locations
+        split_locs = np.nonzero(group_ids[1:] != group_ids[:-1])[0] + 1
+
+        # Get grouped strings as separate arrays
+        groups = np.split(strings, split_locs)
+
+        # Build the matcher
+        matcher.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        matcher.labels = {s: g[-1] for g in groups for s in g}
+        matcher.groups = {g[-1]: list(g) for g in groups}
+
+    elif match_format == 'pairs':
+        # TODO: Allow pairs data to use counts
+        for pair_column in pair_columns:
+            matcher.add_strings(df[pair_column].values, inplace=True)
+
+        # There are several ways to unite pairs
+        # Guessing it is most efficient to "group by" one of the string columns
+        groups = {s: pair[1] for pair in df[pair_columns].values for s in pair}
+
+        matcher.unite(groups, inplace=True)
+
+    return matcher
+
+
+def read_csv(
+        filename,
+        match_format='detect',
+        pair_columns=[
+            'string0',
+            'string1'],
+    string_column='string',
+    group_column='group',
+    count_column='count',
+        **pandas_args):
+    """
+    Read a csv file and construct a new matcher.
+
+    Parameters
+    ----------
+    filename : str
+        The path to the csv file.
+    match_format : str, optional (default='detect')
+        One of "unmatched", "groups", "pairs", or "detect".
+    pair_columns : list of str, optional (default=['string0', 'string1'])
+        Two string columns to use if match_format='pairs'.
+    string_column : str, optional (default='string')
+        Column name for string values in match_format='unmatched' or 'groups'.
+    group_column : str, optional (default='group')
+        Column name for group values in match_format='groups'.
+    count_column : str, optional (default='count')
+        Column name for count values in match_format='unmatched' or 'groups'.
+    **pandas_args : optional
+        Optional arguments to pass to `pandas.read_csv`.
+
+    Returns
+    -------
+    MatchGroups
+        A new matcher built from the csv file.
+    """
+    df = pd.read_csv(filename, **pandas_args, na_filter=False)
+    df = df.astype(str)
+
+    return from_df(df, match_format=match_format, pair_columns=pair_columns,
+                   string_column=string_column, group_column=group_column,
+                   count_column=count_column)
