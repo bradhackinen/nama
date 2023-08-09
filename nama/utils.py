@@ -59,19 +59,19 @@ def simplify_corp(s):
 
 # MatchGroups Tools
 
-# def plot(matchers, strings, matcher_names=None, ax=None):
+# def plot(groupings, strings, grouping_names=None, ax=None):
 #     """
-#     Plots strings and their parent groups for multiple matchers as a graph, with
+#     Plots strings and their parent groups for multiple groupings as a graph, with
 #     groups represented as nodes that connect strings.
 
 #     Parameters
 #     ----------
-#     matchers : MatchGroups or list of MatchGroups
-#         a matcher or list of matchers to plot
+#     groupings : MatchGroups or list of MatchGroups
+#         a grouping or list of groupings to plot
 #     strings : str or list of str
 #         a string or list of strings to plot (all connected strings will also be plotted)
-#     matcher_names : list of str, optional
-#         a list of strings to label matchers in the plot legend
+#     grouping_names : list of str, optional
+#         a list of strings to label groupings in the plot legend
 #     ax : matplotlib.axes._subplots.AxesSubplot, optional
 #         a matplotlib axis object to draw the plot on.
 
@@ -81,26 +81,26 @@ def simplify_corp(s):
 #         The matplotlib axis object with the plot.
 #     """
 
-#     if isinstance(matchers, MatchGroups):
-#         matchers = [matchers]
+#     if isinstance(groupings, MatchGroups):
+#         groupings = [groupings]
 
 #     if isinstance(strings, str):
 #         strings = [strings]
 
-#     if not matcher_names:
-#         matcher_names = [f'matcher{i}' for i in range(len(matchers))]
-#     elif not (len(matcher_names) == len(matchers)):
-#         raise ValueError('matcher_names must be the same length as matchers')
+#     if not grouping_names:
+#         grouping_names = [f'grouping{i}' for i in range(len(groupings))]
+#     elif not (len(grouping_names) == len(groupings)):
+#         raise ValueError('grouping_names must be the same length as groupings')
 
 #     def varname(x): return f'{x=}'.split('=')[0]
 
 #     # First build graph representation of the parent groups
 #     G = nx.Graph()
-#     for i, matcher in enumerate(matchers):
-#         m_groups = set(matcher[strings])
+#     for i, grouping in enumerate(groupings):
+#         m_groups = set(grouping[strings])
 #         for g in m_groups:
-#             group_node = f'{matcher_names[i]}: {g}'
-#             string_nodes = matcher.groups[g]
+#             group_node = f'{grouping_names[i]}: {g}'
+#             string_nodes = grouping.groups[g]
 #             G.add_nodes_from(string_nodes, type='string', color='w')
 #             if len(string_nodes) > 1:
 #                 G.add_nodes_from(
@@ -167,7 +167,7 @@ def simplify_corp(s):
 #             markersize=15,
 #             marker='.',
 #             label=f'{name}') for i,
-#         name in enumerate(matcher_names)]
+#         name in enumerate(grouping_names)]
 #     plt.legend(handles=legend_handles,
 #                bbox_to_anchor=(0.5, -0.2), loc='lower center',
 #                ncol=3, borderaxespad=0)

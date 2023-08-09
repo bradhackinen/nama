@@ -110,18 +110,18 @@ class SimilarityModel(nn.Module):
                             weighting_function=weighting_function,
                             device=to)
 
-    def train(self,training_matcher,max_epochs=1,batch_size=8,
+    def train(self,training_groupings,max_epochs=1,batch_size=8,
                 score_decay=0,regularization=0,
                 transformer_lr=1e-5,projection_lr=1e-5,score_lr=10,warmup_frac=0.1,
                 max_grad_norm=1,dropout=False,
-                validation_matcher=None,target='F1',restore_best=True,val_seed=None,
+                validation_groupings=None,target='F1',restore_best=True,val_seed=None,
                 validation_interval=1000,early_stopping=True,early_stopping_patience=3,
                 verbose=False,progress_bar=True,
                 **kwargs):
 
         """
         Train the projector_model and score_model to predict match probabilities
-        using the training_matcher as a source of "correct" matches.
+        using the training_groupings as a source of "correct" matches.
         Training algorithm uses contrastive learning with hard-positive
         and hard-negative mining to fine tune the projector model to place
         matched strings near to each other in embedding space, while
@@ -129,11 +129,11 @@ class SimilarityModel(nn.Module):
         probabilities as a function of cosine distance
         """
 
-        if validation_matcher is None:
+        if validation_groupings is None:
             early_stopping = False
             restore_best = False
 
-        num_training_steps = max_epochs*len(training_matcher)//batch_size
+        num_training_steps = max_epochs*len(training_groupings)//batch_size
         num_warmup_steps = int(warmup_frac*num_training_steps)
 
         if transformer_lr or projection_lr:
@@ -154,13 +154,13 @@ class SimilarityModel(nn.Module):
         self.val_scores = []
         for epoch in range(max_epochs):
 
-            global_embeddings = self.embed(training_matcher)
+            global_embeddings = self.embed(training_groupings)
 
             strings = global_embeddings.strings
             V = global_embeddings.V
             w = global_embeddings.w
 
-            groups = torch.tensor([global_embeddings.string_map[training_matcher[s]] for s in strings],device=self.device)
+            groups = torch.tensor([global_embeddings.string_map[training_groupings[s]] for s in strings],device=self.device)
 
             # Normalize weights to make learning rates more general
             if w is not None:
@@ -290,10 +290,10 @@ class SimilarityModel(nn.Module):
                 self.history.append(h)
                 step += 1
 
-                if (validation_matcher is not None) and not (step % validation_interval):
+                if (validation_groupings is not None) and not (step % validation_interval):
 
                     validation = len(self.validation_scores)
-                    val_scores = self.test(validation_matcher)
+                    val_scores = self.test(validation_groupings)
                     val_scores['step'] = step - 1
                     val_scores['epoch'] = epoch
                     val_scores['validation'] = validation
@@ -335,12 +335,12 @@ class SimilarityModel(nn.Module):
         embeddings = self.embed(input,**kwargs)
         return embeddings.unite_similar(**kwargs)
 
-    def test(self,gold_matcher, threshold=0.5, **kwargs):
-        embeddings = self.embed(gold_matcher, **kwargs)
+    def test(self,gold_groupings, threshold=0.5, **kwargs):
+        embeddings = self.embed(gold_groupings, **kwargs)
 
         if (isinstance(threshold, float)):
             predicted = embeddings.unite_similar(threshold=threshold, **kwargs)
-            scores = score_predicted(predicted, gold_matcher, use_counts=True)
+            scores = score_predicted(predicted, gold_groupings, use_counts=True)
 
             return scores
         
@@ -348,7 +348,7 @@ class SimilarityModel(nn.Module):
         for thres in threshold:
             predicted = embeddings.unite_similar(threshold=thres, **kwargs)
 
-            scores = score_predicted(predicted, gold_matcher, use_counts=True)
+            scores = score_predicted(predicted, gold_groupings, use_counts=True)
             scores["threshold"] = thres
             results.append(scores)
 

@@ -21,7 +21,7 @@ class MatchGroups():
         Parameters
         ----------
         strings : list, optional
-            List of strings to add to the matcher, by default None
+            List of strings to add to the match groups object, by default None
         """
         self.counts = Counter()
         self.labels = {}
@@ -31,7 +31,7 @@ class MatchGroups():
             self.add_strings(strings, inplace=True)
 
     def __len__(self):
-        """Return the number of strings in the matcher."""
+        """Return the number of strings in the match groups object."""
         return len(self.labels)
 
     def __repr__(self):
@@ -56,7 +56,7 @@ class MatchGroups():
         return output
 
     def __contains__(self, s):
-        """Return True if string is in the matcher, False otherwise."""
+        """Return True if string is in the match groups object, False otherwise."""
         return s in self.labels
 
     def __getitem__(self, strings):
@@ -66,10 +66,10 @@ class MatchGroups():
         else:
             return [self.labels[s] for s in strings]
 
-    def __add__(self, matcher):
-        """Add two matchers together and return the result."""
-        result = self.add_strings(matcher)
-        result.unite(matcher, inplace=True)
+    def __add__(self, match_obj):
+        """Add two match groups objects together and return the result."""
+        result = self.add_strings(match_obj)
+        result.unite(match_obj, inplace=True)
 
         return result
 
@@ -80,15 +80,15 @@ class MatchGroups():
 
     def copy(self):
         """Return a copy of the MatchGroups object."""
-        new_matcher = MatchGroups()
-        new_matcher.counts = self.counts.copy()
-        new_matcher.labels = self.labels.copy()
-        new_matcher.groups = self.groups.copy()
+        new_match_obj = MatchGroups()
+        new_match_obj.counts = self.counts.copy()
+        new_match_obj.labels = self.labels.copy()
+        new_match_obj.groups = self.groups.copy()
 
-        return new_matcher
+        return new_match_obj
 
     def strings(self):
-        """Return a list of strings in the matcher. Order is not guaranteed."""
+        """Return a list of strings in the match groups object. Order is not guaranteed."""
         return list(self.labels.keys())
 
     def matches(self, string):
@@ -96,12 +96,12 @@ class MatchGroups():
         return self.groups[self.labels[string]]
 
     def add_strings(self, arg, inplace=False):
-        """Add new strings to the matcher.
+        """Add new strings to the match groups object.
 
         Parameters
         ----------
         arg : str, Counter, MatchGroups, Iterable
-            String or group of strings to add to the matcher
+            String or group of strings to add to the match groups object
         inplace : bool, optional
             If True, add strings to the existing MatchGroups object, by default False
 
@@ -135,12 +135,12 @@ class MatchGroups():
         return self
 
     def drop(self, strings, inplace=False):
-        """Remove strings from the matcher.
+        """Remove strings from the match groups object.
 
         Parameters
         ----------
         strings : list or str
-            String or list of strings to remove from the matcher
+            String or list of strings to remove from the match groups object
         inplace : bool, optional
             If True, remove strings from the existing MatchGroups object, by default False
 
@@ -185,12 +185,12 @@ class MatchGroups():
         return self
 
     def keep(self, strings, inplace=False):
-        """Drop all strings from the matcher except the passed strings.
+        """Drop all strings from the match groups object except the passed strings.
 
         Parameters
         ----------
         strings : list
-            List of strings to keep in the matcher
+            List of strings to keep in the match groups object
         inplace : bool, optional
             If True, drop strings from the existing MatchGroups object, by default False
 
@@ -207,13 +207,13 @@ class MatchGroups():
 
     def _unite_strings(self, strings):
         """
-        Unite strings in the matcher without checking argument type.
+        Unite strings in the match groups object without checking argument type.
         Intended as a low-level function called by self.unite()
 
         Parameters
         ----------
         strings : list
-            List of strings to unite in the matcher
+            List of strings to unite in the match groups object
 
         Returns
         -------
@@ -262,8 +262,8 @@ class MatchGroups():
         inplace : bool, optional
             Whether to perform the operation in place or return a new MatchGroups.
         kwargs : dict, optional
-            Additional arguments to be passed to predict_matcher method if arg
-            is a similarity model with a predict_matcher method.
+            Additional arguments to be passed to predict_groupings method if arg
+            is a similarity model with a predict_groupings method.
 
         Returns
         -------
@@ -281,10 +281,10 @@ class MatchGroups():
         elif isinstance(arg, MatchGroups):
             self.unite(arg.groups.values(), inplace=True)
 
-        elif hasattr(arg, 'predict_matcher'):
-            # Unite can accept a similarity model if it has a predict_matcher
+        elif hasattr(arg, 'unite_similar'):
+            # Unite can accept a similarity model if it has a unite_similar
             # method
-            self.unite(arg.predict_matcher(self, **kwargs))
+            self.unite(arg.unite_similar(self, **kwargs))
 
         elif callable(arg):
             # Assume arg is a mapping from strings to labels and unite by label
@@ -584,7 +584,7 @@ class MatchGroups():
 
     def to_df(self, singletons=True, sort_groups=True):
         """
-        Convert the matcher to a dataframe with string, count and group columns.
+        Convert the match groups object to a dataframe with string, count and group columns.
 
         Parameters
         ----------
@@ -617,7 +617,7 @@ class MatchGroups():
 
     def to_csv(self, filename, singletons=True, **pandas_args):
         """
-        Save the matcher as a csv file with string, count and group columns.
+        Save the match groups object as a csv file with string, count and group columns.
 
         Parameters
         ----------
@@ -713,7 +713,7 @@ def from_df(
     group_column='group',
         count_column='count'):
     """
-    Construct a new matcher from a pandas DataFrame.
+    Construct a new match groups object from a pandas DataFrame.
 
     Parameters
     ----------
@@ -747,15 +747,15 @@ def from_df(
     -----
     The function accepts two formats of the input dataframe:
 
-        - "groups": The standard format for a matcher dataframe. It includes a
+        - "groups": The standard format for a match groups object dataframe. It includes a
           string column, and a "group" column that contains group labels, and an
           optional "count" column. These three columns completely describe a
-          matcher object, allowing lossless matcher -> dataframe -> matcher
+          match groups object, allowing lossless match groups object -> dataframe -> match groups object
           conversion (though the specific group labels in the dataframe will be
-          ignored and rebuilt in the new matcher).
+          ignored and rebuilt in the new match groups object).
 
         - "pairs": The dataframe includes two string columns, and each row indicates
-          a link between a pair of strings. A new matcher will be constructed by
+          a link between a pair of strings. A new match groups object will be constructed by
           uniting each pair of strings.
     """
 
@@ -763,8 +763,8 @@ def from_df(
         raise ValueError(
             'match_format must be one of "unmatched", "groups", "pairs", or "detect"')
 
-    # Create an empty matcher
-    matcher = MatchGroups()
+    # Create an empty match groups object
+    match_obj = MatchGroups()
 
     if match_format == 'detect':
         if (string_column in df.columns):
@@ -786,10 +786,10 @@ def from_df(
     if match_format == 'unmatched':
         strings = df[string_column].values
 
-        # Build the matcher
-        matcher.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
-        matcher.labels = {s: s for s in strings}
-        matcher.groups = {s: [s] for s in strings}
+        # Build the match groups object
+        match_obj.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        match_obj.labels = {s: s for s in strings}
+        match_obj.groups = {s: [s] for s in strings}
 
     elif match_format == 'groups':
 
@@ -808,23 +808,23 @@ def from_df(
         # Get grouped strings as separate arrays
         groups = np.split(strings, split_locs)
 
-        # Build the matcher
-        matcher.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
-        matcher.labels = {s: g[-1] for g in groups for s in g}
-        matcher.groups = {g[-1]: list(g) for g in groups}
+        # Build the match groups object
+        match_obj.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        match_obj.labels = {s: g[-1] for g in groups for s in g}
+        match_obj.groups = {g[-1]: list(g) for g in groups}
 
     elif match_format == 'pairs':
         # TODO: Allow pairs data to use counts
         for pair_column in pair_columns:
-            matcher.add_strings(df[pair_column].values, inplace=True)
+            match_obj.add_strings(df[pair_column].values, inplace=True)
 
         # There are several ways to unite pairs
         # Guessing it is most efficient to "group by" one of the string columns
         groups = {s: pair[1] for pair in df[pair_columns].values for s in pair}
 
-        matcher.unite(groups, inplace=True)
+        match_obj.unite(groups, inplace=True)
 
-    return matcher
+    return match_obj
 
 
 def read_csv(
@@ -838,7 +838,7 @@ def read_csv(
     count_column='count',
         **pandas_args):
     """
-    Read a csv file and construct a new matcher.
+    Read a csv file and construct a new match groups object.
 
     Parameters
     ----------
@@ -860,7 +860,7 @@ def read_csv(
     Returns
     -------
     MatchGroups
-        A new matcher built from the csv file.
+        A new match groups object built from the csv file.
     """
     df = pd.read_csv(filename, **pandas_args, na_filter=False)
     df = df.astype(str)
