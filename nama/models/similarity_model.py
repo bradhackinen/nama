@@ -29,21 +29,21 @@ class ExponentWeights():
 
 class SimilarityModel(nn.Module):
     """
-    A combined projector/scorer model that produces Embeddings objects
+    A combined embedding/scorer model that produces Embeddings objects
     as its primary output.
 
-    - train() jointly optimizes the projector_model and score_model using
+    - train() jointly optimizes the embedding_model and score_model using
       contrastive learning to learn from a training MatchGroups.
     """
     def __init__(self,
-                    projector_class=EmbeddingModel,
+                    embedding_class=EmbeddingModel,
                     score_class=SimilarityScore,
                     weighting_class=ExponentWeights,
                     **kwargs):
 
         super().__init__()
 
-        self.projector_model = projector_class(**kwargs)
+        self.embedding_model = embedding_class(**kwargs)
         self.score_model = score_class(**kwargs)
         self.weighting_function = weighting_class(**kwargs)
         self.config = kwargs
@@ -52,7 +52,7 @@ class SimilarityModel(nn.Module):
 
     def to(self,device):
         super().to(device)
-        self.projector_model.to(device)
+        self.embedding_model.to(device)
         self.score_model.to(device)
         self.device = device
 
@@ -78,14 +78,14 @@ class SimilarityModel(nn.Module):
 
         input_loader = DataLoader(strings,batch_size=batch_size,num_workers=0)
 
-        self.projector_model.eval()
+        self.embedding_model.eval()
 
         V = None
         batch_start = 0
         with tqdm(total=len(strings),delay=1,desc='Embedding strings',disable=not progress_bar) as pbar:
             for batch_strings in input_loader:
 
-                v = self.projector_model(batch_strings).detach().to(to)
+                v = self.embedding_model(batch_strings).detach().to(to)
 
                 if V is None:
                     # Use v to determine dim and dtype of pre-allocated embedding tensor
@@ -120,10 +120,10 @@ class SimilarityModel(nn.Module):
                 **kwargs):
 
         """
-        Train the projector_model and score_model to predict match probabilities
+        Train the embedding_model and score_model to predict match probabilities
         using the training_groupings as a source of "correct" matches.
         Training algorithm uses contrastive learning with hard-positive
-        and hard-negative mining to fine tune the projector model to place
+        and hard-negative mining to fine tune the embedding model to place
         matched strings near to each other in embedding space, while
         simulataneously calibrating the score_model to predict the match
         probabilities as a function of cosine distance
@@ -137,7 +137,7 @@ class SimilarityModel(nn.Module):
         num_warmup_steps = int(warmup_frac*num_training_steps)
 
         if transformer_lr or projection_lr:
-            embedding_optimizer = self.projector_model.config_optimizer(transformer_lr,projection_lr)
+            embedding_optimizer = self.embedding_model.config_optimizer(transformer_lr,projection_lr)
             embedding_scheduler = get_cosine_schedule_with_warmup(
                                         embedding_optimizer,
                                         num_warmup_steps=num_warmup_steps,
@@ -170,9 +170,9 @@ class SimilarityModel(nn.Module):
             random.shuffle(shuffled_ids)
 
             if dropout:
-                self.projector_model.train()
+                self.embedding_model.train()
             else:
-                self.projector_model.eval()
+                self.embedding_model.eval()
 
             for batch_start in tqdm(range(0,len(strings),batch_size),desc=f'training epoch {epoch}',disable=not progress_bar):
 
@@ -191,7 +191,7 @@ class SimilarityModel(nn.Module):
                 to the embeddings and prevent the same pairs from being selected
                 every time.
                 """
-                V_i = self.projector_model(strings[batch_i])
+                V_i = self.embedding_model(strings[batch_i])
 
                 # Update global embedding cache
                 V[batch_i,:] = V_i.detach()
@@ -233,10 +233,10 @@ class SimilarityModel(nn.Module):
 
                 h['global_loss'] = global_loss.detach().nanmean().item()
 
-                # Train projector model
+                # Train embedding model
                 if (transformer_lr or projection_lr) and step <= num_warmup_steps + num_training_steps:
 
-                    # Turn off score model updating - only want to train projector here
+                    # Turn off score model updating - only want to train embedding here
                     self.score_model.requires_grad_(False)
 
                     # Select hard training examples
@@ -249,7 +249,7 @@ class SimilarityModel(nn.Module):
                             batch_W = None
 
                     # Train the model on the selected high-loss pairs
-                    V_j = self.projector_model(strings[batch_j.tolist()])
+                    V_j = self.embedding_model(strings[batch_j.tolist()])
 
                     # Update global embedding cache
                     V[batch_j,:] = V_j.detach()
@@ -268,7 +268,7 @@ class SimilarityModel(nn.Module):
                             gor_X = (V_i@V_i.T)*gor_Y
                             gor_m1 = 0.5*gor_X.sum()/gor_n
                             gor_m2 = 0.5*(gor_X**2).sum()/gor_n
-                            batch_loss += regularization*(gor_m1 + torch.clamp(gor_m2 - 1/self.projector_model.d,min=0))
+                            batch_loss += regularization*(gor_m1 + torch.clamp(gor_m2 - 1/self.embedding_model.d,min=0))
 
                     h['batch_nan'] = torch.isnan(batch_loss.detach()).sum().item()
 
