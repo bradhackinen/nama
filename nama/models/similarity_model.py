@@ -8,7 +8,8 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from transformers import get_cosine_schedule_with_warmup,get_linear_schedule_with_warmup, logging
-
+import requests
+from io import BytesIO
 
 from ..match_groups import MatchGroups
 from ..scoring import score_predicted
@@ -355,9 +356,10 @@ class SimilarityModel(nn.Module):
         
         return results
 
+def debug_state_dict(f, **kwargs):
+    return torch.load(f, map_location='cpu', **kwargs)
 
-
-def load_similarity_model(f,map_location='cpu',*args,**kwargs):
+def load_similarity_model(f,map_location='cpu',**kwargs):
     checkpoint = torch.load(f, map_location=map_location, **kwargs)
     metadata = checkpoint['metadata']
     state_dict = checkpoint['state_dict']
@@ -368,6 +370,16 @@ def load_similarity_model(f,map_location='cpu',*args,**kwargs):
     return model
     #return torch.load(f,map_location=map_location,**kwargs)
 
+
+def load_pretrained_model(model='base', map_location='cpu', **kwargs):
+
+    if model.lower() not in ["base"]:
+        raise ValueError("Model must be 'base'")
+
+    response = requests.get(f"https://huggingface.co/beny2000/nama/resolve/main/nama-{model.lower()}.bin")
+    model_data = BytesIO(response.content)
+    
+    return load_similarity_model(model_data, map_location=map_location, **kwargs)
     
 
 
