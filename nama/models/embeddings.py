@@ -8,13 +8,13 @@ from zipfile import ZipFile
 import pickle
 from io import BytesIO
 
-from ..match_groups import MatchGroups
+from ..match_data import MatchData
 
 
 class Embeddings(torch.nn.Module):
     """
     Stores embeddings for a fixed array of strings and provides methods for
-    clustering the strings to create MatchGroups objects according to different
+    clustering the strings to create MatchData objects according to different
     algorithms.
     """
     def __init__(self,strings,V,score_model,weighting_function,counts,device='cpu'):
@@ -73,7 +73,7 @@ class Embeddings(torch.nn.Module):
         """
         if isinstance(arg,slice):
             i = arg
-        elif isinstance(arg, MatchGroups):
+        elif isinstance(arg, MatchData):
             return self[arg.strings()]
         elif hasattr(arg,'__iter__'):
             # Return a subset of the embeddings and their weights
@@ -95,12 +95,12 @@ class Embeddings(torch.nn.Module):
 
         return new
 
-    def embed(self,grouping):
+    def embed(self,matches):
         """
-        Construct updated Embeddings with counts from the input MatchGroups
+        Construct updated Embeddings with counts from the input MatchData
         """
-        new = self[grouping]
-        new.counts = torch.tensor([grouping.counts[s] for s in new.strings],device=self.device)
+        new = self[matches]
+        new.counts = torch.tensor([matches.counts[s] for s in new.strings],device=self.device)
         new.w = new.weighting_function(new.counts)
 
         return new
@@ -108,9 +108,9 @@ class Embeddings(torch.nn.Module):
     def __len__(self):
         return len(self.strings)
 
-    def _group_to_ids(self,grouping):
-        group_id_map = {g:i for i,g in enumerate(grouping.groups.keys())}
-        group_ids = torch.tensor([group_id_map[grouping[s]] for s in self.strings]).to(self.device)
+    def _group_to_ids(self,matches):
+        group_id_map = {g:i for i,g in enumerate(matches.groups.keys())}
+        group_ids = torch.tensor([group_id_map[matches[s]] for s in self.strings]).to(self.device)
         return group_ids
 
     def _ids_to_group(self,group_ids):
@@ -132,13 +132,13 @@ class Embeddings(torch.nn.Module):
         # Get grouped strings as separate arrays
         groups = np.split(strings,split_locs)
 
-        # Build the groupings
-        grouping = MatchGroups()
-        grouping.counts = Counter({s:int(c) for s,c in zip(strings,counts)})
-        grouping.labels = {s:g[-1] for g in groups for s in g}
-        grouping.groups = {g[-1]:list(g) for g in groups}
+        # Build the matches
+        matches = MatchData()
+        matches.counts = Counter({s:int(c) for s,c in zip(strings,counts)})
+        matches.labels = {s:g[-1] for g in groups for s in g}
+        matches.groups = {g[-1]:list(g) for g in groups}
 
-        return grouping
+        return matches
 
     @torch.no_grad()
     def _fast_unite_similar(self,group_ids,threshold=0.5,progress_bar=True,batch_size=64):
@@ -209,11 +209,11 @@ class Embeddings(torch.nn.Module):
         If "group_threshold" or "never_match" arguments are supplied, strings pairs are
         united in order of similarity. Highest similarity strings are matched first, and 
         before each time a new pair of strings is united, the function checks if this will
-        result in grouping any two strings with similarity<group_threshold. If so, this
+        result in matches any two strings with similarity<group_threshold. If so, this
         pair is skipped. This version of the algorithm requires more memory and processing
         time, but guaruntees deterministic output that is consistent with the constraints.
             
-        returns: MatchGroups object
+        returns: MatchData object
         """
         if group_threshold and group_threshold < threshold:
             raise ValueError('group_threshold must be greater than or equal to threshold')
@@ -221,15 +221,15 @@ class Embeddings(torch.nn.Module):
         group_ids = torch.arange(len(self)).to(self.device)
         
         if always_match is not None:
-            always_grouping = (MatchGroups(self.strings)
+            always_matches = (MatchData(self.strings)
                             .unite(always_match))
-            always_match_labels = always_grouping.labels
+            always_match_labels = always_matches.labels
 
 
         # Use a simpler, faster prediction algorithm if possible
         if not (return_united or group_threshold or (never_match is not None)):
             if always_match is not None:
-                group_ids = self._group_to_ids(always_grouping)
+                group_ids = self._group_to_ids(always_matches)
 
             return self._fast_unite_similar(
                         group_ids=group_ids,
@@ -312,7 +312,7 @@ class Embeddings(torch.nn.Module):
 
                 cos = batch_cos[bi,bj]
 
-                # Can skip strings that are already matched in the base grouping
+                # Can skip strings that are already matched in the base matches
                 unmatched = group_ids[i] != group_ids[j]
                 i = i[unmatched]
                 j = j[unmatched]
@@ -428,10 +428,10 @@ class Embeddings(torch.nn.Module):
                     p_bar.update(n_matches - matches.shape[0])
                     n_matches = matches.shape[0]
 
-        predicted_grouping = self.ids_to_group(group_ids)
+        predicted_matches = self.ids_to_group(group_ids)
 
         if always_match is not None:
-            predicted_grouping = predicted_grouping.unite(always_grouping)
+            predicted_matches = predicted_matches.unite(always_matches)
 
         if return_united:
             united_df = pd.DataFrame(np.vstack(united),columns=['i','j','n_i','n_j'])
@@ -446,32 +446,32 @@ class Embeddings(torch.nn.Module):
                 united_df[c] = [self.strings[i] for i in united_df[c]]
 
             if always_match is not None:
-                united_df['always_match'] = [always_grouping[i] == always_grouping[j] 
+                united_df['always_match'] = [always_matches[i] == always_matches[j] 
                                             for i,j in united_df[['i','j']].values]
 
-            return predicted_grouping,united_df
+            return predicted_matches,united_df
             
         else:
 
-            return predicted_grouping
+            return predicted_matches
 
     @torch.no_grad()
-    def unite_nearest(self,target_strings,threshold=0,always_grouping=None,progress_bar=True,batch_size=64):
+    def unite_nearest(self,target_strings,threshold=0,always_matches=None,progress_bar=True,batch_size=64):
         """
         Unite embedding strings with each string's most similar target string.
 
-        - "always_grouping" will be used to inialize the group_ids before uniting new matches
+        - "always_matches" will be used to inialize the group_ids before uniting new matches
         - "theshold" sets the minimimum match similarity required between a string and target string
           for the string to be matched. (i.e., setting theshold=0 will result in every embedding
           string to be matched its nearest target string, while setting threshold=0.9 will leave
           strings that have similarity<0.9 with their nearest target string unaffected)
 
-        returns: MatchGroups object
+        returns: MatchData object
         """
 
-        if always_grouping is not None:
-            # self = self.embed(always_grouping)
-            group_ids = self._group_to_ids(always_grouping)
+        if always_matches is not None:
+            # self = self.embed(always_matches)
+            group_ids = self._group_to_ids(always_matches)
         else:
             group_ids = torch.arange(len(self)).to(self.device)
 
@@ -596,11 +596,11 @@ class Embeddings(torch.nn.Module):
 
         return pairs,pair_groups,pair_scores,pair_losses
 
-    def iter_scores(self,grouping=None,batch_size=64,progress_bar=True,**kwargs):
+    def iter_scores(self,matches=None,batch_size=64,progress_bar=True,**kwargs):
 
-        if grouping is not None:
-            self = self.embed(grouping)
-            group_ids = self._group_to_ids(grouping)
+        if matches is not None:
+            self = self.embed(matches)
+            group_ids = self._group_to_ids(matches)
         else:
             group_ids = torch.arange(len(self)).to(self.device)
 

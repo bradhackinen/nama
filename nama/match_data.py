@@ -11,12 +11,12 @@ import matplotlib as mplt
 MAX_STR = 50
 
 
-class MatchGroups():
+class MatchData():
     """A class for grouping strings based on set membership.  Supports splitting and uniting of groups."""
 
     def __init__(self, strings=None):
         """
-        Initialize MatchGroups object.
+        Initialize MatchData object.
 
         Parameters
         ----------
@@ -35,11 +35,11 @@ class MatchGroups():
         return len(self.labels)
 
     def __repr__(self):
-        """Return a string representation of the MatchGroups object."""
-        return f'<nama.MatchGroups containing {len(self)} strings in {len(self.groups)} groups>'
+        """Return a string representation of the MatchData object."""
+        return f'<nama.MatchData containing {len(self)} strings in {len(self.groups)} groups>'
 
     def __str__(self):
-        """Return a string representation of the groups of a MatchGroups object."""
+        """Return a string representation of the groups of a MatchData object."""
         output = self.__repr__()
         remaining = MAX_STR
         for group in self.groups.values():
@@ -66,10 +66,10 @@ class MatchGroups():
         else:
             return [self.labels[s] for s in strings]
 
-    def __add__(self, match_obj):
+    def __add__(self, matches):
         """Add two match groups objects together and return the result."""
-        result = self.add_strings(match_obj)
-        result.unite(match_obj, inplace=True)
+        result = self.add_strings(matches)
+        result.unite(matches, inplace=True)
 
         return result
 
@@ -79,13 +79,13 @@ class MatchGroups():
             yield i, g
 
     def copy(self):
-        """Return a copy of the MatchGroups object."""
-        new_match_obj = MatchGroups()
-        new_match_obj.counts = self.counts.copy()
-        new_match_obj.labels = self.labels.copy()
-        new_match_obj.groups = self.groups.copy()
+        """Return a copy of the MatchData object."""
+        new_matches = MatchData()
+        new_matches.counts = self.counts.copy()
+        new_matches.labels = self.labels.copy()
+        new_matches.groups = self.groups.copy()
 
-        return new_match_obj
+        return new_matches
 
     def strings(self):
         """Return a list of strings in the match groups object. Order is not guaranteed."""
@@ -100,15 +100,15 @@ class MatchGroups():
 
         Parameters
         ----------
-        arg : str, Counter, MatchGroups, Iterable
+        arg : str, Counter, MatchData, Iterable
             String or group of strings to add to the match groups object
         inplace : bool, optional
-            If True, add strings to the existing MatchGroups object, by default False
+            If True, add strings to the existing MatchData object, by default False
 
         Returns
         -------
-        MatchGroups
-            The updated MatchGroups object
+        MatchData
+            The updated MatchData object
         """
         if isinstance(arg, str):
             counts = {arg: 1}
@@ -116,7 +116,7 @@ class MatchGroups():
         elif isinstance(arg, Counter):
             counts = arg
 
-        elif isinstance(arg, MatchGroups):
+        elif isinstance(arg, MatchData):
             counts = arg.counts
 
         elif hasattr(arg, '__next__') or hasattr(arg, '__iter__'):
@@ -142,12 +142,12 @@ class MatchGroups():
         strings : list or str
             String or list of strings to remove from the match groups object
         inplace : bool, optional
-            If True, remove strings from the existing MatchGroups object, by default False
+            If True, remove strings from the existing MatchData object, by default False
 
         Returns
         -------
-        MatchGroups
-            The updated MatchGroups object
+        MatchData
+            The updated MatchData object
         """
         if isinstance(strings, str):
             strings = [strings]
@@ -192,12 +192,12 @@ class MatchGroups():
         strings : list
             List of strings to keep in the match groups object
         inplace : bool, optional
-            If True, drop strings from the existing MatchGroups object, by default False
+            If True, drop strings from the existing MatchData object, by default False
 
         Returns
         -------
-        MatchGroups
-            The updated MatchGroups object
+        MatchData
+            The updated MatchData object
         """
         strings = set(strings)
 
@@ -253,23 +253,23 @@ class MatchGroups():
         - A nested list to unite each set of strings
         - A dictionary mapping strings to labels to unite by label
         - A function mapping strings to labels to unite by label
-        - A MatchGroups instance to unite by MatchGroups groups
+        - A MatchData instance to unite by MatchData groups
 
         Parameters
         ----------
-        arg : list, dict, function or MatchGroups instance
+        arg : list, dict, function or MatchData instance
             Argument representing the strings or labels to merge.
         inplace : bool, optional
-            Whether to perform the operation in place or return a new MatchGroups.
+            Whether to perform the operation in place or return a new MatchData.
         kwargs : dict, optional
-            Additional arguments to be passed to predict_groupings method if arg
-            is a similarity model with a predict_groupings method.
+            Additional arguments to be passed to unite_similar method if arg
+            is a similarity model with a unite_similar method.
 
         Returns
         -------
-        MatchGroups
-            The updated MatchGroups object. If `inplace` is True, the updated object
-            is returned, else a new MatchGroups object with the updates is returned.
+        MatchData
+            The updated MatchData object. If `inplace` is True, the updated object
+            is returned, else a new MatchData object with the updates is returned.
         """
 
         if not inplace:
@@ -278,7 +278,7 @@ class MatchGroups():
         if isinstance(arg, str):
             raise ValueError('Cannot unite a single string')
 
-        elif isinstance(arg, MatchGroups):
+        elif isinstance(arg, MatchData):
             self.unite(arg.groups.values(), inplace=True)
 
         elif hasattr(arg, 'unite_similar'):
@@ -333,13 +333,13 @@ class MatchGroups():
         strings : str or list of str
             The string(s) to split into singleton groups.
         inplace : bool, optional
-            Whether to perform the operation in place or return a new MatchGroups.
+            Whether to perform the operation in place or return a new MatchData.
 
         Returns
         -------
-        MatchGroups
-            The updated MatchGroups object. If `inplace` is True, the updated object
-            is returned, else a new MatchGroups object with the updates is returned.
+        MatchData
+            The updated MatchData object. If `inplace` is True, the updated object
+            is returned, else a new MatchData object with the updates is returned.
         """
         if not inplace:
             self = self.copy()
@@ -381,13 +381,13 @@ class MatchGroups():
         Parameters
         ----------
         inplace : bool, optional
-            Whether to perform the operation in place or return a new MatchGroups.
+            Whether to perform the operation in place or return a new MatchData.
 
         Returns
         -------
-        MatchGroups
-            The updated MatchGroups object. If `inplace` is True, the updated object
-            is returned, else a new MatchGroups object with the updates is returned.
+        MatchData
+            The updated MatchData object. If `inplace` is True, the updated object
+            is returned, else a new MatchData object with the updates is returned.
         """
         if not inplace:
             self = self.copy()
@@ -422,8 +422,8 @@ class MatchGroups():
 
         Returns
         -------
-        self: MatchGroups
-            Returns the MatchGroups object after the separation operation.
+        self: MatchData
+            Returns the MatchData object after the separation operation.
 
         """
         if not inplace:
@@ -562,7 +562,7 @@ class MatchGroups():
 
     def reset_counts(self, inplace=False):
         """
-        Reset the counts of strings in the MatchGroups object.
+        Reset the counts of strings in the MatchData object.
 
         Parameters
         ----------
@@ -571,8 +571,8 @@ class MatchGroups():
 
         Returns
         -------
-        self: MatchGroups
-            Returns the MatchGroups object after the reset operation.
+        self: MatchData
+            Returns the MatchData object after the reset operation.
 
         """
         if not inplace:
@@ -733,8 +733,8 @@ def from_df(
 
     Returns
     -------
-    MatchGroups
-        The constructed MatchGroups object.
+    MatchData
+        The constructed MatchData object.
 
     Raises
     ------
@@ -764,7 +764,7 @@ def from_df(
             'match_format must be one of "unmatched", "groups", "pairs", or "detect"')
 
     # Create an empty match groups object
-    match_obj = MatchGroups()
+    matches = MatchData()
 
     if match_format == 'detect':
         if (string_column in df.columns):
@@ -787,9 +787,9 @@ def from_df(
         strings = df[string_column].values
 
         # Build the match groups object
-        match_obj.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
-        match_obj.labels = {s: s for s in strings}
-        match_obj.groups = {s: [s] for s in strings}
+        matches.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        matches.labels = {s: s for s in strings}
+        matches.groups = {s: [s] for s in strings}
 
     elif match_format == 'groups':
 
@@ -809,22 +809,22 @@ def from_df(
         groups = np.split(strings, split_locs)
 
         # Build the match groups object
-        match_obj.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
-        match_obj.labels = {s: g[-1] for g in groups for s in g}
-        match_obj.groups = {g[-1]: list(g) for g in groups}
+        matches.counts = Counter({s: int(c) for s, c in zip(strings, counts)})
+        matches.labels = {s: g[-1] for g in groups for s in g}
+        matches.groups = {g[-1]: list(g) for g in groups}
 
     elif match_format == 'pairs':
         # TODO: Allow pairs data to use counts
         for pair_column in pair_columns:
-            match_obj.add_strings(df[pair_column].values, inplace=True)
+            matches.add_strings(df[pair_column].values, inplace=True)
 
         # There are several ways to unite pairs
         # Guessing it is most efficient to "group by" one of the string columns
         groups = {s: pair[1] for pair in df[pair_columns].values for s in pair}
 
-        match_obj.unite(groups, inplace=True)
+        matches.unite(groups, inplace=True)
 
-    return match_obj
+    return matches
 
 
 def read_csv(
@@ -859,7 +859,7 @@ def read_csv(
 
     Returns
     -------
-    MatchGroups
+    MatchData
         A new match groups object built from the csv file.
     """
     df = pd.read_csv(filename, **pandas_args, na_filter=False)

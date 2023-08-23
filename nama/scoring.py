@@ -2,15 +2,15 @@ import pandas as pd
 import random
 
 
-def confusion_df(predicted_groupings, gold_groupings, use_counts=True):
+def confusion_df(predicted_matches, gold_matches, use_counts=True):
     """
     Computes the confusion matrix dataframe for a predicted match groups object relative to a gold match groups object.
 
     Parameters
     ----------
-    predicted_groupings : MatchGroups
+    predicted_matches : MatchData
         The predicted match groups object.
-    gold_groupings : MatchGroups
+    gold_matches : MatchData
         The gold match groups object.
     use_counts : bool, optional
         Use the count of each string. If False, the count is set to 1.
@@ -22,8 +22,8 @@ def confusion_df(predicted_groupings, gold_groupings, use_counts=True):
     """
 
     df = pd.merge(
-        predicted_groupings.to_df(),
-        gold_groupings.to_df().drop(
+        predicted_matches.to_df(),
+        gold_matches.to_df().drop(
             'count',
             axis=1),
         on='string',
@@ -46,15 +46,15 @@ def confusion_df(predicted_groupings, gold_groupings, use_counts=True):
     return df
 
 
-def confusion_matrix(predicted_groupings, gold_groupings, use_counts=True):
+def confusion_matrix(predicted_matches, gold_matches, use_counts=True):
     """
     Computes the confusion matrix for a predicted match groups object relative to a gold match groups object.
 
     Parameters
     ----------
-    predicted_groupings : MatchGroups
+    predicted_matches : MatchData
         The predicted match groups object.
-    gold_groupings : MatchGroups
+    gold_matches : MatchData
         The gold match groups object.
     use_counts : bool, optional
         Use the count of each string. If False, the count is set to 1.
@@ -65,14 +65,14 @@ def confusion_matrix(predicted_groupings, gold_groupings, use_counts=True):
         Dictionary with keys 'TP', 'FP', 'TN', and 'FN', representing the values in the confusion matrix.
     """
 
-    df = confusion_df(predicted_groupings, gold_groupings, use_counts=use_counts)
+    df = confusion_df(predicted_matches, gold_matches, use_counts=use_counts)
 
     return {c: df[c].sum() // 2 for c in ['TP', 'FP', 'TN', 'FN']}
 
 
 def score_predicted(
-        predicted_groupings,
-        gold_groupings,
+        predicted_matches,
+        gold_matches,
         use_counts=True,
         drop_self_matches=True):
     """
@@ -81,9 +81,9 @@ def score_predicted(
 
     Parameters
     ----------
-    predicted_groupings : MatchGroups
+    predicted_matches : MatchData
         The predicted match groups object .
-    gold_groupings : MatchGroups
+    gold_matches : MatchData
         The gold match groups object.
     use_counts : bool, optional
         Use the count of each string. If False, the count is set to 1.
@@ -97,18 +97,18 @@ def score_predicted(
     """
 
     scores = confusion_matrix(
-        predicted_groupings,
-        gold_groupings,
+        predicted_matches,
+        gold_matches,
         use_counts=use_counts)
 
     n_scored = scores['TP'] + scores['TN'] + scores['FP'] + scores['FN']
 
     if use_counts:
-        n_predicted = (sum(predicted_groupings.counts.values())**2 -
-                       sum(c**2 for c in predicted_groupings.counts.values())) / 2
+        n_predicted = (sum(predicted_matches.counts.values())**2 -
+                       sum(c**2 for c in predicted_matches.counts.values())) / 2
     else:
-        n_predicted = (len(predicted_groupings)**2
-                       - len(predicted_groupings)) / 2
+        n_predicted = (len(predicted_matches)**2
+                       - len(predicted_matches)) / 2
 
     scores['coverage'] = n_scored / n_predicted
 
@@ -128,13 +128,13 @@ def score_predicted(
     return scores
 
 
-def split_on_groups(groupings, frac=0.5, seed=None):
+def split_on_groups(matches, frac=0.5, seed=None):
     """
     Splits the match groups object into two parts by given fraction.
 
     Parameters
     ----------
-    groupings : MatchGroups
+    matches : MatchData
         The match groups object to be split.
     frac : float, optional
         The fraction of groups to select.
@@ -143,29 +143,29 @@ def split_on_groups(groupings, frac=0.5, seed=None):
 
     Returns
     -------
-    groupings1, groupings2 : tuple of match groups objects
+    matches1, matches2 : tuple of match groups objects
         Tuple of two match groups objects.
     """
     if seed is not None:
         random.seed(seed)
 
-    groups = list(groupings.groups.values())
+    groups = list(matches.groups.values())
     random.shuffle(groups)
 
     selected_groups = groups[:int(frac * len(groups))]
     selected_strings = [s for group in selected_groups for s in group]
 
-    return groupings.keep(selected_strings), groupings.drop(selected_strings)
+    return matches.keep(selected_strings), matches.drop(selected_strings)
 
 
-def kfold_on_groups(groupings, k=4, shuffle=True, seed=None):
+def kfold_on_groups(matches, k=4, shuffle=True, seed=None):
     """
     Perform K-fold cross validation on groups of strings.
 
     Parameters
     ----------
-    groupings : object
-        MatchGroups object to perform K-fold cross validation on.
+    matches : object
+        MatchData object to perform K-fold cross validation on.
     k : int, optional
         Number of folds to perform, by default 4.
     shuffle : bool, optional
@@ -175,13 +175,13 @@ def kfold_on_groups(groupings, k=4, shuffle=True, seed=None):
 
     Yields
     ------
-    tuple : MatchGroups, MatchGroups
+    tuple : MatchData, MatchData
         A tuple of k match groups objects, the first for the training set and the second for the testing set for each fold.
     """
     if seed is not None:
         random.seed(seed)
 
-    groups = list(groupings.groups.keys())
+    groups = list(matches.groups.keys())
 
     if shuffle:
         random.shuffle(groups)
@@ -191,6 +191,6 @@ def kfold_on_groups(groupings, k=4, shuffle=True, seed=None):
     for fold in range(k):
 
         fold_groups = groups[fold::k]
-        fold_strings = [s for g in fold_groups for s in groupings.groups[g]]
+        fold_strings = [s for g in fold_groups for s in matches.groups[g]]
 
-        yield groupings.drop(fold_strings), groupings.keep(fold_strings)
+        yield matches.drop(fold_strings), matches.keep(fold_strings)
