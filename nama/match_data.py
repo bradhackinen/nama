@@ -1,12 +1,7 @@
-import os
-from pathlib import Path
 from collections import Counter, defaultdict
 from itertools import islice
 import pandas as pd
 import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
-import matplotlib as mplt
 
 MAX_STR = 50
 
