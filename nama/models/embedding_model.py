@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoTokenizer,RobertaModel
+from transformers import AutoTokenizer,AutoModel
 
 class EmbeddingModel(torch.nn.Module):
     """
@@ -7,7 +7,7 @@ class EmbeddingModel(torch.nn.Module):
     Takes a string as input and produces an embedding vector of size d.
     """
     def __init__(self,
-                    model_class=RobertaModel,
+                    model_class=AutoModel,
                     model_name='roberta-base',
                     pooling='pooler',
                     normalize=True,
@@ -84,12 +84,17 @@ class EmbeddingModel(torch.nn.Module):
 
         if self.pooling == 'pooler':
             v = batch_out['pooler_output']
+        
         elif self.pooling == 'mean':
             h = batch_out['last_hidden_state']
 
             # Compute mean of unmasked token vectors
             h = h*attention_mask[:,:,None]
             v = h.sum(dim=1)/attention_mask.sum(dim=1)[:,None]
+
+        elif self.pooling == 'cls':
+            h = batch_out['last_hidden_state']
+            v = h[:,0]
 
         if self.d:
             v = self.projection(v)
