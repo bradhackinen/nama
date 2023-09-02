@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 setup(
     name='nama',
     version='0.1.0',
-    packages=['nama'],
+    packages=['nama', 'nama.models'],
     install_requires=requirements,
     data_files=[('',['requirements.txt'])],
     url='https://github.com/bradhackinen/nama',

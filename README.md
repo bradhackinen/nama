@@ -5,7 +5,7 @@
 ## Installation
 Recommended install via pip
 1. Create virtual env ``. Optional
-2. Install nama `pip install git+https://github.com/bradhackinen/nama.git@make-package2`
+2. Install nama `pip install git+https://github.com/bradhackinen/nama.git@master`
 
 
 Install from source with ```conda```
