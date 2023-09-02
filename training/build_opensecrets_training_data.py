@@ -14,10 +14,11 @@ import re
 from collections import Counter
 
 import nama
-from nama.config import data_dir
+# from nama.config import data_dir
 
 import opensecrets
 
+data_dir = '/home/brad/Dropbox/Data/nama'
 
 def clean_name(s):
     # Standardise whitespace
@@ -30,7 +31,7 @@ def clean_name(s):
 
     # Drop raw strings that look like they contain multiple names
     # (sometimes "on behalf of" appears multiple times - drop these cases also)
-    if re.search(r'([/\(\)\[\]\{\}]|f[/\.]?k[/\.]?a|formerly|\(for|doing business as|d/?b/?a)|on behalf of|in affiliation with',s,flags=re.IGNORECASE):
+    if re.search(r'([/\(\)\[\]\{\}]|f[/\.]?k[/\.]?a|formerly|\(for|doing business as|d/?b/?a)|on behalf of| OBO |in affiliation with',s,flags=re.IGNORECASE):
         return ''
 
     return s

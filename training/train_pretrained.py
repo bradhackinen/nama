@@ -11,8 +11,9 @@ from nama.embedding_similarity import EmbeddingSimilarityModel, load_similarity_
 
 data_dir = Path('/home/brad/Dropbox/Data/nama')
 
-gold = nama.read_csv(Path(data_dir)/'training_data'/'combined_train.csv')
+gold = nama.read_csv(Path(data_dir)/'training_data'/'combined_train_no_compound.csv')
 # gold_upper = nama.read_csv(data_dir/'training_data'/'combined_train_upper_case.csv')
+
 
 train_kwargs = {
                 'max_epochs': 1,
@@ -26,7 +27,10 @@ train_kwargs = {
                 }
 
 model_defs = {
-    'nama_base':{'d':64,'model_name':'roberta-base'},
+    'nama-64':{'d':64,'model_name':'roberta-base'},
+    'nama-128':{'d':128,'model_name':'roberta-base'},
+    'nama-256':{'d':256,'model_name':'roberta-base'},
+    'nama-768':{'d':None,'model_name':'roberta-base'},
     # 'nama_large':{'d':256,'model_name':'roberta-large'},
     }
 
