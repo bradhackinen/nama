@@ -1,540 +1,20 @@
-import random
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from copy import copy,deepcopy
+from copy import copy
 from collections import Counter
 import torch
-from torch import nn
-from torch.utils.data import DataLoader
-from transformers import AutoTokenizer,RobertaModel,get_cosine_schedule_with_warmup,get_linear_schedule_with_warmup, logging
 from zipfile import ZipFile
 import pickle
 from io import BytesIO
-from itertools import islice
 
-import nama
-from .scoring import score_predicted
+from ..match_data import MatchData
 
 
-logging.set_verbosity_error()
-
-
-class TransformerProjector(nn.Module):
-    """
-    A basic wrapper around a Hugging Face transformer model.
-    Takes a string as input and produces an embedding vector of size d.
-    """
-    def __init__(self,
-                    model_class=RobertaModel,
-                    model_name='roberta-base',
-                    pooling='pooler',
-                    normalize=True,
-                    d=128,
-                    prompt='',
-                    device='cpu',
-                    add_upper=True,
-                    upper_case=False,
-                    **kwargs):
-
-        super().__init__()
-
-        self.model_class = model_class
-        self.model_name = model_name
-        self.pooling = pooling
-        self.normalize = normalize
-        self.d = d
-        self.prompt = prompt
-        self.add_upper = add_upper
-        self.upper_case = upper_case
-
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-        try:
-            self.transformer = model_class.from_pretrained(model_name)
-        except OSError:
-            self.transformer = model_class.from_pretrained(model_name,from_tf=True)
-
-        self.dropout = torch.nn.Dropout(0.5)
-
-        if d:
-            # Project embedding to a lower dimension
-            # Initialization based on random projection LSH (preserves approximate cosine distances)
-            self.projection = torch.nn.Linear(self.transformer.config.hidden_size,d)
-            torch.nn.init.normal_(self.projection.weight)
-            torch.nn.init.constant_(self.projection.bias,0)
-
-        self.to(device)
-
-    def to(self,device):
-        super().to(device)
-        self.device = device
-
-    def encode(self,strings):
-        if self.prompt is not None:
-            strings = [self.prompt + s for s in strings]
-        if self.add_upper:
-            strings = [s + ' </s> ' + s.upper() for s in strings]
-        if self.upper_case:
-            strings = [s + ' </s> ' + s.upper() for s in strings]
-
-        try:
-            encoded = self.tokenizer(strings,padding=True,truncation=True)
-        except Exception as e:
-            print(strings)
-            raise Exception(e)
-        input_ids = torch.tensor(encoded['input_ids']).long()
-        attention_mask = torch.tensor(encoded['attention_mask'])
-
-        return input_ids,attention_mask
-
-    def forward(self,strings):
-
-        with torch.no_grad():
-            input_ids,attention_mask = self.encode(strings)
-
-            input_ids = input_ids.to(device=self.device)
-            attention_mask = attention_mask.to(device=self.device)
-
-        # with amp.autocast(self.amp):
-        batch_out = self.transformer(input_ids=input_ids,
-                                        attention_mask=attention_mask,
-                                        return_dict=True)
-
-        if self.pooling == 'pooler':
-            v = batch_out['pooler_output']
-        elif self.pooling == 'mean':
-            h = batch_out['last_hidden_state']
-
-            # Compute mean of unmasked token vectors
-            h = h*attention_mask[:,:,None]
-            v = h.sum(dim=1)/attention_mask.sum(dim=1)[:,None]
-
-        if self.d:
-            v = self.projection(v)
-
-        if self.normalize:
-            v = v/torch.sqrt((v**2).sum(dim=1)[:,None])
-
-        return v
-
-    def config_optimizer(self,transformer_lr=1e-5,projection_lr=1e-4):
-
-        parameters = list(self.named_parameters())
-        grouped_parameters = [
-                {
-                    'params': [param for name,param in parameters if name.startswith('transformer') and name.endswith('bias')],
-                    'weight_decay_rate': 0.0,
-                    'lr':transformer_lr,
-                    },
-                {
-                    'params': [param for name,param in parameters if name.startswith('transformer') and not name.endswith('bias')],
-                    'weight_decay_rate': 0.0,
-                    'lr':transformer_lr,
-                    },
-                {
-                    'params': [param for name,param in parameters if name.startswith('projection')],
-                    'weight_decay_rate': 0.0,
-                    'lr':projection_lr,
-                    },
-                ]
-
-        # Drop groups with lr of 0
-        grouped_parameters = [p for p in grouped_parameters if p['lr']]
-
-        optimizer = torch.optim.AdamW(grouped_parameters)
-
-        return optimizer
-
-
-class ExpCosSimilarity(nn.Module):
-    """
-    A trainable similarity scoring model that estimates the probability
-    of a match as the negative exponent of 1+cosine distance between
-    embeddings:
-        p(match|v_i,v_j) = exp(-alpha*(1-v_i@v_j))
-    """
-    def __init__(self,alpha=50,**kwargs):
-
-        super().__init__()
-
-        self.alpha = nn.Parameter(torch.tensor(float(alpha)))
-
-    def __repr__(self):
-        return f'<nama.ExpCosSimilarity with {self.alpha=}>'
-
-    def forward(self,X):
-        # Z is a scaled distance measure: Z=0 means that the score should be 1
-        Z = self.alpha*(1 - X)
-        return torch.clamp(torch.exp(-Z),min=0,max=1.0)
-
-    def loss(self,X,Y,weights=None,decay=1e-6,epsilon=1e-6):
-
-        Z = self.alpha*(1 - X)
-
-        # Put epsilon floor to prevent overflow/undefined results
-        # Z = torch.tensor([1e-2,1e-3,1e-6,1e-7,1e-8,1e-9])
-        # torch.log(1 - torch.exp(-Z))
-        # 1/(1 - torch.exp(-Z))
-        with torch.no_grad():
-            Z_eps_adjustment = torch.clamp(epsilon-Z,min=0)
-
-        Z += Z_eps_adjustment
-
-        # Cross entropy loss with a simplified and (hopefully) numerically appropriate formula
-        # TODO: Stick an epsilon in here to prevent nan?
-        loss = Y*Z - torch.xlogy(1-Y,-torch.expm1(-Z))
-        # loss = Y*Z - torch.xlogy(1-Y,1-torch.exp(-Z))
-
-        if weights is not None:
-            loss *= weights*loss
-
-        if decay:
-            loss += decay*self.alpha**2
-
-        return loss
-
-    def score_to_cos(self,score):
-        if score > 0:
-            return 1 + np.log(score)/self.alpha.item()
-        else:
-            return -99
-
-    def config_optimizer(self,lr=10):
-        optimizer = torch.optim.AdamW(self.parameters(),lr=lr,weight_decay=0)
-
-        return optimizer
-
-
-class ExponentWeights():
-    def __init__(self,weighting_exponent=0.5,**kwargs):
-        self.exponent = weighting_exponent
-
-    def __call__(self,counts):
-        return counts**self.exponent
-
-
-class EmbeddingSimilarityModel(nn.Module):
-    """
-    A combined projector/scorer model that produces Embeddings objects
-    as its primary output.
-
-    - train() jointly optimizes the projector_model and score_model using
-      contrastive learning to learn from a training Matcher.
-    """
-    def __init__(self,
-                    projector_class=TransformerProjector,
-                    score_class=ExpCosSimilarity,
-                    weighting_class=ExponentWeights,
-                    **kwargs):
-
-        super().__init__()
-
-        self.projector_model = projector_class(**kwargs)
-        self.score_model = score_class(**kwargs)
-        self.weighting_function = weighting_class(**kwargs)
-
-        self.to(kwargs.get('device','cpu'))
-
-    def to(self,device):
-        super().to(device)
-        self.projector_model.to(device)
-        self.score_model.to(device)
-        self.device = device
-
-    def save(self,savefile):
-        torch.save(self,savefile)
-
-    @torch.no_grad()
-    def embed(self,input,to=None,batch_size=64,progress_bar=True,**kwargs):
-        """
-        Construct an Embeddings object from input strings or a Matcher
-        """
-
-        if to is None:
-            to = self.device
-
-        if isinstance(input,nama.Matcher):
-            strings = input.strings()
-            counts = torch.tensor([input.counts[s] for s in strings],device=self.device).float().to(to)
-
-        else:
-            strings = list(input)
-            counts = torch.ones(len(strings),device=self.device).float().to(to)
-
-        input_loader = DataLoader(strings,batch_size=batch_size,num_workers=0)
-
-        self.projector_model.eval()
-
-        V = None
-        batch_start = 0
-        with tqdm(total=len(strings),delay=1,desc='Embedding strings',disable=not progress_bar) as pbar:
-            for batch_strings in input_loader:
-
-                v = self.projector_model(batch_strings).detach().to(to)
-
-                if V is None:
-                    # Use v to determine dim and dtype of pre-allocated embedding tensor
-                    # (Pre-allocating avoids duplicating tensors with a big .cat() operation)
-                    V = torch.empty(len(strings),v.shape[1],device=to,dtype=v.dtype)
-
-                V[batch_start:batch_start+len(batch_strings),:] = v
-
-                pbar.update(len(batch_strings))
-                batch_start += len(batch_strings)
-
-        score_model = copy(self.score_model)
-        score_model.load_state_dict(self.score_model.state_dict())
-        score_model.to(to)
-
-        weighting_function = deepcopy(self.weighting_function)
-
-        return Embeddings(strings=strings,
-                            V=V.detach(),
-                            counts=counts.detach(),
-                            score_model=score_model,
-                            weighting_function=weighting_function,
-                            device=to)
-
-    def train(self,training_matcher,max_epochs=1,batch_size=8,
-                score_decay=0,regularization=0,
-                transformer_lr=1e-5,projection_lr=1e-5,score_lr=10,warmup_frac=0.1,
-                max_grad_norm=1,dropout=False,
-                validation_matcher=None,target='F1',restore_best=True,val_seed=None,
-                validation_interval=1000,early_stopping=True,early_stopping_patience=3,
-                verbose=False,progress_bar=True,
-                **kwargs):
-
-        """
-        Train the projector_model and score_model to predict match probabilities
-        using the training_matcher as a source of "correct" matches.
-        Training algorithm uses contrastive learning with hard-positive
-        and hard-negative mining to fine tune the projector model to place
-        matched strings near to each other in embedding space, while
-        simulataneously calibrating the score_model to predict the match
-        probabilities as a function of cosine distance
-        """
-
-        if validation_matcher is None:
-            early_stopping = False
-            restore_best = False
-
-        num_training_steps = max_epochs*len(training_matcher)//batch_size
-        num_warmup_steps = int(warmup_frac*num_training_steps)
-
-        if transformer_lr or projection_lr:
-            embedding_optimizer = self.projector_model.config_optimizer(transformer_lr,projection_lr)
-            embedding_scheduler = get_cosine_schedule_with_warmup(
-                                        embedding_optimizer,
-                                        num_warmup_steps=num_warmup_steps,
-                                        num_training_steps=num_training_steps)
-        if score_lr:
-            score_optimizer = self.score_model.config_optimizer(score_lr)
-            score_scheduler = get_linear_schedule_with_warmup(
-                                        score_optimizer,
-                                        num_warmup_steps=num_warmup_steps,
-                                        num_training_steps=num_training_steps)
-
-        step = 0
-        self.history = []
-        self.val_scores = []
-        for epoch in range(max_epochs):
-
-            global_embeddings = self.embed(training_matcher)
-
-            strings = global_embeddings.strings
-            V = global_embeddings.V
-            w = global_embeddings.w
-
-            groups = torch.tensor([global_embeddings.string_map[training_matcher[s]] for s in strings],device=self.device)
-
-            # Normalize weights to make learning rates more general
-            if w is not None:
-                w = w/w.mean()
-
-            shuffled_ids = list(range(len(strings)))
-            random.shuffle(shuffled_ids)
-
-            if dropout:
-                self.projector_model.train()
-            else:
-                self.projector_model.eval()
-
-            for batch_start in tqdm(range(0,len(strings),batch_size),desc=f'training epoch {epoch}',disable=not progress_bar):
-
-                h = {'epoch':epoch,'step':step}
-
-                batch_i = shuffled_ids[batch_start:batch_start+batch_size]
-
-                # Recycle ids from the beginning to pad the last batch if necessary
-                if len(batch_i) < batch_size:
-                    batch_i = batch_i + shuffled_ids[:(batch_size-len(batch_i))]
-
-                """
-                Find highest loss match for each batch string (global search)
-
-                Note: If we compute V_i with dropout enabled, it will add noise
-                to the embeddings and prevent the same pairs from being selected
-                every time.
-                """
-                V_i = self.projector_model(strings[batch_i])
-
-                # Update global embedding cache
-                V[batch_i,:] = V_i.detach()
-
-                with torch.no_grad():
-
-                    global_X = V_i@V.T
-                    global_Y = (groups[batch_i][:,None] == groups[None,:]).float()
-
-                    if w is not None:
-                        global_W = torch.outer(w[batch_i],w)
-                    else:
-                        global_W = None
-
-                # Train scoring model only
-                if score_lr:
-                    # Make sure gradients are enabled for score model
-                    self.score_model.requires_grad_(True)
-
-                    global_loss = self.score_model.loss(global_X,global_Y,weights=global_W,decay=score_decay)
-
-                    score_optimizer.zero_grad()
-                    global_loss.nanmean().backward()
-                    torch.nn.utils.clip_grad_norm_(self.score_model.parameters(),max_norm=max_grad_norm)
-
-                    score_optimizer.step()
-                    score_scheduler.step()
-
-                    h['score_lr'] = score_optimizer.param_groups[0]['lr']
-                    h['global_mean_cos'] = global_X.mean().item()
-                    try:
-                        h['score_alpha'] = self.score_model.alpha.item()
-                    except:
-                        pass
-
-                else:
-                    with torch.no_grad():
-                        global_loss = self.score_model.loss(global_X,global_Y)
-
-                h['global_loss'] = global_loss.detach().nanmean().item()
-
-                # Train projector model
-                if (transformer_lr or projection_lr) and step <= num_warmup_steps + num_training_steps:
-
-                    # Turn off score model updating - only want to train projector here
-                    self.score_model.requires_grad_(False)
-
-                    # Select hard training examples
-                    with torch.no_grad():
-                        batch_j = global_loss.argmax(dim=1).flatten()
-
-                        if w is not None:
-                            batch_W = torch.outer(w[batch_i],w[batch_j])
-                        else:
-                            batch_W = None
-
-                    # Train the model on the selected high-loss pairs
-                    V_j = self.projector_model(strings[batch_j.tolist()])
-
-                    # Update global embedding cache
-                    V[batch_j,:] = V_j.detach()
-
-                    batch_X = V_i@V_j.T
-                    batch_Y = (groups[batch_i][:,None] == groups[batch_j][None,:]).float()
-                    h['batch_obs'] = len(batch_i)*len(batch_j)
-
-                    batch_loss = self.score_model.loss(batch_X,batch_Y,weights=batch_W)
-
-                    if regularization:
-                        # Apply Global Orthogonal Regularization from https://arxiv.org/abs/1708.06320
-                        gor_Y = (groups[batch_i][:,None] != groups[batch_i][None,:]).float()
-                        gor_n = gor_Y.sum()
-                        if gor_n > 1:
-                            gor_X = (V_i@V_i.T)*gor_Y
-                            gor_m1 = 0.5*gor_X.sum()/gor_n
-                            gor_m2 = 0.5*(gor_X**2).sum()/gor_n
-                            batch_loss += regularization*(gor_m1 + torch.clamp(gor_m2 - 1/self.projector_model.d,min=0))
-
-                    h['batch_nan'] = torch.isnan(batch_loss.detach()).sum().item()
-
-                    embedding_optimizer.zero_grad()
-                    batch_loss.nanmean().backward()
-
-                    torch.nn.utils.clip_grad_norm_(self.parameters(),max_norm=max_grad_norm)
-
-                    embedding_optimizer.step()
-                    embedding_scheduler.step()
-
-                    h['transformer_lr'] = embedding_optimizer.param_groups[1]['lr']
-                    h['projection_lr'] = embedding_optimizer.param_groups[-1]['lr']
-
-                    # Save stats
-                    h['batch_loss'] = batch_loss.detach().mean().item()
-                    h['batch_pos_target'] = batch_Y.detach().mean().item()
-
-                self.history.append(h)
-                step += 1
-
-                if (validation_matcher is not None) and not (step % validation_interval):
-
-                    validation = len(self.validation_scores)
-                    val_scores = self.test(validation_matcher)
-                    val_scores['step'] = step - 1
-                    val_scores['epoch'] = epoch
-                    val_scores['validation'] = validation
-
-                    self.validation_scores.append(val_scores)
-
-                    # Print validation stats
-                    if verbose:
-                        print(f'\nValidation results at step {step} (current epoch {epoch})')
-                        for k,v in val_scores.items():
-                            print(f'    {k}: {v:.4f}')
-
-                        print(list(self.score_model.named_parameters()))
-
-                    # Update best saved model
-                    if restore_best:
-                        if val_scores[target] >= max(h[target] for h in self.validation_scores):
-                            best_state = deepcopy({
-                                            'state_dict':self.state_dict(),
-                                            'val_scores':val_scores
-                                            })
-
-                    if early_stopping and (validation - best_state['val_scores']['validation'] > early_stopping_patience):
-                        print(f'Stopping training ({early_stopping_patience} validation checks since best validation score)')
-                        break
-
-        if restore_best:
-            print(f"Restoring to best state (step {best_state['val_scores']['step']}):")
-            for k,v in best_state['val_scores'].items():
-                print(f'    {k}: {v:.4f}')
-
-            self.to('cpu')
-            self.load_state_dict(best_state['state_dict'])
-            self.to(self.device)
-
-        return pd.DataFrame(self.history)
-
-    def unite_similar(self,input,**kwargs):
-        embeddings = self.embed(input,**kwargs)
-        return embeddings.unite_similar(**kwargs)
-
-    def test(self,gold_matcher,batch_size=32):
-
-        embeddings = self.embed(gold_matcher)
-        predicted = embeddings.unite_similar(gold_matcher)
-
-        scores = score_predicted(predicted,gold_matcher,use_counts=True)
-
-        return scores
-
-
-class Embeddings(nn.Module):
+class Embeddings(torch.nn.Module):
     """
     Stores embeddings for a fixed array of strings and provides methods for
-    clustering the strings to create Matcher objects according to different
+    clustering the strings to create MatchData objects according to different
     algorithms.
     """
     def __init__(self,strings,V,score_model,weighting_function,counts,device='cpu'):
@@ -589,11 +69,11 @@ class Embeddings(nn.Module):
 
     def __getitem__(self,arg):
         """
-        Slice a matcher
+        Slice a Match Groups object
         """
         if isinstance(arg,slice):
             i = arg
-        elif isinstance(arg,nama.Matcher):
+        elif isinstance(arg, MatchData):
             return self[arg.strings()]
         elif hasattr(arg,'__iter__'):
             # Return a subset of the embeddings and their weights
@@ -601,10 +81,10 @@ class Embeddings(nn.Module):
             i = [string_map[s] for s in arg]
 
             if i == list(range(len(self))):
-                # Just selecting the whole matcher - no need to slice the embedding
+                # Just selecting the whole match groups object - no need to slice the embedding
                 return copy(self)
         else:
-            raise ValueError(f'Unknown slice input type ({type(input)}). Can only slice Embedding with a slice, matcher, or iterable.')
+            raise ValueError(f'Unknown slice input type ({type(input)}). Can only slice Embedding with a slice, match group, or iterable.')
 
         new = copy(self)
         new.strings = self.strings[i]
@@ -615,12 +95,12 @@ class Embeddings(nn.Module):
 
         return new
 
-    def embed(self,matcher):
+    def embed(self,matches):
         """
-        Construct updated Embeddings with counts from the input Matcher
+        Construct updated Embeddings with counts from the input MatchData
         """
-        new = self[matcher]
-        new.counts = torch.tensor([matcher.counts[s] for s in new.strings],device=self.device)
+        new = self[matches]
+        new.counts = torch.tensor([matches.counts[s] for s in new.strings],device=self.device)
         new.w = new.weighting_function(new.counts)
 
         return new
@@ -628,12 +108,12 @@ class Embeddings(nn.Module):
     def __len__(self):
         return len(self.strings)
 
-    def _matcher_to_group_ids(self,matcher):
-        group_id_map = {g:i for i,g in enumerate(matcher.groups.keys())}
-        group_ids = torch.tensor([group_id_map[matcher[s]] for s in self.strings]).to(self.device)
+    def _group_to_ids(self,matches):
+        group_id_map = {g:i for i,g in enumerate(matches.groups.keys())}
+        group_ids = torch.tensor([group_id_map[matches[s]] for s in self.strings]).to(self.device)
         return group_ids
 
-    def _group_ids_to_matcher(self,group_ids):
+    def _ids_to_group(self,group_ids):
         if isinstance(group_ids,torch.Tensor):
             group_ids = group_ids.to('cpu').numpy()
 
@@ -652,13 +132,13 @@ class Embeddings(nn.Module):
         # Get grouped strings as separate arrays
         groups = np.split(strings,split_locs)
 
-        # Build the matcher
-        matcher = nama.Matcher()
-        matcher.counts = Counter({s:int(c) for s,c in zip(strings,counts)})
-        matcher.labels = {s:g[-1] for g in groups for s in g}
-        matcher.groups = {g[-1]:list(g) for g in groups}
+        # Build the matches
+        matches = MatchData()
+        matches.counts = Counter({s:int(c) for s,c in zip(strings,counts)})
+        matches.labels = {s:g[-1] for g in groups for s in g}
+        matches.groups = {g[-1]:list(g) for g in groups}
 
-        return matcher
+        return matches
 
     @torch.no_grad()
     def _fast_unite_similar(self,group_ids,threshold=0.5,progress_bar=True,batch_size=64):
@@ -690,7 +170,7 @@ class Embeddings(nn.Module):
                     # Assign all matched embeddings to the same group
                     group_ids[ids_to_group] = g_i[k].clone()
 
-        return self._group_ids_to_matcher(group_ids)
+        return self._ids_to_group(group_ids)
 
     @torch.no_grad()
     def unite_similar(self,
@@ -729,11 +209,11 @@ class Embeddings(nn.Module):
         If "group_threshold" or "never_match" arguments are supplied, strings pairs are
         united in order of similarity. Highest similarity strings are matched first, and 
         before each time a new pair of strings is united, the function checks if this will
-        result in grouping any two strings with similarity<group_threshold. If so, this
+        result in matches any two strings with similarity<group_threshold. If so, this
         pair is skipped. This version of the algorithm requires more memory and processing
         time, but guaruntees deterministic output that is consistent with the constraints.
             
-        returns: Matcher object
+        returns: MatchData object
         """
         if group_threshold and group_threshold < threshold:
             raise ValueError('group_threshold must be greater than or equal to threshold')
@@ -741,15 +221,15 @@ class Embeddings(nn.Module):
         group_ids = torch.arange(len(self)).to(self.device)
         
         if always_match is not None:
-            always_matcher = (nama.Matcher(self.strings)
+            always_matches = (MatchData(self.strings)
                             .unite(always_match))
-            always_match_labels = always_matcher.labels
+            always_match_labels = always_matches.labels
 
 
         # Use a simpler, faster prediction algorithm if possible
         if not (return_united or group_threshold or (never_match is not None)):
             if always_match is not None:
-                group_ids = self._matcher_to_group_ids(always_matcher)
+                group_ids = self._group_to_ids(always_matches)
 
             return self._fast_unite_similar(
                         group_ids=group_ids,
@@ -832,7 +312,7 @@ class Embeddings(nn.Module):
 
                 cos = batch_cos[bi,bj]
 
-                # Can skip strings that are already matched in the base matcher
+                # Can skip strings that are already matched in the base matches
                 unmatched = group_ids[i] != group_ids[j]
                 i = i[unmatched]
                 j = j[unmatched]
@@ -948,10 +428,10 @@ class Embeddings(nn.Module):
                     p_bar.update(n_matches - matches.shape[0])
                     n_matches = matches.shape[0]
 
-        predicted_matcher = self._group_ids_to_matcher(group_ids)
+        predicted_matches = self.ids_to_group(group_ids)
 
         if always_match is not None:
-            predicted_matcher = predicted_matcher.unite(always_matcher)
+            predicted_matches = predicted_matches.unite(always_matches)
 
         if return_united:
             united_df = pd.DataFrame(np.vstack(united),columns=['i','j','n_i','n_j'])
@@ -966,32 +446,32 @@ class Embeddings(nn.Module):
                 united_df[c] = [self.strings[i] for i in united_df[c]]
 
             if always_match is not None:
-                united_df['always_match'] = [always_matcher[i] == always_matcher[j] 
+                united_df['always_match'] = [always_matches[i] == always_matches[j] 
                                             for i,j in united_df[['i','j']].values]
 
-            return predicted_matcher,united_df
+            return predicted_matches,united_df
             
         else:
 
-            return predicted_matcher
+            return predicted_matches
 
     @torch.no_grad()
-    def unite_nearest(self,target_strings,threshold=0,always_matcher=None,progress_bar=True,batch_size=64):
+    def unite_nearest(self,target_strings,threshold=0,always_matches=None,progress_bar=True,batch_size=64):
         """
         Unite embedding strings with each string's most similar target string.
 
-        - "always_matcher" will be used to inialize the group_ids before uniting new matches
+        - "always_matches" will be used to inialize the group_ids before uniting new matches
         - "theshold" sets the minimimum match similarity required between a string and target string
           for the string to be matched. (i.e., setting theshold=0 will result in every embedding
           string to be matched its nearest target string, while setting threshold=0.9 will leave
           strings that have similarity<0.9 with their nearest target string unaffected)
 
-        returns: Matcher object
+        returns: MatchData object
         """
 
-        if always_matcher is not None:
-            # self = self.embed(always_matcher)
-            group_ids = self._matcher_to_group_ids(always_matcher)
+        if always_matches is not None:
+            # self = self.embed(always_matches)
+            group_ids = self._group_to_ids(always_matches)
         else:
             group_ids = torch.arange(len(self)).to(self.device)
 
@@ -1028,7 +508,7 @@ class Embeddings(nn.Module):
                     # Assign matched strings to the target string's group
                     group_ids[i] = g_seed[max_seed[batch_i]]
 
-        return self._group_ids_to_matcher(group_ids)
+        return self._ids_to_group(group_ids)
 
     @torch.no_grad()
     def score_pairs(self,string_pairs,batch_size=64,progress_bar=True):
@@ -1116,12 +596,11 @@ class Embeddings(nn.Module):
 
         return pairs,pair_groups,pair_scores,pair_losses
 
+    def iter_scores(self,matches=None,batch_size=64,progress_bar=True,**kwargs):
 
-    def iter_scores(self,matcher=None,batch_size=64,progress_bar=True,**kwargs):
-
-        if matcher is not None:
-            self = self.embed(matcher)
-            group_ids = self._matcher_to_group_ids(matcher)
+        if matches is not None:
+            self = self.embed(matches)
+            group_ids = self._group_to_ids(matches)
         else:
             group_ids = torch.arange(len(self)).to(self.device)
 
@@ -1136,8 +615,6 @@ class Embeddings(nn.Module):
                         'score':score,
                         'loss':loss,
                         }
-
-
 
 
 def load_embeddings(f):
@@ -1158,6 +635,3 @@ def load_embeddings(f):
                             V=torch.tensor(V)
                             )
 
-
-def load_similarity_model(f,map_location='cpu',**kwargs):
-    return torch.load(f,map_location=map_location,**kwargs)
