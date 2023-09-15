@@ -86,7 +86,7 @@ class MatchData():
         """Return a list of strings in the match groups object. Order is not guaranteed."""
         return list(self.labels.keys())
 
-    def matches(self, string):
+    def matched_to(self, string):
         """Return the group of strings that match the given string."""
         return self.groups[self.labels[string]]
 

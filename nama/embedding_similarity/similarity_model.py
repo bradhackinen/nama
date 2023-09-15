@@ -112,12 +112,9 @@ class SimilarityModel(nn.Module):
                             device=to)
 
     def train(self,training_matches,max_epochs=1,batch_size=8,
-                score_decay=0,regularization=0,
                 transformer_lr=1e-5,projection_lr=1e-5,score_lr=10,warmup_frac=0.1,
                 max_grad_norm=1,dropout=False,
-                validation_matches=None,target='F1',restore_best=True,val_seed=None,
-                validation_interval=1000,early_stopping=True,early_stopping_patience=3,
-                verbose=False,progress_bar=True,
+                progress_bar=True,
                 **kwargs):
 
         """
@@ -129,10 +126,6 @@ class SimilarityModel(nn.Module):
         simulataneously calibrating the score_model to predict the match
         probabilities as a function of cosine distance
         """
-
-        if validation_matches is None:
-            early_stopping = False
-            restore_best = False
 
         num_training_steps = max_epochs*len(training_matches)//batch_size
         num_warmup_steps = int(warmup_frac*num_training_steps)
@@ -212,7 +205,7 @@ class SimilarityModel(nn.Module):
                     # Make sure gradients are enabled for score model
                     self.score_model.requires_grad_(True)
 
-                    global_loss = self.score_model.loss(global_X,global_Y,weights=global_W,decay=score_decay)
+                    global_loss = self.score_model.loss(global_X,global_Y,weights=global_W)
 
                     score_optimizer.zero_grad()
                     global_loss.nanmean().backward()
@@ -261,16 +254,6 @@ class SimilarityModel(nn.Module):
 
                     batch_loss = self.score_model.loss(batch_X,batch_Y,weights=batch_W)
 
-                    if regularization:
-                        # Apply Global Orthogonal Regularization from https://arxiv.org/abs/1708.06320
-                        gor_Y = (groups[batch_i][:,None] != groups[batch_i][None,:]).float()
-                        gor_n = gor_Y.sum()
-                        if gor_n > 1:
-                            gor_X = (V_i@V_i.T)*gor_Y
-                            gor_m1 = 0.5*gor_X.sum()/gor_n
-                            gor_m2 = 0.5*(gor_X**2).sum()/gor_n
-                            batch_loss += regularization*(gor_m1 + torch.clamp(gor_m2 - 1/self.embedding_model.d,min=0))
-
                     h['batch_nan'] = torch.isnan(batch_loss.detach()).sum().item()
 
                     embedding_optimizer.zero_grad()
@@ -289,46 +272,6 @@ class SimilarityModel(nn.Module):
                     h['batch_pos_target'] = batch_Y.detach().mean().item()
 
                 self.history.append(h)
-                step += 1
-
-                if (validation_matches is not None) and not (step % validation_interval):
-
-                    validation = len(self.validation_scores)
-                    val_scores = self.test(validation_matches)
-                    val_scores['step'] = step - 1
-                    val_scores['epoch'] = epoch
-                    val_scores['validation'] = validation
-
-                    self.validation_scores.append(val_scores)
-
-                    # Print validation stats
-                    if verbose:
-                        print(f'\nValidation results at step {step} (current epoch {epoch})')
-                        for k,v in val_scores.items():
-                            print(f'    {k}: {v:.4f}')
-
-                        print(list(self.score_model.named_parameters()))
-
-                    # Update best saved model
-                    if restore_best:
-                        if val_scores[target] >= max(h[target] for h in self.validation_scores):
-                            best_state = deepcopy({
-                                            'state_dict':self.state_dict(),
-                                            'val_scores':val_scores
-                                            })
-
-                    if early_stopping and (validation - best_state['val_scores']['validation'] > early_stopping_patience):
-                        print(f'Stopping training ({early_stopping_patience} validation checks since best validation score)')
-                        break
-
-        if restore_best:
-            print(f"Restoring to best state (step {best_state['val_scores']['step']}):")
-            for k,v in best_state['val_scores'].items():
-                print(f'    {k}: {v:.4f}')
-
-            self.to('cpu')
-            self.load_state_dict(best_state['state_dict'])
-            self.to(self.device)
 
         return pd.DataFrame(self.history)
 

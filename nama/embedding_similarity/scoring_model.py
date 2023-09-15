@@ -15,14 +15,14 @@ class SimilarityScore(torch.nn.Module):
         self.alpha = torch.nn.Parameter(torch.tensor(float(alpha)))
 
     def __repr__(self):
-        return f'<nama.ExpCosSimilarity with {self.alpha=}>'
+        return f'<nama.SimilarityScore with {self.alpha=}>'
 
     def forward(self,X):
         # Z is a scaled distance measure: Z=0 means that the score should be 1
         Z = self.alpha*(1 - X)
         return torch.clamp(torch.exp(-Z),min=0,max=1.0)
 
-    def loss(self,X,Y,weights=None,decay=1e-6,epsilon=1e-6):
+    def loss(self,X,Y,weights=None,epsilon=1e-6):
 
         Z = self.alpha*(1 - X)
 
@@ -42,9 +42,6 @@ class SimilarityScore(torch.nn.Module):
 
         if weights is not None:
             loss *= weights*loss
-
-        if decay:
-            loss += decay*self.alpha**2
 
         return loss
 

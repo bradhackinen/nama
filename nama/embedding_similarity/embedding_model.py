@@ -9,13 +9,12 @@ class EmbeddingModel(torch.nn.Module):
     def __init__(self,
                     model_class=AutoModel,
                     model_name='roberta-base',
-                    pooling='pooler',
+                    pooling='cls',
                     normalize=True,
-                    d=128,
+                    d=None,
                     prompt='',
                     device='cpu',
                     add_upper=True,
-                    upper_case=False,
                     **kwargs):
 
         super().__init__()
@@ -27,7 +26,6 @@ class EmbeddingModel(torch.nn.Module):
         self.d = d
         self.prompt = prompt
         self.add_upper = add_upper
-        self.upper_case = upper_case
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -55,9 +53,7 @@ class EmbeddingModel(torch.nn.Module):
         if self.prompt is not None:
             strings = [self.prompt + s for s in strings]
         if self.add_upper:
-            strings = [s + ' </s> ' + s.upper() for s in strings]
-        if self.upper_case:
-            strings = [s + ' </s> ' + s.upper() for s in strings]
+            strings = [s + self.tokenizer.sep_token + s.upper() for s in strings]
 
         try:
             encoded = self.tokenizer(strings,padding=True,truncation=True)
