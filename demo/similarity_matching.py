@@ -43,8 +43,11 @@ print(test_data.to_df())
 # Load a pre-trained similarity model
 sim = nama.load_similarity_model(model_dir/'nama-256.bin')
 
-# Send the model to the GPU
-sim.to('cuda:0')
+try:
+    # Send the model to the GPU
+    sim.to('cuda')
+except:
+    print('GPU not available. Using CPU instead.')
 
 # Embed the strings using the similarity model
 # Note: With a large number of strings, this can take a while. GPU acceleration helps a lot.
