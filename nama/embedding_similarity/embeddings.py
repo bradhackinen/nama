@@ -108,12 +108,12 @@ class Embeddings(torch.nn.Module):
     def __len__(self):
         return len(self.strings)
 
-    def _group_to_ids(self,matches):
+    def _match_data_to_group_ids(self,matches):
         group_id_map = {g:i for i,g in enumerate(matches.groups.keys())}
         group_ids = torch.tensor([group_id_map[matches[s]] for s in self.strings]).to(self.device)
         return group_ids
 
-    def _ids_to_group(self,group_ids):
+    def _group_ids_to_match_data(self,group_ids):
         if isinstance(group_ids,torch.Tensor):
             group_ids = group_ids.to('cpu').numpy()
 
@@ -147,7 +147,8 @@ class Embeddings(torch.nn.Module):
         cos_threshold = self.score_model.score_to_cos(threshold)
 
         for batch_start in tqdm(range(0,len(self),batch_size),
-                                    delay=1,desc='Predicting matches',disable=not progress_bar):
+                                    desc='Predicting matches',delay=1,smoothing=0.01,
+                                    disable=not progress_bar):
 
             i_slice = slice(batch_start,batch_start+batch_size)
             j_slice = slice(batch_start+1,None)
@@ -170,7 +171,7 @@ class Embeddings(torch.nn.Module):
                     # Assign all matched embeddings to the same group
                     group_ids[ids_to_group] = g_i[k].clone()
 
-        return self._ids_to_group(group_ids)
+        return self._group_ids_to_match_data(group_ids)
 
     @torch.no_grad()
     def unite_similar(self,
@@ -229,7 +230,7 @@ class Embeddings(torch.nn.Module):
         # Use a simpler, faster prediction algorithm if possible
         if not (return_united or group_threshold or (never_match is not None)):
             if always_match is not None:
-                group_ids = self._group_to_ids(always_matches)
+                group_ids = self._match_data_to_group_ids(always_matches)
 
             return self._fast_unite_similar(
                         group_ids=group_ids,
@@ -290,8 +291,8 @@ class Embeddings(torch.nn.Module):
         matches = []
         cos_scores = []
         for batch_start in tqdm(range(0,len(self),batch_size),
-                                    desc='Scoring pairs',
-                                    delay=1,disable=not progress_bar):
+                                    desc='Scoring pairs',delay=1,smoothing=0.01,
+                                    disable=not progress_bar):
 
             i_slice = slice(batch_start,batch_start+batch_size)
             j_slice = slice(batch_start+1,None)
@@ -355,8 +356,9 @@ class Embeddings(torch.nn.Module):
             
 
             n_matches = matches.shape[0]
-            with tqdm(total=n_matches,desc='Uniting matches',
-                        delay=1,disable=not progress_bar) as p_bar:
+            with tqdm(total=n_matches,
+                        desc='Uniting matches',delay=1,smoothing=0.01,
+                        disable=not progress_bar) as p_bar:
 
                 while len(matches):
 
@@ -428,7 +430,7 @@ class Embeddings(torch.nn.Module):
                     p_bar.update(n_matches - matches.shape[0])
                     n_matches = matches.shape[0]
 
-        predicted_matches = self.ids_to_group(group_ids)
+        predicted_matches = self._group_ids_to_match_data(group_ids)
 
         if always_match is not None:
             predicted_matches = predicted_matches.unite(always_matches)
@@ -471,7 +473,7 @@ class Embeddings(torch.nn.Module):
 
         if always_matches is not None:
             # self = self.embed(always_matches)
-            group_ids = self._group_to_ids(always_matches)
+            group_ids = self._match_data_to_group_ids(always_matches)
         else:
             group_ids = torch.arange(len(self)).to(self.device)
 
@@ -485,7 +487,8 @@ class Embeddings(torch.nn.Module):
         is_seed[g_seed] = True
 
         for batch_start in tqdm(range(0,len(self),batch_size),
-                                    delay=1,desc='Predicting matches',disable=not progress_bar):
+                                    desc='Predicting matches',delay=1,smoothing=0.01,
+                                    disable=not progress_bar):
 
             batch_slice = slice(batch_start,batch_start+batch_size)
 
@@ -508,14 +511,16 @@ class Embeddings(torch.nn.Module):
                     # Assign matched strings to the target string's group
                     group_ids[i] = g_seed[max_seed[batch_i]]
 
-        return self._ids_to_group(group_ids)
+        return self._group_ids_to_match_data(group_ids)
 
     @torch.no_grad()
     def score_pairs(self,string_pairs,batch_size=64,progress_bar=True):
         string_pairs = np.array(string_pairs)
 
         scores = []
-        for batch_start in tqdm(range(0,string_pairs.shape[0],batch_size),desc='Scoring pairs',disable=not progress_bar):
+        for batch_start in tqdm(range(0,string_pairs.shape[0],batch_size),
+                                desc='Scoring pairs',delay=1,smoothing=0.01,
+                                disable=not progress_bar):
 
             V0 = self[string_pairs[batch_start:batch_start+batch_size,0]].V
             V1 = self[string_pairs[batch_start:batch_start+batch_size,1]].V
@@ -600,11 +605,14 @@ class Embeddings(torch.nn.Module):
 
         if matches is not None:
             self = self.embed(matches)
-            group_ids = self._group_to_ids(matches)
+            group_ids = self._match_data_to_group_ids(matches)
         else:
             group_ids = torch.arange(len(self)).to(self.device)
 
-        for batch_start in tqdm(range(0,len(self),batch_size),desc='Scoring pairs',disable=not progress_bar):
+        for batch_start in tqdm(range(0,len(self),batch_size),
+                                desc='Scoring pairs',delay=1,smoothing=0.01,
+                                disable=not progress_bar):
+            
             pairs,pair_groups,scores,losses = self._batch_scored_pairs(self,group_ids,batch_start,batch_size,**kwargs)
             for (s0,s1),(g0,g1),score,loss in zip(pairs,pair_groups,scores,losses):
                 yield {

@@ -1,5 +1,5 @@
 '''
-This script builds matchers from names that have been manually
+This script builds matchess from names that have been manually
 cleaned by the Center for Responsive Politics. The source data is available from
 www.opensecrets.org.
 
@@ -7,18 +7,22 @@ The opensecrets data loader module used in this script is available here:
 https://github.com/bradhackinen/opensecrets
 '''
 
+import os
 from pathlib import Path
 import pandas as pd
+import numpy as np
 import re
-# from unidecode import unidecode
 from collections import Counter
-
-import nama
-# from nama.config import data_dir
 
 import opensecrets
 
-data_dir = '/home/brad/Dropbox/Data/nama'
+import nama
+from nama.utils import simplify
+from nama.scoring import split_on_groups
+
+data_dir = Path(os.environ['NAMA_DATA'])
+
+
 
 def clean_name(s):
     # Standardise whitespace
@@ -32,89 +36,65 @@ def clean_name(s):
     # Drop raw strings that look like they contain multiple names
     # (sometimes "on behalf of" appears multiple times - drop these cases also)
     if re.search(r'([/\(\)\[\]\{\}]|f[/\.]?k[/\.]?a|formerly|\(for|doing business as|d/?b/?a)|on behalf of| OBO |in affiliation with',s,flags=re.IGNORECASE):
-        return ''
+        return np.nan
 
     return s
-
-
-def get_training_matcher(df,raw_col,clean_col):
-    df = df[[raw_col,clean_col]].dropna()
-
-    for c in raw_col,clean_col:
-        df[c] = df[c].apply(clean_name)
-        df = df[df[c].str.len() > 1]
-
-    # Collapse to counts
-    counts = Counter((s0,s1) for s0,s1 in df[[raw_col,clean_col]].values)
-    counts.update((s,s) for s in df[clean_col])
-
-    """
-    Some raw names are associated with multiple different clean names (reason is unclear)
-    In these cases, keep only the most common clean name associated with each raw name.
-    """
-    df = pd.DataFrame(((s0,s1,c) for (s0,s1),c in counts.most_common()),columns=['string0','string1','count']) \
-            .groupby('string0') \
-            .first() \
-            .reset_index()
-
-    matcher = nama.from_df(df,string_column='string0',group_column='string1',count_column='count')
-
-    return matcher
 
 
 # Load cleaned and raw client strings from lobbying data
 print('Loading filings data')
 filings_df = opensecrets.load_df('lobbying.filings')
 
-for c in 'client','registrant':
-    print(f'Building {c} matcher')
-    matcher = get_training_matcher(filings_df,f'{c}_raw',c)
-    save_name = Path(root_dir)/'training'/'data'/f'opensecrets_{c}s.csv'
-    print(f'Saving {c} matcher as {save_name}')
-    matcher.to_csv(save_name)
+print('Getting string pairs')
+raw_df = (pd.concat([
+            filings_df[['client_raw','client']]
+                .dropna()
+                .rename(columns={'client_raw':'raw','client':'clean'}),
+            filings_df[['client']]
+                .dropna()
+                .rename(columns={'client':'clean'})
+                .assign(raw=lambda df: df['clean']),
+            filings_df[['registrant_raw','registrant']]
+                .dropna()
+                .rename(columns={'registrant_raw':'raw','registrant':'clean'}),        
+            filings_df[['registrant']]
+                .dropna()
+                .rename(columns={'registrant':'clean'})
+                .assign(raw=lambda df: df['clean']),
+            ])
+            .assign(count=1)
+            .groupby(['raw','clean'])[['count']].sum()
+            .reset_index()
+            .assign(raw=lambda df: df['raw'].apply(clean_name))
+            .dropna())
 
-# s = 'the Washington Group on behalf of SoundExchange'
-c = 'client_raw'
+# Some raw names are associated with multiple different clean names (reason is unclear)
+# In these cases, keep only the most common clean name associated with each raw name.
+raw_df = (raw_df
+            .sort_values('count',ascending=False)
+            .drop_duplicates(subset=['raw'],keep='first'))
 
-filings_df[filings_df[c].astype(str).str.contains('Piramal')].T
+# Add uppercase strings
+upper_df = raw_df.assign(raw = lambda df: df['raw'].str.upper())
+
+raw_df = (pd.concat([raw_df,upper_df])
+          .drop_duplicates(subset=['raw'],keep='first'))
+
+print('Compiling match data')
+# Build match data
+matches = nama.from_df(raw_df,
+                    string_column='raw',
+                    group_column='clean',
+                    count_column='count')
+
+# Unite by simplify - want to make sure we aren't missing easy matches
+matches = matches.unite(simplify)
 
 
-df = filings_df[filings_df[c].astype(str).str.contains('Piramal')][[c]] \
-    .value_counts() \
-    .to_frame('count') \
-    .reset_index()
+# Save files
+matches.to_csv(data_dir/'training_data'/'opensecrets_all_matches.csv')
 
-df['clean'] = df['client_raw'].apply(clean_name)
+train,test = split_on_groups(matches,0.8,seed=1)
 
-
-# # load donation org strings
-# print('Loading donor employer data')
-# donors_df = opensecrets.load_df('campaign_finance.individual',fields=['org_name','employer'])
-#
-# print(f'Building donor employer matcher')
-# matcher = get_training_matcher(filings_df,'employer','org_name')
-# save_name = Path(root_dir)/'training'/'data'/f'opensecrets_employers.csv'
-# print(f'Saving donor employer matcher as {save_name}')
-# matcher.to_csv(save_name)
-#
-#
-# df = matcher.to_df()
-#
-# df2 = df[df['group'] != '!BEW LO 58']
-# df3 = df2[df2['group'] != '!ST AMERICAN']
-# df4 = df3[df3['count']>1]
-#
-# df[df['group'].str.startswith('{')]['group'].value_counts()
-# df[df['group'].str.startswith('#')]['group'].value_counts()
-#
-# df3.head(50)
-#
-#
-# df3.sample(50)
-#
-# df4.sample(50)
-#
-#
-clients_df = pd.read_csv(Path(root_dir)/'training'/'data'/'opensecrets_clients.csv')
-#
-# clients_df[clients_df['string'].str.contains('on behalf of',case=False)].sample(50)
+train.to_csv(data_dir/'training_data'/'opensecrets_train.csv')
+test.to_csv(data_dir/'training_data'/'opensecrets_test.csv')

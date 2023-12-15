@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -7,12 +8,12 @@ import matplotlib.pyplot as plt
 
 import nama
 from nama.scoring import score_predicted, split_on_groups
-from nama.embedding_similarity import EmbeddingSimilarityModel, load_similarity_model
+from nama import SimilarityModel, load_similarity_model
 
-data_dir = Path('/home/brad/Dropbox/Data/nama')
+data_dir = Path(os.environ['NAMA_DATA'])
 
-gold = nama.read_csv(Path(data_dir)/'training_data'/'combined_train_no_compound.csv')
-# gold_upper = nama.read_csv(data_dir/'training_data'/'combined_train_upper_case.csv')
+gold = nama.read_csv(Path(data_dir)/'training_data'/'combined_train.csv')
+
 
 
 train_kwargs = {
@@ -27,10 +28,10 @@ train_kwargs = {
                 }
 
 model_defs = {
-    'nama-64':{'d':64,'model_name':'roberta-base'},
+    # 'nama-64':{'d':64,'model_name':'roberta-base'},
     'nama-128':{'d':128,'model_name':'roberta-base'},
-    'nama-256':{'d':256,'model_name':'roberta-base'},
-    'nama-768':{'d':None,'model_name':'roberta-base'},
+    # 'nama-256':{'d':256,'model_name':'roberta-base'},
+    # 'nama-768':{'d':None,'model_name':'roberta-base'},
     # 'nama_large':{'d':256,'model_name':'roberta-large'},
     }
 
@@ -39,8 +40,8 @@ for model_name,hparams in model_defs.items():
 
     print(f'Training {model_name}')
 
-    sim = EmbeddingSimilarityModel(prompt='Organization: ',**hparams)
-    sim.to('cuda:3')
+    sim = SimilarityModel(prompt='Organization: ',**hparams)
+    sim.to('cuda:2')
 
     history_df = sim.train(gold,verbose=True,**train_kwargs)
 
@@ -65,7 +66,7 @@ for model_name in model_defs.keys():
     print(f'Verifying {model_name}')
 
     sim = load_similarity_model(Path(data_dir)/'models'/f'{model_name}.bin')
-    sim.to('cuda:2')
+    sim.to('cuda:1')
 
     for half in False,True:
 
@@ -76,7 +77,7 @@ for model_name in model_defs.keys():
 
         for threshold in tqdm(np.linspace(0,1,21),desc='scoring'):
 
-            pred = test_embeddings.predict(threshold=threshold,progress_bar=False)
+            pred = test_embeddings.unite_similar(threshold=threshold,progress_bar=False)
 
             scores = score_predicted(pred,test,use_counts=train_kwargs['use_counts'])
 
