@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 import nama
 from nama.scoring import score_predicted, split_on_groups

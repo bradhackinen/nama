@@ -25,9 +25,7 @@ class Embeddings(torch.nn.Module):
         self.string_map = {s:i for i,s in enumerate(strings)}
         self.V = V
         self.counts = counts
-        # self.w = weighting_function(counts)
         self.score_model = score_model
-        # self.weighting_function = weighting_function
         self.device = device
 
         self.to(device)
@@ -39,7 +37,6 @@ class Embeddings(torch.nn.Module):
         super().to(device)
         self.V = self.V.to(device)
         self.counts = self.counts.to(device)
-        # self.w = self.w.to(device)
         self.score_model.to(device)
         self.device = device
 
@@ -53,9 +50,6 @@ class Embeddings(torch.nn.Module):
 
             # Write score model
             zip.writestr('score_model.pkl',pickle.dumps(self.score_model))
-
-            # # Write score model
-            # zip.writestr('weighting_function.pkl',pickle.dumps(self.weighting_function))
 
             # Write string info
             strings_df = pd.DataFrame().assign(
@@ -91,7 +85,6 @@ class Embeddings(torch.nn.Module):
         new.strings = self.strings[i]
         new.V = self.V[i]
         new.counts = self.counts[i]
-        # new.w = self.w[i]
         new.string_map = {s:i for i,s in enumerate(new.strings)}
 
         return new
@@ -102,7 +95,6 @@ class Embeddings(torch.nn.Module):
         """
         new = self[matches]
         new.counts = torch.tensor([matches.counts[s] for s in new.strings],device=self.device)
-        new.w = new.weighting_function(new.counts)
 
         return new
 
@@ -621,58 +613,6 @@ class Embeddings(torch.nn.Module):
 
 
 
-    # def inner_join(self,left_strings,right_strings,threshold=0,progress_bar=True,batch_size=64):
-    #     """
-    #     Match left strings to right strings, and return a dataframe of scored pairs.
-
-    #     - "theshold" sets the minimimum match similarity required between the left and right strings.
-
-    #     returns: pd.DataFrame with columns ['i','j','score']
-    #     """
-
-    #     V = self.V
-    #     cos_threshold = self.score_model.score_to_cos(threshold)
-
-    #     left_ids = torch.tensor([self.string_map[s] for s in left_strings]).to(self.device)
-    #     right_ids = torch.tensor([self.string_map[s] for s in right_strings]).to(self.device)
-
-    #     left_V = V[left_ids]
-    #     right_V = V[right_ids]
-
-    #     pairs = []
-    #     scores = []
-    #     for batch_start in tqdm(range(0,len(left_strings),batch_size),
-    #                                 desc='Joining Pairs',delay=1,smoothing=0.01,
-    #                                 disable=not progress_bar):
-
-    #         batch_slice = slice(batch_start,batch_start+batch_size)
-
-    #         batch_cos = left_V[batch_slice]@right_V.T
-
-    #         batch_i,batch_j = torch.nonzero(batch_cos > cos_threshold,as_tuple=True)
-
-    #         if len(batch_i):
-    #             # Get indices of matched strings
-    #             i = batch_i + batch_start
-    #             j = batch_j
-
-    #             # Assign matched strings to the target string's group
-    #             left_group_ids[i] = right_group_ids[j]
-
-    #             batch_scores = self.score_model(batch_cos[batch_i,batch_j])
-
-    #             scores.append(batch_scores.cpu().numpy())
-
-    #     scores = np.hstack(scores)
-
-    #     return pd.DataFrame({
-    #                         'i':left_strings,
-    #                         'j':right_strings,
-    #                         'score':scores,
-    #                         })
-
-
-    
 
     @torch.no_grad()
     def score_pairs(self,string_pairs,batch_size=64,progress_bar=True):
@@ -692,76 +632,6 @@ class Embeddings(torch.nn.Module):
             scores.append(batch_scores.cpu().numpy())
 
         return np.concatenate(scores)
-
-    # @torch.no_grad()
-    # def _batch_scores(self,group_ids,batch_start,batch_size,
-    #                         is_match=None,
-    #                         min_score=None,max_score=None,
-    #                         min_loss=None,max_loss=None):
-
-    #     strings = self.strings
-    #     V = self.V
-    #     w = self.w
-
-    #     # Create simple slice objects to avoid creating copies with advanced indexing
-    #     i_slice = slice(batch_start,batch_start+batch_size)
-    #     j_slice = slice(batch_start+1,None)
-
-    #     X = V[i_slice]@V[j_slice].T
-    #     Y = (group_ids[i_slice,None] == group_ids[None,j_slice]).float()
-    #     if w is not None:
-    #         W = w[i_slice,None]*w[None,j_slice]
-    #     else:
-    #         W = None
-
-    #     scores = self.score_model(X)
-    #     loss = self.score_model.loss(X,Y,weights=W)
-
-    #     # Search upper diagonal entries only
-    #     # (note j_slice starting index is offset by one)
-    #     scores = torch.triu(scores)
-
-    #     # Filter by match type
-    #     if is_match is not None:
-    #         if is_match:
-    #             scores *= Y
-    #         else:
-    #             scores *= (1 - Y)
-
-    #     # Filter by min score
-    #     if min_score is not None:
-    #         scores *= (scores >= min_score)
-
-    #     # Filter by max score
-    #     if max_score is not None:
-    #         scores *= (scores <= max_score)
-
-    #     # Filter by min loss
-    #     if min_loss is not None:
-    #         scores *= (loss >= min_loss)
-
-    #     # Filter by max loss
-    #     if max_loss is not None:
-    #         scores *= (loss <= max_loss)
-
-    #     # Collect scored pairs
-    #     i,j = torch.nonzero(scores,as_tuple=True)
-
-    #     pairs = np.hstack([
-    #                             strings[i.cpu().numpy() + batch_start][:,None],
-    #                             strings[j.cpu().numpy() + (batch_start + 1)][:,None]
-    #                             ])
-
-    #     pair_groups = np.hstack([
-    #                             strings[group_ids[i + batch_start].cpu().numpy()][:,None],
-    #                             strings[group_ids[j + (batch_start + 1)].cpu().numpy()][:,None]
-    #                             ])
-
-    #     pair_scores = scores[i,j].cpu().numpy()
-    #     pair_losses = loss[i,j].cpu().numpy()
-
-    #     return pairs,pair_groups,pair_scores,pair_losses
-    
 
     @torch.no_grad()
     def get_mean_loss(self,matches,batch_size=64,progress_bar=True,weight_by_counts=False,weight_exponent=0.5,**kwargs):
@@ -817,7 +687,6 @@ def load_embeddings(f):
     """
     with ZipFile(f,'r') as zip:
         score_model = pickle.loads(zip.read('score_model.pkl'))
-        weighting_function = pickle.loads(zip.read('weighting_function.pkl'))
         strings_df = pd.read_csv(zip.open('strings.csv'),na_filter=False)
         V = np.load(zip.open('V.npy'))
 
@@ -825,7 +694,6 @@ def load_embeddings(f):
                             strings=strings_df['string'].values,
                             counts=torch.tensor(strings_df['count'].values),
                             score_model=score_model,
-                            weighting_function=weighting_function,
                             V=torch.tensor(V)
                             )
 

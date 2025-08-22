@@ -13,6 +13,7 @@ import requests
 from io import BytesIO
 from grad_cache import GradCache
 import time
+import datetime
 
 from ..match_data import MatchData
 from ..scoring import score_predicted
@@ -23,19 +24,6 @@ from .embedding_model import EmbeddingModel
 logging.set_verbosity_error()
 
 
-# class ExponentWeights():
-#     def __init__(self,weighting_exponent=0.5,**kwargs):
-#         self.exponent = weighting_exponent
-
-#     def __call__(self,counts):
-#         return counts**self.exponent
-
-# class UnitWeights():
-#     def __init__(self,**kwargs):
-#         pass
-
-#     def __call__(self,counts):
-#         return torch.ones_like(counts)
 
 
 class SimilarityModel(nn.Module):
@@ -58,9 +46,7 @@ class SimilarityModel(nn.Module):
 
         self.embedding_model = embedding_class(**kwargs)
         self.score_model = score_class(**kwargs)
-        # self.weighting_function = weighting_class(**kwargs)
         self.config = kwargs
-        # self.n_train_groups = None
 
         self.to(kwargs.get('device','cpu'))
 
@@ -120,16 +106,12 @@ class SimilarityModel(nn.Module):
                 batch_start += len(batch_strings)
 
         score_model = deepcopy(self.score_model)
-        # score_model.load_state_dict(self.score_model.state_dict())
         score_model.to(to)
-
-        # weighting_function = deepcopy(self.weighting_function)
 
         return Embeddings(strings=strings,
                             counts=counts.detach(),
                             V=V.detach(),
                             score_model=score_model,
-                            # weighting_function=weighting_function,
                             device=to)
 
     def train(self,training_matches,max_epochs=1,batch_size=8,grad_acc=1,top_k=1,batch_top_k=False,
@@ -371,9 +353,6 @@ class SimilarityModel(nn.Module):
 
                 
 
-        # # Set the n_train_groups attribute of the score model
-        # self.score_model.n_train_groups = len(training_matches.groups())
-        # self.n_train_groups = len(training_matches.groups())
 
         return pd.DataFrame(self.history)
 
@@ -407,36 +386,12 @@ class SimilarityModel(nn.Module):
         config.update({
             'score_class':      self.score_model.__class__.__name__,
             'embedding_class':  self.embedding_model.__class__.__name__,
-            # 'weighting_class':  self.weighting_function.__class__.__name__,
         })
         torch.save({
             'state_dict': self.state_dict(),
             'config': config
         }, path)
 
-#     @classmethod
-#     def load(cls, path, *args, **kwargs):
-#         ckpt   = torch.load(path, map_location='cpu')
-#         config = ckpt.get('config', {})
-
-#         # look up module where SimilarityModel is defined
-#         module = sys.modules[cls.__module__]
-
-#         # find the recorded classes (fallback to the class’s defaults if missing)
-#         score_cls = getattr(module, config.get('score_class'),      cls.score_class)
-#         embed_cls = getattr(module, config.get('embedding_class'),  cls.embedding_class)
-
-#         # inject into constructor kwargs
-#         kwargs.setdefault('score_class',     score_cls)
-#         kwargs.setdefault('embedding_class', embed_cls)
-
-#         model = cls(*args, **kwargs)
-#         model.load_state_dict(ckpt['state_dict'])
-#         return model
-
-
-# def debug_state_dict(f, **kwargs):
-#     return torch.load(f, map_location='cpu', **kwargs)
 
 def _load_old_similarity_model(f, map_location='cpu', **kwargs):
 
@@ -481,18 +436,8 @@ def load_similarity_model(f,map_location='cpu',strict=True,**kwargs):
     model.load_state_dict(checkpoint['state_dict'],strict=strict)
 
     return model
-    #return torch.load(f,map_location=map_location,**kwargs)
 
 
-# def load_pretrained_model(model='base', map_location='cpu', **kwargs):
-
-#     if model.lower() not in ["base"]:
-#         raise ValueError("Model must be 'base'")
-
-#     response = requests.get(f"https://huggingface.co/beny2000/nama/resolve/main/nama-{model.lower()}.bin")
-#     model_data = BytesIO(response.content)
-    
-#     return load_similarity_model(model_data, map_location=map_location, **kwargs)
     
 
 class ContrastiveModel(SimilarityModel):
@@ -503,14 +448,12 @@ class ContrastiveModel(SimilarityModel):
     """
     def __init__(self,
                  embedding_class=EmbeddingModel,
-                #  weighting_class=ExponentWeights,
                  loss_type='NTXent',
                  **kwargs):
         # Initialize parent class with ContrastiveLossScore
         super().__init__(
             embedding_class=embedding_class,
             score_class=CosineSimilarityScore,
-            # weighting_class=weighting_class,
             **kwargs
         )
 
@@ -626,7 +569,7 @@ class ContrastiveModel(SimilarityModel):
                 embedding_optimizer.step()
                 embedding_scheduler.step()
 
-                h = {'epoch': epoch, 'step': step,'time':datetime.datetime.now()}
+                h = {'epoch': epoch, 'step': step, 'time': datetime.datetime.now()}
                 h['batch_loss'] = loss.detach().mean().item()
                 h['batch_obs'] = len(batch_groups)
                 try:

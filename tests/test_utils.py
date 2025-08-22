@@ -1,7 +1,4 @@
 import pytest
-import sys
-sys.path.append("/home/ben/Code/nama/nama-git")
-print(sys.path)
 from nama.utils import simplify, simplify_corp
 
 
