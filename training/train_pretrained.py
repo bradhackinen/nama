@@ -12,7 +12,7 @@ from nama import SimilarityModel, load_similarity_model
 
 data_dir = Path(os.environ['NAMA_DATA'])
 
-gold = nama.read_csv(Path(data_dir)/'training_data'/'combined_train.csv')
+gold = nama.read_csv(Path(data_dir)/'training_data'/'processed'/'gpt_reviewed_matches.csv')
 
 
 
@@ -22,13 +22,13 @@ train_kwargs = {
                 'transformer_lr':5e-6,
                 'score_lr':30,
                 'alpha':20,
-                'use_counts':True,
+                'use_counts':False,
                 'batch_size':6,
                 'add_upper':True,
                 }
 
 model_defs = {
-    # 'nama-64':{'d':64,'model_name':'roberta-base'},
+    'nama-64':{'d':64,'model_name':'roberta-base'},
     'nama-128':{'d':128,'model_name':'roberta-base'},
     # 'nama-256':{'d':256,'model_name':'roberta-base'},
     # 'nama-768':{'d':None,'model_name':'roberta-base'},

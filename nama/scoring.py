@@ -2,7 +2,7 @@ import pandas as pd
 import random
 
 
-def confusion_df(predicted_matches, gold_matches, use_counts=True):
+def get_confusion_df(predicted_matches, gold_matches, use_counts=False):
     """
     Computes the confusion matrix dataframe for a predicted match groups object relative to a gold match groups object.
     Self-matches are excluded from the counts.
@@ -47,7 +47,7 @@ def confusion_df(predicted_matches, gold_matches, use_counts=True):
     return df
 
 
-def confusion_matrix(predicted_matches, gold_matches, use_counts=True):
+def get_confusion_matrix(predicted_matches, gold_matches, use_counts=False):
     """
     Computes the confusion matrix for a predicted match groups object relative to a gold match groups object.
     Self-matches are excluded from the counts.
@@ -67,12 +67,12 @@ def confusion_matrix(predicted_matches, gold_matches, use_counts=True):
         Dictionary with keys 'TP', 'FP', 'TN', and 'FN', representing the values in the confusion matrix.
     """
 
-    df = confusion_df(predicted_matches, gold_matches, use_counts=use_counts)
+    df = get_confusion_df(predicted_matches, gold_matches, use_counts=use_counts)
 
-    return {c: df[c].sum() // 2 for c in ['TP', 'FP', 'TN', 'FN']}
+    return {c: int(df[c].sum() // 2) for c in ['TP', 'FP', 'TN', 'FN']}
 
 
-def score_predicted(predicted_matches,gold_matches,use_counts=True):
+def score_predicted(predicted_matches,gold_matches,use_counts=False):
     """
     Computes the pairwise F1 and other scores for a predicted match groups object relative to a gold match groups object
     which is assumed to be correct. Matches between a string and itself are excluded from scoring.
@@ -94,7 +94,7 @@ def score_predicted(predicted_matches,gold_matches,use_counts=True):
         Dictionary with keys 'accuracy', 'precision', 'recall', 'F1', and 'coverage'.
     """
 
-    scores = confusion_matrix(
+    scores = get_confusion_matrix(
         predicted_matches,
         gold_matches,
         use_counts=use_counts)

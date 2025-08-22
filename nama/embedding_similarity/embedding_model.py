@@ -1,5 +1,6 @@
 import torch
 from transformers import AutoTokenizer,AutoModel
+from torch.utils.checkpoint import checkpoint
 
 class EmbeddingModel(torch.nn.Module):
     """
@@ -15,6 +16,8 @@ class EmbeddingModel(torch.nn.Module):
                     prompt='',
                     device='cpu',
                     add_upper=True,
+                    use_checkpointing=False,
+                    trust_remote_code=False,
                     **kwargs):
 
         super().__init__()
@@ -26,15 +29,18 @@ class EmbeddingModel(torch.nn.Module):
         self.d = d
         self.prompt = prompt
         self.add_upper = add_upper
+        self.use_checkpointing = use_checkpointing
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name,trust_remote_code=trust_remote_code)
 
         try:
-            self.transformer = model_class.from_pretrained(model_name)
+            self.transformer = model_class.from_pretrained(model_name,trust_remote_code=trust_remote_code)
+            if use_checkpointing:
+                self.transformer.gradient_checkpointing_enable()
         except OSError:
-            self.transformer = model_class.from_pretrained(model_name,from_tf=True)
-
-        self.dropout = torch.nn.Dropout(0.5)
+            self.transformer = model_class.from_pretrained(model_name,from_tf=True,trust_remote_code=trust_remote_code)
+            if use_checkpointing:
+                self.transformer.gradient_checkpointing_enable()
 
         if d:
             # Project embedding to a lower dimension
@@ -44,6 +50,16 @@ class EmbeddingModel(torch.nn.Module):
             torch.nn.init.constant_(self.projection.bias,0)
 
         self.to(device)
+
+    def enable_checkpointing(self):
+        """Enable gradient checkpointing for memory efficiency"""
+        self.use_checkpointing = True
+        self.transformer.gradient_checkpointing_enable()
+
+    def disable_checkpointing(self):
+        """Disable gradient checkpointing"""
+        self.use_checkpointing = False
+        self.transformer.gradient_checkpointing_disable()
 
     def to(self,device):
         super().to(device)
@@ -67,16 +83,25 @@ class EmbeddingModel(torch.nn.Module):
 
     def forward(self,strings):
 
+        if isinstance(strings,str):
+            strings = [strings]
+
         with torch.no_grad():
             input_ids,attention_mask = self.encode(strings)
 
             input_ids = input_ids.to(device=self.device)
             attention_mask = attention_mask.to(device=self.device)
 
-        # with amp.autocast(self.amp):
-        batch_out = self.transformer(input_ids=input_ids,
-                                        attention_mask=attention_mask,
-                                        return_dict=True)
+        # Use gradient checkpointing if enabled
+        if self.use_checkpointing:
+            batch_out = checkpoint(self.transformer,
+                                 input_ids=input_ids,
+                                 attention_mask=attention_mask,
+                                 return_dict=True)
+        else:
+            batch_out = self.transformer(input_ids=input_ids,
+                                       attention_mask=attention_mask,
+                                       return_dict=True)
 
         if self.pooling == 'pooler':
             v = batch_out['pooler_output']

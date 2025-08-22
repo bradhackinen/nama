@@ -704,6 +704,7 @@ def from_df(
         pair_columns=[
             'string0',
             'string1'],
+        match_column=None,
     string_column='string',
     group_column='group',
         count_column='count'):
@@ -812,6 +813,10 @@ def from_df(
         # TODO: Allow pairs data to use counts
         for pair_column in pair_columns:
             matches.add_strings(df[pair_column].values, inplace=True)
+
+        if match_column is not None:
+            # Filter the dataframe to only include rows where the match column is True
+            df = df[df[match_column]]
 
         # There are several ways to unite pairs
         # Guessing it is most efficient to "group by" one of the string columns

@@ -30,6 +30,10 @@ conda create --name <env-name>
 conda activate <env-name>
 ```
 
+
+
+
+
 6. Download & Install [`pytorch-mutex`](https://anaconda.org/pytorch/pytorch-mutex/1.0/download/noarch/pytorch-mutex-1.0-cuda.tar.bz2)
 ```
 conda install pytorch-mutex-1.0-cuda.tar.bz2

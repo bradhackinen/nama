@@ -1,4 +1,7 @@
 import re
+import nama
+import pandas as pd
+from collections import Counter
 
 
 # Preprocessors
@@ -18,7 +21,7 @@ def simplify(s):
         The simplified string.
     """
     s = s.lower()
-    s = re.sub(' & ', ' and ', s)
+    s = re.sub('&', ' and ', s)
     s = re.sub(r'(?<=\S)[\'’´\.](?=\S)', '', s)
     s = re.sub(r'[\s\.,!@#$%^&*:;/\'"`´‘’“”\(\)_—\-]+', ' ', s)
     s = s.strip()
@@ -57,119 +60,81 @@ def simplify_corp(s):
     return s
 
 
-# MatchData Tools
+def get_always_never_match_conflicts(always_match, never_match):
 
-# def plot(matches, strings, matches_names=None, ax=None):
-#     """
-#     Plots strings and their parent groups for multiple matches as a graph, with
-#     groups represented as nodes that connect strings.
+    # Convert always_match to a MatchData object
+    if not isinstance(always_match, nama.MatchData):
+        if isinstance(always_match[0], str):
+            always_match = [always_match]
 
-#     Parameters
-#     ----------
-#     matches : MatchData or list of MatchData
-#         a matches or list of matches to plot
-#     strings : str or list of str
-#         a string or list of strings to plot (all connected strings will also be plotted)
-#     matches_names : list of str, optional
-#         a list of strings to label matches in the plot legend
-#     ax : matplotlib.axes._subplots.AxesSubplot, optional
-#         a matplotlib axis object to draw the plot on.
+        strings = [s for g in always_match for s in g]
 
-#     Returns
-#     -------
-#     matplotlib.axes._subplots.AxesSubplot
-#         The matplotlib axis object with the plot.
-#     """
+        always_match = nama.MatchData(strings).unite(always_match)
 
-#     if isinstance(matches, MatchData):
-#         matches = [matches]
+    # Ensure never_match is a nested list
+    if all(isinstance(s,str) for s in never_match):
+        never_match = [never_match]
+    
+    always_match_labels = always_match.labels
 
-#     if isinstance(strings, str):
-#         strings = [strings]
+    # Find conflicts between never_match and always_match groups
+    conflicts = []
+    for g in never_match:
+        g = sorted(list(g))
+        g_labels = [always_match_labels.get(s,s) for s in g]
+        g_label_counts = Counter(g_labels)
+        if len(g_label_counts) < len(g):
+            for label,count in g_label_counts.items():
+                if count > 1:
+                    conflict = {'conflict_strings':[s for i,s in enumerate(g) if g_labels[i]==label],
+                                'never_match_group':g,
+                                'always_match_group':always_match.groups[label]}
+                    
+                    conflicts.append(conflict)
 
-#     if not matches_names:
-#         matches_names = [f'matches{i}' for i in range(len(matches))]
-#     elif not (len(matches_names) == len(matches)):
-#         raise ValueError('matches_names must be the same length as matches')
+    return conflicts
 
-#     def varname(x): return f'{x=}'.split('=')[0]
 
-#     # First build graph representation of the parent groups
-#     G = nx.Graph()
-#     for i, matches in enumerate(matches):
-#         m_groups = set(matches[strings])
-#         for g in m_groups:
-#             group_node = f'{matches_names[i]}: {g}'
-#             string_nodes = matches.groups[g]
-#             G.add_nodes_from(string_nodes, type='string', color='w')
-#             if len(string_nodes) > 1:
-#                 G.add_nodes_from(
-#                     [group_node],
-#                     type='group',
-#                     color=f'C{i}',
-#                     label=group_node)
-#                 nx.add_star(G, [group_node] + string_nodes, color=f'C{i}')
+def check_always_never_match_conflicts(always_match, never_match,always_never_conflicts='error'):
+    """
+    Check for conflicts between always_match and never_match groups.
+    If a conflict is found, raise a ValueError with the details of the conflict.
 
-#     # Now plot graph components in a grid
-#     components = sorted(nx.connected_components(G), key=len, reverse=True)
+    Parameters
+    ----------
+    always_match : list
+        List of strings or MatchData objects that should always match.
+    never_match : list
+        List of strings or MatchData objects that should never match.
 
-#     n_grid = int(np.ceil(np.sqrt(len(components))))
-#     grid_xy = [(x, -y) for y in range(n_grid) for x in range(n_grid)]
+    Raises
+    ------
+    ValueError
+        If a conflict is found between always_match and never_match groups.
+    """
 
-#     if ax is None:
-#         fig, ax = plt.subplots()
+    assert always_never_conflicts in ['error','warn','ignore'], 'always_never_conflicts must be one of "error", "warn", or "ignore"'
+    
+    conflicts = get_always_never_match_conflicts(always_match,never_match)
 
-#     for i, component in enumerate(components):
-#         G_sub = G.subgraph(component)
+    if conflicts:
+        if always_never_conflicts != 'ignore':
+            
+            conflicts_text = '\n'.join([f'{conflict["conflict_strings"]}' for conflict in conflicts])
 
-#         x0, y0 = grid_xy[i]
+            if always_never_conflicts == 'warn':
+                warning_text = '\n'.join([
+                                    f'The following groups of strings are required to always match *and* never match:',
+                                    conflicts_text,
+                                    'always_match relationships will take precedence.',
+                                    'Use nama.utils.get_always_never_conflicts to see more information about the conflicts.'])
+                print(warning_text)
 
-#         # Position nodes
-#         if len(component) > 1:
-#             pos = nx.random_layout(G_sub)
-#             pos = nx.kamada_kawai_layout(G_sub, pos=pos, scale=0.25)
-#             pos = {n: (x0 + x, y0 + y) for n, (x, y) in pos.items()}
-#         else:
-#             pos = {list(component)[0]: (x0, y0)}
-
-#         edges = list(G_sub.edges(data=True))
-
-#         edge_coord = [[pos[n0], pos[n1]] for n0, n1, d in edges]
-#         edge_colors = [mplt.colors.to_rgba(d['color']) for n0, n1, d in edges]
-
-#         lc = mplt.collections.LineCollection(
-#             edge_coord, color=edge_colors, zorder=0)
-
-#         ax.add_collection(lc)
-
-#         for node, d in G_sub.nodes(data=True):
-#             x, y = pos[node]
-#             if d['type'] == 'group':
-#                 ax.scatter(
-#                     x,
-#                     y,
-#                     color=mplt.colors.to_rgb(
-#                         d['color']),
-#                     label=d['label'],
-#                     s=50,
-#                     zorder=2)
-#             else:
-#                 ax.scatter(x, y, color='w', s=200, zorder=1)
-#                 ax.text(x, y, node, ha='center', va='center', zorder=3)
-
-#     ax.axis('off')
-
-#     legend_handles = [
-#         mplt.lines.Line2D(
-#             [],
-#             [],
-#             color=mplt.colors.to_rgb(f'C{i}'),
-#             markersize=15,
-#             marker='.',
-#             label=f'{name}') for i,
-#         name in enumerate(matches_names)]
-#     plt.legend(handles=legend_handles,
-#                bbox_to_anchor=(0.5, -0.2), loc='lower center',
-#                ncol=3, borderaxespad=0)
-
-#     return ax
+            else:
+                error_text = '\n'.join([
+                                    f'The following groups of strings are required to always match *and* never match:',
+                                    conflicts_text,
+                                    'Use nama.utils.get_always_never_conflicts to see more information about the conflicts.'])
+                    
+                raise ValueError(error_text)
+                    

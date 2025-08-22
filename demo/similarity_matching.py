@@ -47,7 +47,7 @@ try:
     # Send the model to the GPU
     sim.to('cuda')
 except:
-    print('GPU not available. Using CPU instead.')
+    print('CUDA GPU not available. Using CPU instead.')
 
 # Embed the strings using the similarity model
 # Note: With a large number of strings, this can take a while. GPU acceleration helps a lot.
@@ -103,9 +103,9 @@ print(matches.to_df().sort_values('count',ascending=False))
 # lists with additional groups of strings that should be matched or separated.
 
 
-# Finally, we might want to review the pairs that were matched or separated. 
+# Finally, we might want to review the specific pairs that were matched. 
 # Setting return_united=True returns an additional list of pairs that were united
-# to construct the final matc groups. Reviewing pairs with moderate similarity can
+# to construct the final match groups. Reviewing pairs with moderate similarity can
 # be an effecient way to identify additional manual matches and separations.
 
 matches,united_df = embeddings.unite_similar(
